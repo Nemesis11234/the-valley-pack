@@ -73,6 +73,46 @@ def modrinth_lookup(sha1s):
 
 
 REDIST = json.loads((Path(__file__).parent / "redistributable.json").read_text(encoding="utf-8"))
+EXCLUDE = set(json.loads((Path(__file__).parent / "exclude.json").read_text(encoding="utf-8"))["files"])
+
+
+def strip_pack_refs(names):
+    """제외한 파일을 가리키는 팩 설정을 정리한다 (게임 안 경고·리소스팩 오류 방지)."""
+    # 1) 팩 자체의 '빠진 모드 알림' 목록
+    mmc = PACK / "config" / "missing_mods_checker.json"
+    if mmc.exists():
+        items = json.loads(mmc.read_text(encoding="utf-8"))
+        kept = [x for x in items if not any(re.fullmatch(x.get("pattern", "$^"), n) for n in names)]
+        if len(kept) != len(items):
+            mmc.write_text(json.dumps(kept, ensure_ascii=False, indent=4) + "\n", encoding="utf-8")
+            print(f"  · missing_mods_checker에서 {len(items) - len(kept)}개 제거")
+    # 2) 기본 리소스팩 목록
+    refs = {f"file/{n}" for n in names}
+    rpo = PACK / "config" / "resourcepackoverrides.json"
+    if rpo.exists():
+        data = json.loads(rpo.read_text(encoding="utf-8"))
+
+        def clean(v):
+            if isinstance(v, list):
+                return [clean(x) for x in v if not (isinstance(x, str) and x in refs)]
+            if isinstance(v, dict):
+                return {k: clean(x) for k, x in v.items()}
+            return v
+        rpo.write_text(json.dumps(clean(data), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    opt = PACK / "configureddefaults" / "options.txt"
+    if opt.exists():
+        # 줄바꿈이 섞여 있는 파일이라 두 줄의 배열 부분만 바꾸고 나머지는 바이트 그대로 둔다
+        raw = opt.read_bytes().decode("utf-8")
+
+        def fix(m):
+            try:
+                arr = [x for x in json.loads(m.group(2)) if x not in refs]
+            except json.JSONDecodeError:
+                return m.group(0)
+            return m.group(1) + json.dumps(arr, ensure_ascii=False, separators=(",", ":"))
+        new = re.sub(r"(?m)^((?:resourcePacks|incompatibleResourcePacks):)(\[[^\r\n]*\])", fix, raw)
+        if new != raw:
+            opt.write_bytes(new.encode("utf-8"))
 
 
 def bundle_from_cdn(cf_url: str, filename: str, sha1: str, dest: Path) -> bool:
@@ -130,6 +170,7 @@ def main():
 
     manual_out = []
     bundled = []
+    excluded = []
     switched = 0
     for m, p, data, sha1 in targets:
         ver = found.get(sha1) if sha1 else None
@@ -139,7 +180,11 @@ def main():
                 if f.get("hashes", {}).get("sha1") == sha1:
                     url = f.get("url")
                     break
-        if url:
+        if data["filename"] in EXCLUDE:
+            p.unlink()
+            excluded.append(data["filename"])
+            print(f"  → 팩에서 제외: {data['filename']}")
+        elif url:
             write_url_metafile(p, data, url, sha1)
             switched += 1
             print(f"  → Modrinth로 대체: {data['filename']}")
@@ -159,8 +204,18 @@ def main():
             p.unlink()
             print(f"  → 런처 수동 안내: {data['filename']}")
 
+    # 수동 다운로드 대상이 아니더라도 제외 목록에 있으면 뺀다
+    for fn in EXCLUDE - set(excluded):
+        hit = meta.get(fn)
+        if hit:
+            hit[0].unlink()
+            excluded.append(fn)
+            print(f"  → 팩에서 제외: {fn}")
+    if excluded:
+        strip_pack_refs(excluded)
+
     (PACK / "manual-mods.json").write_text(json.dumps(manual_out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    summary = f"Modrinth로 대체 {switched}개, 저장소에 포함 {len(bundled)}개, 수동 다운로드 {len(manual_out)}개"
+    summary = f"Modrinth로 대체 {switched}개, 저장소에 포함 {len(bundled)}개, 제외 {len(excluded)}개, 수동 다운로드 {len(manual_out)}개"
     print(summary)
     gh = Path(sys.argv[2]) if len(sys.argv) > 2 else None
     if gh:
