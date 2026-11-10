@@ -96,8 +96,8 @@ global.TV_CONFIG = {
   idleChatMaxSec: 5,
   idleChatMinSec: 1.2,
   // AI 잡담 간격(초)
-  aiIdleMaxSec: 90,
-  aiIdleMinSec: 25,
+  aiIdleMaxSec: 40,
+  aiIdleMinSec: 15,
 
   // 업적: 선릿 밸리(society) 업적 위주 + 마인크래프트 주요 업적만 반응. 위에서부터 처음 맞는 규칙 적용, 없으면 무시
   advancementRules: [

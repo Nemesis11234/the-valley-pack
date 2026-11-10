@@ -9,11 +9,11 @@
 const TV_AI = {
   dir: "thevalley_ai",
   enabled: true,
-  minGapSec: 12, // 한 사람에게 AI 요청 최소 간격 (시청자가 많으면 5초까지 줄어듦)
+  minGapSec: 10, // 한 사람에게 AI 요청 최소 간격 (시청자가 많으면 5초까지 줄어듦)
   eventMinHype: 15, // 이 이상 화제성인 장면만 AI로 (작은 일은 템플릿)
   idleEverySec: 180, // 조용할 때 AI 잡담 간격
   chatReply: true, // 스트리머가 채팅 치면 AI가 반응
-  maxPerHour: 60, // 한 사람당 시간당 최대 AI 호출: 시청자 적을 때 60 → 1,000명 이상 120
+  maxPerHour: 100, // 한 사람당 시간당 최대 AI 호출: 시청자 적을 때 100 → 1,000명 이상 200
   aliveSec: 30, // thevalley-ai.jar 신호가 이 시간 안에 있어야 사용
 };
 
