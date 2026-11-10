@@ -16038,6 +16038,10 @@ file = "kubejs/data/dialog/dialogs/shepherd_unique_five_gift.json"
 hash = "e5f8e962c4da6ed67e01608d1bfb953f86d3162cc73ffe5541508adcdc4a24f2"
 
 [[files]]
+file = "kubejs/data/dialog/dialogs/thevalley_stream_menu.json"
+hash = "c7ac3248958d1ea0e492312f731b835388992052470b191983cce24804fb6fb6"
+
+[[files]]
 file = "kubejs/data/dialog/dialogs/trader_chatter_friendship0_0.json"
 hash = "5090fd018dbae25e18ac0a02c4eea0738c3d94b57a693c8bd9684c641452e3d5"
 
@@ -25667,15 +25671,19 @@ hash = "d8f4c5a71bfbb550002ce28ac5a17ccf6bb676a3cc0f989241d057e9408517e5"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/stream.js"
-hash = "f5c110f913e4d9ac74d42e5b788677645a10e2c67f2bdbdf46215a8f5687ab53"
+hash = "2300d8fb95e93c703e45d8b34f906131238e7a3999ae2fc662fd1466bd538a9a"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamConfig.js"
-hash = "8065a45e866c7219f3adde74906fd4e53f892309ce1182424167fb0c46d4afd6"
+hash = "08d008c2190adc080b7fb2b2c9a1fff973f5db85e59ee4e2e4f51883253401f2"
+
+[[files]]
+file = "kubejs/server_scripts/thevalley/stream/streamFeeHook.js"
+hash = "90168515c8e9c0e3cc79c835a663c0db919c558184b2f9441ca0cea2d9010cbd"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamTemplates.js"
-hash = "550be754c816aa435768d62ab3024cd9a6080b50d50b790b5dd7a143fbe6ee93"
+hash = "de1d4415c7018b2c1ffb53187d0bc8b3762ff6abbdf499a7aec7fc66713af6d9"
 
 [[files]]
 file = "kubejs/startup_scripts/_config.js"

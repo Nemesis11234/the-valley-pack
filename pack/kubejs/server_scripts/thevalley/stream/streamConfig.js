@@ -28,9 +28,8 @@ global.TV_CONFIG = {
     { name: "파트너", minSubs: 3000, fee: 0.2 },
   ],
 
-  // 미정산 한도 = base + 구독자 × perSub (차면 후원 멈춤)
-  pendingCapBase: 20000,
-  pendingCapPerSub: 100,
+  // 미정산 후원금 한도 없음. 죽거나 해골 광산에서 기절하면 병원비가 미정산 금액에서도 빠짐
+  // (비율·상한은 계좌 병원비와 같음, stream.js의 global.tvPendingFee)
 
   // 랜덤 후원: 분당 기대 횟수 = min(max, base + 시청자 / perViewers)
   donationRateBase: 0.2,

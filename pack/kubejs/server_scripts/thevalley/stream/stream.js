@@ -99,9 +99,6 @@ function tvTier(player) {
   });
   return tier;
 }
-function tvPendingCap(player) {
-  return TV.pendingCapBase + tvSubs(player) * TV.pendingCapPerSub;
-}
 function tvGetObj(player, key) {
   try {
     return JSON.parse(String(tvData(player)[key] || "{}"));
@@ -297,20 +294,12 @@ function tvDonate(player, opt) {
   if (tvAfkSec(player) > TV.afkHardSec) return;
   const pd = tvData(player);
   const mem = tvMem(player);
-  if (Number(pd.tvPending) >= tvPendingCap(player)) {
-    if (Math.random() < 0.3) {
-      tvViewerChat(player, "pending_full", {}, 1, 2);
-      tvSettleHint(player, true);
-    }
-    return;
-  }
   const viewer = tvRand(global.TV_VIEWERS);
   let base = Math.max(TV.donationMin, tvViewers(player) * TV.donationPerViewer);
   base *= (opt && opt.mult) || 1;
   base *= 0.4 + Math.random() * 1.2;
   if (Math.random() < TV.bigDonationChance) base *= TV.bigDonationMult;
-  const amount = Math.min(tvRoundCoins(base), Math.max(0, tvPendingCap(player) - Number(pd.tvPending)));
-  if (amount <= 0) return;
+  const amount = tvRoundCoins(base);
 
   const troll = !(opt && opt.reason) && Math.random() < TV.trollChance;
   pd.tvPending = Number(pd.tvPending) + amount;
@@ -341,7 +330,6 @@ function tvDonate(player, opt) {
     );
   }
   if (Math.random() < 0.4) tvViewerChat(player, troll ? "troll" : "donation_thanks", {}, 1, 4);
-  if (Number(pd.tvPending) >= 2000 && Math.random() < 0.15) tvSettleHint(player, false);
 }
 
 function tvSettleHint(player, full) {
@@ -349,7 +337,7 @@ function tvSettleHint(player, full) {
   player.server.runCommandSilent(
     `tellraw ${tvName(player)} ${tvJson([
       { text: "[방송] ", color: "#FF5555" },
-      { text: `미정산 후원금 ${tvFmt(pd.tvPending)}${full ? " (한도 도달, 후원 멈춤)" : ""} `, color: "#FFFFFF" },
+      { text: `미정산 후원금 ${tvFmt(pd.tvPending)} `, color: "#FFFFFF" },
       {
         text: "[정산하기]",
         color: "#FFD54F",
@@ -807,6 +795,7 @@ PlayerEvents.loggedIn((e) => {
   mem.lastActive = tvNow();
   mem.lastBalance = null;
   tvUpdateSidebar(player.server);
+  tvEnsureMenuObjectives(player.server);
   player.server.runCommandSilent(`team leave ${tvName(player)}`);
   tvSetSidebarScore(player);
   if (tvIsOn(player)) {
@@ -814,8 +803,7 @@ PlayerEvents.loggedIn((e) => {
       if (player.isRemoved()) return;
       tvChange(player, 10, 0, "방송 시작");
       tvViewerChat(player, "stream_on", {}, 3, 8);
-      player.tell(Text.of("[방송] 방송 중이에요. /stream off 또는 /방송 끄기 로 끌 수 있어요.").gray());
-      if (Number(tvData(player).tvPending) > 0) tvSettleHint(player, false);
+      player.tell(Text.of("[방송] 방송 중이에요. /방송 을 입력하면 메뉴가 열려요.").gray());
     });
   }
 });
@@ -868,7 +856,7 @@ function tvStats(player) {
     `§c[방송 통계]§r ${tvIsOn(player) ? "§aON" : "§7OFF"}`,
     `§f시청자 §e${tvFmt(tvViewers(player))}§f = 구독자 §e${tvFmt(tvSubs(player))}§f × 화제성 §e${(1 + tvHype(player) / 100).toFixed(2)}배`,
     `§f등급 §e${tier.name}§f (정산 수수료 ${Math.round(tier.fee * 100)}%)`,
-    `§f미정산 후원금 §e${tvFmt(pd.tvPending)}§f / 한도 ${tvFmt(tvPendingCap(player))}`,
+    `§f미정산 후원금 §e${tvFmt(pd.tvPending)}§7 (죽거나 기절하면 병원비가 여기서도 빠져요)`,
     `§f누적 후원 §e${tvFmt(pd.tvDonatedTotal)}§f · 해골 광산 최고 ${pd.tvSkullBest}구간`,
     "§7최근 변동:",
   ];
@@ -888,6 +876,65 @@ function tvToggleChat(player, on) {
   return 1;
 }
 
+// ───────────── 병원비 (미정산 후원금에도 적용) ─────────────
+// streamFeeHook.js가 팩의 global.handleFee 뒤에 이 함수를 부른다. 비율·상한은 계좌 병원비와 같다.
+global.tvPendingFee = (player, reason) => {
+  if (!player || player.isFake()) return;
+  const pd = tvData(player);
+  const pending = Number(pd.tvPending) || 0;
+  if (pending <= 0) return;
+  const guide = player.stages.has("first_aid_guide");
+  let rate = 0, cap = 0;
+  if (reason === "death") {
+    rate = guide ? 0.075 : 0.15;
+    cap = guide ? 25000 : 50000;
+  } else if (reason === "skull_cavern") {
+    rate = 0.2;
+    cap = 100000;
+  }
+  const fee = Math.min(Math.round(pending * rate), cap);
+  if (fee <= 0) return;
+  pd.tvPending = pending - fee;
+  player.tell(Text.of(`[방송] 병원비: 미정산 후원금에서 ${tvFmt(fee)} 빠짐 (남은 금액 ${tvFmt(pd.tvPending)})`).red());
+};
+
+// ───────────── 메뉴 (SVDialog 창) ─────────────
+// 창 글자는 서버에서 점수판 값으로 채워지므로, 열기 직전에 점수를 맞춰 둔다.
+const TV_MENU_OBJECTIVES = ["tv_m_on", "tv_m_chat", "tv_m_viewers", "tv_m_subs", "tv_m_pending", "tv_m_fee", "tv_m_net"];
+
+function tvSyncMenuScores(player) {
+  const s = player.server;
+  const name = tvName(player);
+  const pd = tvData(player);
+  const tier = tvTier(player);
+  const pending = Number(pd.tvPending) || 0;
+  const vals = {
+    tv_m_on: tvIsOn(player) ? 1 : 0,
+    tv_m_chat: Number(pd.tvChatOn) == 1 ? 1 : 0,
+    tv_m_viewers: tvIsOn(player) ? tvViewers(player) : 0,
+    tv_m_subs: tvSubs(player),
+    tv_m_pending: Math.min(2000000000, pending),
+    tv_m_fee: Math.round(tier.fee * 100),
+    tv_m_net: Math.min(2000000000, pending - Math.round(pending * tier.fee)),
+  };
+  Object.keys(vals).forEach((k) => s.runCommandSilent(`scoreboard players set ${name} ${k} ${vals[k]}`));
+}
+
+function tvOpenMenu(player) {
+  tvSyncMenuScores(player);
+  player.server.runCommandSilent(`dialog ${tvName(player)} show ${tvName(player)} thevalley_stream_menu`);
+  return 1;
+}
+
+// 메뉴 버튼이 부르는 명령: 실행 후 2틱 뒤 새 값으로 메뉴를 다시 연다
+function tvMenuAction(player, fn) {
+  fn(player);
+  player.server.scheduleInTicks(2, () => {
+    if (!player.isRemoved()) tvOpenMenu(player);
+  });
+  return 1;
+}
+
 ServerEvents.commandRegistry((event) => {
   const { commands: Commands } = event;
   const run = (fn) => (ctx) => {
@@ -897,7 +944,10 @@ ServerEvents.commandRegistry((event) => {
   };
   const build = (root, words) =>
     Commands.literal(root)
-      .executes(run(tvStats))
+      .executes(run(tvOpenMenu))
+      .then(Commands.literal("menu_toggle").executes(run((p) => tvMenuAction(p, (q) => tvSetOn(q, !tvIsOn(q))))))
+      .then(Commands.literal("menu_settle").executes(run((p) => tvMenuAction(p, tvSettle))))
+      .then(Commands.literal("menu_chat").executes(run((p) => tvMenuAction(p, (q) => tvToggleChat(q, Number(tvData(q).tvChatOn) != 1)))))
       .then(Commands.literal(words.on).executes(run((p) => tvSetOn(p, true))))
       .then(Commands.literal(words.off).executes(run((p) => tvSetOn(p, false))))
       .then(Commands.literal(words.stats).executes(run(tvStats)))
@@ -911,6 +961,11 @@ ServerEvents.commandRegistry((event) => {
   event.register(build("방송", { on: "켜기", off: "끄기", stats: "통계", settle: "정산", chat: "채팅" }));
 });
 
+function tvEnsureMenuObjectives(server) {
+  TV_MENU_OBJECTIVES.forEach((o) => server.runCommandSilent(`scoreboard objectives add ${o} dummy`));
+}
+
 ServerEvents.loaded((e) => {
   tvUpdateSidebar(e.server);
+  tvEnsureMenuObjectives(e.server);
 });
