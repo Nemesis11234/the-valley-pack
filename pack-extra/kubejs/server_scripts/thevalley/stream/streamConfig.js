@@ -93,8 +93,10 @@ global.TV_CONFIG = {
   swearSubsFrom: 3, // 이 횟수부터 구독자 -1씩
 
   // 평소 잡담 간격(초): 시청자 적을 때 max ↔ 1,000명 이상일 때 min
-  idleChatMaxSec: 5,
-  idleChatMinSec: 1.2,
+  idleChatMaxSec: 12,
+  idleChatMinSec: 3,
+  // 평소 잡담 중 화면 상황(밤·비·몹·체력·손에 든 것·하는 일 등)에 반응하는 비율
+  situationChatRatio: 0.9,
   // AI 잡담 간격(초)
   aiIdleMaxSec: 40,
   aiIdleMinSec: 15,

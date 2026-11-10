@@ -839,8 +839,13 @@ function tvSecond(player) {
     if (now - (mem.aiIdleAt || 0) > aiIdleGap && global.tvAiRequest && global.tvAiRequest(player, "idle", "특별한 일 없이 플레이 중")) {
       mem.aiIdleAt = now;
     } else {
-      let n = 1 + Math.floor(Math.random() * (2 + busy * 4));
-      tvViewerChat(player, Math.random() < 0.6 ? "idle" : "chat_generic", {}, n, 3);
+      // 90%는 화면 상황 반응, 10%만 일반 잡담
+      let n = 1 + Math.floor(Math.random() * (1.5 + busy * 3));
+      if (Math.random() < TV.situationChatRatio && tvSituationChat(player, n, 3)) {
+        // 화면 반응
+      } else {
+        tvViewerChat(player, Math.random() < 0.6 ? "idle" : "chat_generic", {}, 1, 3);
+      }
     }
   }
 

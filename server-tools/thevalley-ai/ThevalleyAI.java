@@ -176,7 +176,7 @@ public class ThevalleyAI {
         String kind = str(req.get("kind"));
         String what = switch (kind) {
             case "chat" -> "스트리머가 채팅을 침: \"" + str(req.get("text")) + "\"";
-            case "idle" -> "특별한 일 없이 평범하게 플레이 중 (잡담해도 됨)";
+            case "idle" -> "평범하게 플레이 중. 모든 줄을 지금 화면 상황(장소·시간·날씨·계절·체력·배고픔·손에 든 것·주변 몹·최근 행동) 중 하나에 대한 반응으로 쓴다. 상황과 상관없는 뻘한 잡담(밥, 학교, 회사 얘기 등)은 쓰지 않는다";
             case "donation" -> "시청자 '" + str(extra(req).get("donor")) + "'가 " + num(extra(req).get("amount")).intValue()
                 + "원을 후원함. 상황: " + str(req.get("text"))
                 + ". 첫 줄은 반드시 이름 '" + str(extra(req).get("donor")) + "'로, 후원과 함께 보내는 메시지(35자 이내, 방금 상황이나 스트리머를 구체적으로 언급, 재치있게)."
