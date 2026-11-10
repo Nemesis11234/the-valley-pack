@@ -51,9 +51,9 @@ global.TV_CONFIG = {
   // 집(리스폰 지점)에서 이 거리 안이면 억까 금지
   homeSafeRadius: 24,
 
-  // 주간 순위: 게임 날짜 며칠마다 정산할지, 1·2·3등 보너스 = 그 기간 최고 시청자 × 배수
-  rankWeekDays: 7,
-  rankRewards: [20, 10, 5],
+  // 일간 순위: 매일 자정(UTC+9, 한국·일본 시간)에 정산, 1·2·3등 보너스 = 그날 최고 시청자 × 배수
+  rankUtcOffsetHours: 9,
+  rankRewards: [10, 5, 2],
 
   // 구독자 달성 트로피 (Trofers 모드 트로피 블록으로 지급)
   trophies: [

@@ -771,6 +771,23 @@ if (PlayerEvents.advancement) {
   });
 }
 
+// 강화: enhance.js가 결과마다 부름
+global.tvOnEnhance = (player, result, level, name) => {
+  if (!player || !tvIsOn(player)) return;
+  const vars = { item: name, n: level };
+  if (result == "success") {
+    if (level >= 7) tvEvent(player, Math.round(level * level * 0.8), level >= 10 ? level : 0, `+${level} 강화 성공`, "enhance_success", vars);
+    else tvViewerChat(player, "enhance_success", vars, 1, 3);
+  } else if (result == "break") {
+    // 파괴는 방송에선 최고의 장면
+    tvEvent(player, Math.round(level * level), 0, `+${level} ${name} 파괴`, "enhance_break", vars);
+  } else if (result == "down") {
+    tvEvent(player, level >= 7 ? 8 : 2, 0, `강화 실패 (+${level} → +${level - 1})`, "enhance_fail", vars);
+  } else {
+    tvViewerChat(player, "enhance_fail", vars, 1, 3);
+  }
+};
+
 // 낚시: 시작 스크립트(streamFishing.js)의 Forge 이벤트가 이 함수를 부름
 global.tvOnFished = (player, itemIds) => {
   if (!player || player.isFake() || !tvIsOn(player)) return;
@@ -942,11 +959,12 @@ function tvCheckTrophies(player) {
   });
 }
 
-// ───────────── 주간 순위 ─────────────
-// 게임 날짜 TV.rankWeekDays일마다 그 기간 최고 시청자 순위로 보너스 후원 (미정산금으로)
+// ───────────── 일간 순위 ─────────────
+// 오른쪽 순위표는 실시간 시청자. 매일 자정(한국·일본 시간)에 그날 최고 시청자 순위로 보너스 후원 (미정산금으로)
+// 서버 컴퓨터 시간대와 상관없이 UTC+TV.rankUtcOffsetHours 기준으로 날짜를 셈
 
 function tvRankWeek(server) {
-  return Math.floor(tvDay(server) / TV.rankWeekDays);
+  return Math.floor((Date.now() + TV.rankUtcOffsetHours * 3600000) / 86400000);
 }
 function tvRankLoad(server) {
   try {
@@ -980,7 +998,7 @@ function tvRankCheck(server) {
     .sort((a, b) => b.peak - a.peak)
     .slice(0, TV.rankRewards.length);
   if (ranked.length) {
-    server.runCommandSilent(`tellraw @a ${tvJson({ text: "━━━━ [방송] 이번 주 시청자 순위 ━━━━", color: "#FF5555" })}`);
+    server.runCommandSilent(`tellraw @a ${tvJson({ text: "━━━━ [방송] 오늘의 시청자 순위 ━━━━", color: "#FF5555" })}`);
     ranked.forEach((r, i) => {
       const award = tvRoundCoins(r.peak * TV.rankRewards[i]);
       data.awards[r.id] = (data.awards[r.id] || 0) + award;
@@ -1006,7 +1024,7 @@ function tvApplyRankAwards(player) {
   const pd = tvData(player);
   pd.tvPending = Number(pd.tvPending) + award;
   pd.tvDonatedTotal = Number(pd.tvDonatedTotal) + award;
-  player.tell(Text.of(`[방송] 주간 순위 보너스 ${tvFmt(award)}이 미정산 후원금에 들어왔어요.`).gold());
+  player.tell(Text.of(`[방송] 일간 순위 보너스 ${tvFmt(award)}이 미정산 후원금에 들어왔어요.`).gold());
 }
 
 ServerEvents.tick((e) => {
