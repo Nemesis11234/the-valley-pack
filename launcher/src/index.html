@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:">
+<title>The Valley</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="titlebar">
+    <div class="brand">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F2C14E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22V10"/><path d="M12 10c0-4 3-7 7-7 0 4-3 7-7 7z"/><path d="M12 14c0-3-2.5-5.5-6-5.5 0 3.5 2.5 5.5 6 5.5z"/></svg>
+      <span>THE VALLEY LAUNCHER</span>
+    </div>
+    <div class="winbtns">
+      <button id="btn-min" aria-label="최소화">–</button>
+      <button id="btn-close" aria-label="닫기">✕</button>
+    </div>
+  </header>
+
+  <main class="body">
+    <section class="left">
+      <div class="banner">
+        <svg viewBox="0 0 640 250" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+          <rect width="640" height="250" fill="#22475A"/>
+          <circle cx="510" cy="70" r="34" fill="#F2C14E"/>
+          <path d="M0 170 Q120 110 240 150 T480 130 T640 150 V250 H0Z" fill="#2F6B55"/>
+          <path d="M0 200 Q160 150 320 190 T640 180 V250 H0Z" fill="#3E8A62"/>
+          <path d="M0 230 Q200 205 400 228 T640 222 V250 H0Z" fill="#12201B"/>
+          <g fill="#24503F"><rect x="90" y="150" width="6" height="22"/><circle cx="93" cy="146" r="14"/><rect x="130" y="158" width="5" height="18"/><circle cx="132" cy="154" r="11"/></g>
+          <rect x="380" y="168" width="44" height="30" fill="#7A4B2A"/>
+          <path d="M374 170 L402 148 L430 170Z" fill="#B5543B"/>
+          <rect x="397" y="182" width="10" height="16" fill="#3A2416"/>
+        </svg>
+        <div class="banner-text">
+          <span class="kicker">SUNLIT VALLEY EXPANDED</span>
+          <h1 id="server-name">The Valley</h1>
+        </div>
+      </div>
+
+      <div class="notices">
+        <h2>공지사항</h2>
+        <ul id="notice-list" class="notice-list"></ul>
+      </div>
+    </section>
+
+    <aside class="right">
+      <div class="card account">
+        <div class="avatar" id="avatar">?</div>
+        <div class="acc-text">
+          <span class="acc-name" id="acc-name">로그인 전</span>
+          <span class="muted" id="acc-sub">처음 실행할 때 로그인해요</span>
+        </div>
+        <button class="icon-btn" id="btn-account" aria-label="계정 관리">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+        </button>
+      </div>
+
+      <div class="card status">
+        <div class="row">
+          <span class="label-strong">서버 상태</span>
+          <span class="online" id="srv-state"><span class="dot"></span><span id="srv-state-text">확인 중</span></span>
+        </div>
+        <div class="grid2">
+          <div class="stat"><span class="muted">접속 인원</span><span class="big" id="srv-players">-</span></div>
+          <div class="stat"><span class="muted">핑</span><span class="big" id="srv-ping">-</span></div>
+        </div>
+        <div class="who">
+          <span class="muted">접속 중</span>
+          <span id="srv-names">-</span>
+        </div>
+      </div>
+
+      <div class="pack-row">
+        <span id="pack-version">모드팩 -</span>
+        <span id="pack-state" class="ok">확인 중</span>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="progress" id="progress" hidden>
+        <div class="progress-text"><span id="prog-step"></span><span id="prog-detail" class="muted"></span></div>
+        <div class="bar"><div class="fill" id="prog-fill"></div></div>
+      </div>
+
+      <button class="play" id="btn-play">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#12201B" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>
+        <span id="play-label">실행하기</span>
+      </button>
+      <span class="hint" id="hint">실행 시 설치·업데이트 확인 후 서버로 바로 접속해요</span>
+    </aside>
+  </main>
+
+  <div class="modal" id="manual-modal" hidden>
+    <div class="modal-box" role="dialog" aria-labelledby="manual-title">
+      <h2 id="manual-title">직접 받아야 하는 모드가 있어요</h2>
+      <p class="muted">제작자가 자동 다운로드를 막아 둔 모드예요. 각 페이지에서 <b>Download</b>를 눌러 <b>다운로드 폴더</b>에 받기만 하면, 런처가 알아서 찾아서 넣어줘요.</p>
+      <ul id="manual-list" class="manual-list"></ul>
+      <div class="modal-actions">
+        <button class="ghost" id="btn-open-dl">다운로드 폴더 열기</button>
+        <button class="ghost" id="btn-manual-cancel">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="error-modal" hidden>
+    <div class="modal-box" role="alertdialog" aria-labelledby="error-title">
+      <h2 id="error-title">문제가 생겼어요</h2>
+      <pre id="error-text" class="error-text"></pre>
+      <div class="modal-actions">
+        <button class="ghost" id="btn-logs">로그 폴더 열기</button>
+        <button class="primary" id="btn-error-ok">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="renderer.js"></script>
+</body>
+</html>

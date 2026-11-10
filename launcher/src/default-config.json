@@ -1,0 +1,12 @@
+{
+  "serverName": "The Valley",
+  "server": { "host": "localhost", "port": 25565 },
+  "packUrl": "https://raw.githubusercontent.com/Nemesis11234/the-valley-pack/main/pack/pack.toml",
+  "manualModsUrl": "https://raw.githubusercontent.com/Nemesis11234/the-valley-pack/main/pack/manual-mods.json",
+  "memoryMB": 8192,
+  "closeOnLaunch": true,
+  "notices": [
+    { "tag": "NEW", "text": "런처 첫 버전이 나왔어요!", "date": "11.10", "highlight": true },
+    { "tag": "패치", "text": "모드팩 1.2.1 — 실행하면 자동으로 설치·업데이트돼요", "date": "11.10" }
+  ]
+}

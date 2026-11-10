@@ -1,0 +1,46 @@
+name: 런처 빌드 (Windows)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "launcher/**"
+      - ".github/workflows/build-launcher.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: launcher/package-lock.json
+
+      - name: 의존성 설치
+        working-directory: launcher
+        run: npm ci
+
+      - name: 설치 파일 만들기
+        working-directory: launcher
+        run: npx electron-builder --win nsis --publish never
+
+      - name: 릴리스에 올리기
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd launcher/dist
+          ls -la
+          gh release delete launcher-latest -y --cleanup-tag || true
+          gh release create launcher-latest TheValley-Setup.exe \
+            --title "The Valley 런처" \
+            --notes "TheValley-Setup.exe 를 받아서 실행하면 설치돼요. 처음 실행할 때 Java·Prism·모드가 자동으로 설치되고, 마이크로소프트 로그인 창이 한 번 떠요." \
+            --latest

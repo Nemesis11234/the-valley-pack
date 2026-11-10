@@ -1,0 +1,66 @@
+name: 팩 가져오기 (CurseForge → packwiz)
+
+on:
+  workflow_dispatch:
+    inputs:
+      zip_url:
+        description: CurseForge 클라이언트 팩 zip 주소
+        required: true
+        default: "https://mediafilez.forgecdn.net/files/9002/37/The%20Valley%20-%20Sunlit%20Valley%20Expanded-1.2.1.zip"
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: packwiz 설치
+        run: go install github.com/packwiz/packwiz@latest
+
+      - name: 팩 zip 다운로드
+        env:
+          ZIP_URL: ${{ inputs.zip_url }}
+        run: |
+          curl -fL --retry 3 -A "Mozilla/5.0" -o "$RUNNER_TEMP/pack.zip" "$ZIP_URL"
+          unzip -l "$RUNNER_TEMP/pack.zip" | head -20
+
+      - name: packwiz로 가져오기
+        run: |
+          rm -rf pack
+          mkdir pack
+          cd pack
+          packwiz curseforge import -y "$RUNNER_TEMP/pack.zip"
+
+      - name: 자동 다운로드 막힌 모드 찾기
+        working-directory: pack
+        run: |
+          # modrinth export는 다운로드 전에 '수동 다운로드 필요' 목록을 출력하고 멈춘다
+          timeout 900 packwiz modrinth export -y -o "$RUNNER_TEMP/check.mrpack" > "$RUNNER_TEMP/export.log" 2>&1 || true
+          grep -A200 "manual downloads" "$RUNNER_TEMP/export.log" | head -100 || echo "수동 다운로드 없음"
+          rm -f "$RUNNER_TEMP/check.mrpack"
+
+      - name: 막힌 모드 처리 (Modrinth 대체 / 런처 안내)
+        working-directory: pack
+        run: |
+          python3 ../scripts/postprocess.py "$RUNNER_TEMP/export.log" "$GITHUB_STEP_SUMMARY"
+          packwiz refresh
+
+      - name: 저장소에 올리기
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A pack
+          if git diff --cached --quiet; then
+            echo "변경 없음"
+          else
+            git commit -m "팩 업데이트: $(grep -m1 '^version' pack/pack.toml | cut -d'"' -f2)"
+            git push
+          fi
