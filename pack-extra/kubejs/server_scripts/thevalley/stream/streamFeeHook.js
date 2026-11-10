@@ -4,10 +4,30 @@
 
 if (global.handleFee && !global.handleFee.tvWrapped) {
   const tvOriginalHandleFee = global.handleFee;
+  // 계좌에서 실제로 걷힌 금액(잔고 감소 + 늘어난 빚)을 재서, 미정산금 병원비와 합쳐 상한을 한 번만 적용
+  const tvFeeBalance = (player) => {
+    try {
+      return Number(global.getPersonalOrCurioAccount(player.level, player).getBalance()) || 0;
+    } catch (err) {
+      return 0;
+    }
+  };
+  const tvFeeDebt = (server, player) => {
+    let debt = 0;
+    const debts = server.persistentData.debts;
+    if (!debts) return 0;
+    for (let i = 0; i < debts.length; i++) {
+      if (String(debts[i].uuid) === String(player.getUuid())) debt = Number(debts[i].amount) || 0;
+    }
+    return debt;
+  };
   const tvWrappedHandleFee = (server, player, reason) => {
+    const balBefore = tvFeeBalance(player);
+    const debtBefore = tvFeeDebt(server, player);
     tvOriginalHandleFee(server, player, reason);
     try {
-      if (global.tvPendingFee) global.tvPendingFee(player, reason);
+      const charged = Math.max(0, balBefore - tvFeeBalance(player)) + Math.max(0, tvFeeDebt(server, player) - debtBefore);
+      if (global.tvPendingFee) global.tvPendingFee(player, reason, charged);
     } catch (err) {
       console.error("[TheValley] stream fee hook error: " + err);
     }

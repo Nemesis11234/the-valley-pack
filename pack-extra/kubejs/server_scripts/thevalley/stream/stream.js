@@ -877,8 +877,9 @@ function tvToggleChat(player, on) {
 }
 
 // ───────────── 병원비 (미정산 후원금에도 적용) ─────────────
-// streamFeeHook.js가 팩의 global.handleFee 뒤에 이 함수를 부른다. 비율·상한은 계좌 병원비와 같다.
-global.tvPendingFee = (player, reason) => {
+// streamFeeHook.js가 팩의 global.handleFee 뒤에 이 함수를 부른다.
+// 미정산금도 계좌에 있는 돈처럼 취급: 비율은 같고, 상한은 계좌 병원비와 합쳐서 한 번만 적용.
+global.tvPendingFee = (player, reason, chargedFromAccount) => {
   if (!player || player.isFake()) return;
   const pd = tvData(player);
   const pending = Number(pd.tvPending) || 0;
@@ -892,7 +893,9 @@ global.tvPendingFee = (player, reason) => {
     rate = 0.2;
     cap = 100000;
   }
-  const fee = Math.min(Math.round(pending * rate), cap);
+  // 상한은 계좌 병원비와 합쳐서 한 번만: 계좌에서 이미 걷힌 만큼 상한에서 뺌
+  const room = Math.max(0, cap - (Number(chargedFromAccount) || 0));
+  const fee = Math.min(Math.round(pending * rate), room);
   if (fee <= 0) return;
   pd.tvPending = pending - fee;
   player.tell(Text.of(`[방송] 병원비: 미정산 후원금에서 ${tvFmt(fee)} 빠짐 (남은 금액 ${tvFmt(pd.tvPending)})`).red());
