@@ -1,4 +1,4 @@
-// priority: -20
+// priority: -19
 const NUMISMATICS = Java.loadClass("dev.ithundxr.createnumismatics.Numismatics");
 const NUMISMATICS_CURIO_UTILS = Java.loadClass("io.github.chakyl.numismaticsutils.utils.CurioUtils");
 

@@ -25939,7 +25939,7 @@ hash = "afb4e887ad33a88bbd0128d85393d260b74fe7d380d80c60bfe897430050b95a"
 
 [[files]]
 file = "kubejs/startup_scripts/globalRegistry.js"
-hash = "adaca131a745d2040300ac13ae2840bbbafe0aa62cd7aff4f55370b56d79b319"
+hash = "abdf5c1992fb1d9b1aa6fef1ad836252da3482c4714662df5632e34b3a063122"
 
 [[files]]
 file = "kubejs/startup_scripts/globalRemovedItems.js"
