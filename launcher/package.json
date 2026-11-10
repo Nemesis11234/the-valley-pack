@@ -1,7 +1,7 @@
 {
   "name": "the-valley-launcher",
   "productName": "The Valley",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The Valley 서버 전용 런처",
   "main": "src/main.js",
   "author": "Nemesis11234",
@@ -40,7 +40,9 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "The Valley",
-      "installerLanguages": ["ko_KR"],
+      "installerLanguages": [
+        "ko_KR"
+      ],
       "language": "1042"
     }
   }

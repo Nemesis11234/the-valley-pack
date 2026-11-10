@@ -20,7 +20,19 @@ function renderNotices(notices) {
   }
   for (const n of notices.slice(0, 6)) {
     const li = el('li', n.highlight ? 'hl' : '');
-    li.append(el('span', 'tag', n.tag || '안내'), el('span', 'notice-text', n.text || ''), el('span', 'notice-date', n.date || ''));
+    const parts = [el('span', 'tag', n.tag || '안내'), el('span', 'notice-text', n.text || ''), el('span', 'notice-date', n.date || '')];
+    if (typeof n.url === 'string' && /^https:\/\//.test(n.url)) {
+      // 링크가 있는 공지는 누르면 기본 브라우저(또는 디스코드 앱)로 열림
+      const btn = el('button', 'notice-link');
+      btn.type = 'button';
+      btn.title = n.url;
+      btn.append(...parts);
+      btn.addEventListener('click', () => v.openUrl(n.url));
+      li.classList.add('has-link');
+      li.append(btn);
+    } else {
+      li.append(...parts);
+    }
     list.append(li);
   }
 }

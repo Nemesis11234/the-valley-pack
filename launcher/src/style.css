@@ -47,6 +47,12 @@ button { font-family: inherit; }
 .hl .tag { background: var(--gold); color: var(--bg); }
 .notice-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .notice-date { font-size: 12px; color: var(--muted); flex-shrink: 0; }
+.notice-list li.has-link { padding: 0; }
+.notice-link { all: unset; box-sizing: border-box; width: 100%; display: flex; align-items: center; gap: 14px; padding: 11px 14px;
+  border-radius: 8px; cursor: pointer; color: inherit; font-size: 14px; }
+.notice-link:hover { background: var(--line-2); color: var(--text); }
+.notice-link:hover .notice-text { text-decoration: underline; text-underline-offset: 3px; }
+.notice-link:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
 
 .right { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; padding: 24px;
   background: var(--panel); border-left: 1px solid var(--line); }
