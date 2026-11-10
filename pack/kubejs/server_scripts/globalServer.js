@@ -258,20 +258,26 @@ global.handleFee = (server, player, reason) => {
   let balance = account.getBalance() || 0;
   let maxFee = 0;
   let minimumFee = 512;
+  // The Valley: 원래 상한(4,096 / 8,192)은 해골 광산 이후 최소 청구액으로만 유지
+  let legacyFloor = 0;
   
   if (reason === "death") {
-    maxFee = 4096;
-    if (player.stages.has("first_aid_guide")) maxFee = 2048;
-    amountToDeduct = Math.min(Math.round(balance * 0.1), maxFee);
+    // The Valley: 잔고의 15%, 최대 50,000 (응급 처치 안내서: 7.5%, 최대 25,000)
+    maxFee = player.stages.has("first_aid_guide") ? 25000 : 50000;
+    let deathRate = player.stages.has("first_aid_guide") ? 0.075 : 0.15;
+    legacyFloor = player.stages.has("first_aid_guide") ? 2048 : 4096;
+    amountToDeduct = Math.min(Math.round(balance * deathRate), maxFee);
   }
   if (reason === "skull_cavern") {
+    // The Valley: 잔고의 20%, 최대 100,000
     minimumFee = 1024;
-    maxFee = 8192;
+    maxFee = 100000;
+    legacyFloor = 8192;
 
-    amountToDeduct = Math.min(Math.round(balance * 0.15), maxFee);
+    amountToDeduct = Math.min(Math.round(balance * 0.2), maxFee);
   }
   if (amountToDeduct < minimumFee) amountToDeduct = minimumFee;
-  if (balance < maxFee && player.stages.has("entered_skull_cavern")) amountToDeduct = maxFee;
+  if (balance < legacyFloor && player.stages.has("entered_skull_cavern")) amountToDeduct = legacyFloor;
   if (balance < amountToDeduct) {
     let currentDebt = null;
     let foundIndex = -1;

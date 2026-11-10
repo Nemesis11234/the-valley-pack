@@ -25251,7 +25251,7 @@ hash = "627c106f8f930c8bdee87342a4bf80eaaf62f2e48219ba8f4e05dd492049eb26"
 
 [[files]]
 file = "kubejs/server_scripts/globalServer.js"
-hash = "c3461bddbfe13665b044764c00aa2a7b8da7ffcae892402d4342b1a6b902c89b"
+hash = "77d6c553dcbd535b8b69265f0e64c71a00ddf5737c43850bdf08e7b5c25c8107"
 
 [[files]]
 file = "kubejs/server_scripts/handleDebt.js"
