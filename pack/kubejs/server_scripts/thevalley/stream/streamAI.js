@@ -17,7 +17,7 @@ const TV_AI = {
   aliveSec: 30, // thevalley-ai.jar 신호가 이 시간 안에 있어야 사용
 };
 
-const TV_AI_STATE = { seq: 0, outbox: [], dirty: false, lastApplied: 0, status: null, statusReadAt: 0 };
+const TV_AI_STATE = { seq: 0, outbox: [], dirty: false, lastApplied: 0, status: null, statusReadAt: 0, callbacks: {} };
 
 function tvAiPath(name) {
   return `${TV_AI.dir}/${name}`;
@@ -42,19 +42,24 @@ function tvAiAlive() {
 }
 
 // kind: event | chat | idle
-global.tvAiRequest = (player, kind, text) => {
+// kind: event | chat | idle | donation | recap
+// extra: 요청에 같이 보낼 값, callback(lines): 답이 오면 기본 채팅 대신 이 함수가 처리
+// 성공하면 요청 번호(seq), 못 보내면 false
+global.tvAiRequest = (player, kind, text, extra, callback) => {
   if (!tvAiAlive()) return false;
   let mem = tvMem(player);
   let now = Date.now();
   let busy = tvBusy(player);
   let gap = Math.max(5, TV_AI.minGapSec - 7 * busy);
-  if (kind != "chat" && mem.aiLastAt && now - mem.aiLastAt < gap * 1000) return false;
+  let special = kind == "donation" || kind == "recap";
+  if (!special && kind != "chat" && mem.aiLastAt && now - mem.aiLastAt < gap * 1000) return false;
   if (kind == "chat" && mem.aiLastAt && now - mem.aiLastAt < 4000) return false;
   mem.aiTimes = (mem.aiTimes || []).filter((t) => now - t < 3600000);
   if (mem.aiTimes.length >= TV_AI.maxPerHour * (1 + busy)) return false;
   mem.aiTimes.push(now);
-  mem.aiLastAt = now;
+  if (!special) mem.aiLastAt = now;
   TV_AI_STATE.seq++;
+  if (callback) TV_AI_STATE.callbacks[TV_AI_STATE.seq] = callback;
   let recent = mem.chat.slice(-8).map((l) => `${l.name}: ${l.msg}`);
   TV_AI_STATE.outbox.push({
     seq: TV_AI_STATE.seq,
@@ -69,10 +74,11 @@ global.tvAiRequest = (player, kind, text) => {
     recent: recent,
     names: global.TV_VIEWERS.map((v) => v.name),
     busy: busy,
+    extra: extra || {},
   });
   if (TV_AI_STATE.outbox.length > 30) TV_AI_STATE.outbox = TV_AI_STATE.outbox.slice(-30);
   TV_AI_STATE.dirty = true;
-  return true;
+  return TV_AI_STATE.seq;
 };
 
 function tvAiFlush() {
@@ -96,6 +102,18 @@ function tvAiApply(server) {
     server.players.forEach((p) => {
       if (String(p.uuid) == String(r.uuid)) player = p;
     });
+    let cb = TV_AI_STATE.callbacks[seq];
+    delete TV_AI_STATE.callbacks[seq];
+    TV_AI_STATE.outbox = TV_AI_STATE.outbox.filter((q) => q.seq > seq);
+    TV_AI_STATE.dirty = true;
+    if (cb) {
+      try {
+        cb(player, (r.lines || []).map((l) => ({ n: String(l.n || ""), m: String(l.m || "").replace(/[§\n\r]/g, "") })));
+      } catch (err) {
+        console.error("[TheValley] AI callback error: " + err);
+      }
+      return;
+    }
     if (!player || !tvIsOn(player)) return;
     let mem = tvMem(player);
     let colors = {};

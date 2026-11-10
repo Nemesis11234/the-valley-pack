@@ -352,7 +352,36 @@ function tvDonate(player, opt) {
     message = tvFill(tvRand(pool), { p: tvName(player) });
   }
 
+  // 큰 후원은 AI가 지금 상황에 맞춰 후원 메시지를 씀 (6초 안에 답이 없으면 템플릿 메시지)
+  if (!troll && amount >= TV.aiDonationMin && global.tvAiRequest) {
+    let shown = false;
+    let show = (msg, extraLines) => {
+      if (shown || player.isRemoved()) return;
+      shown = true;
+      tvShowDonation(player, viewer, amount, msg, false, extraLines);
+    };
+    let seq = global.tvAiRequest(player, "donation", opt && opt.reason ? opt.reason : "평소처럼 플레이 중", { donor: viewer.name, amount: amount, names: [viewer.name] }, (p, lines) => {
+      if (!lines.length) return show(message, []);
+      show(lines[0].m.slice(0, 50) || message, lines.slice(1));
+    });
+    if (seq) {
+      player.server.scheduleInTicks(120, () => show(message, []));
+      return;
+    }
+  }
+  tvShowDonation(player, viewer, amount, message, troll, []);
+}
+
+function tvShowDonation(player, viewer, amount, message, troll, extraLines) {
   tvPushChat(player, "[후원] " + viewer.name, viewer.color, `${tvFmt(amount)} 후원 · ${message}`, true);
+  let mem = tvMem(player);
+  let delay = 0;
+  (extraLines || []).forEach((l) => {
+    if (!l.m) return;
+    delay += 800 + Math.random() * 2000;
+    let v = tvRand(global.TV_VIEWERS);
+    mem.queue.push({ at: tvNow() + delay, name: l.n || v.name, color: v.color, msg: l.m.slice(0, 40) });
+  });
   player.server.runCommandSilent(
     `execute as ${tvName(player)} at @s run playsound minecraft:block.note_block.bell player @s ~ ~ ~ 0.6 ${troll ? 0.6 : 1.4}`
   );
@@ -566,12 +595,155 @@ function tvMissionEnd(player, success) {
   }
 }
 
+// ───────────── 시청자 사연 (택배 요청) ─────────────
+// 시청자가 선릿 밸리 아이템을 보내 달라고 함. 모아서 [보내기]를 누르면 출하 가격보다 비싸게(×requestPriceMult) 사 감.
+// 절반 이상은 지금 가방에 있는 팔 수 있는 아이템 중에서 골라서, 할 수 있는 요청이 나오게 함.
+
+function tvCountItem(player, id) {
+  let inv = player.inventory;
+  let n = 0;
+  for (let i = 0; i < inv.getContainerSize(); i++) {
+    let st = inv.getItem(i);
+    if (!st.isEmpty() && String(st.id) == id) n += st.count;
+  }
+  return n;
+}
+
+function tvTakeItem(player, id, count) {
+  let inv = player.inventory;
+  let left = count;
+  for (let i = 0; i < inv.getContainerSize() && left > 0; i++) {
+    let st = inv.getItem(i);
+    if (st.isEmpty() || String(st.id) != id) continue;
+    let take = Math.min(left, st.count);
+    st.shrink(take);
+    left -= take;
+  }
+  return count - left;
+}
+
+function tvItemLabel(id) {
+  try {
+    return String(Item.of(id).displayName.string).replace(/[\[\]]/g, "");
+  } catch (err) {
+    return id;
+  }
+}
+
+function tvTradeValue(id) {
+  let t = global.trades ? global.trades.get(String(id)) : null;
+  return t ? Number(t.value) || 0 : 0;
+}
+
+function tvRequestPick(player) {
+  let cand = [];
+  let inv = player.inventory;
+  for (let i = 0; i < inv.getContainerSize(); i++) {
+    let st = inv.getItem(i);
+    if (st.isEmpty()) continue;
+    let id = String(st.id);
+    let v = tvTradeValue(id);
+    if (v >= TV.requestValueMin && v <= TV.requestValueMax && cand.indexOf(id) < 0) cand.push(id);
+  }
+  if (cand.length && Math.random() < 0.6) return tvRand(cand);
+  let pool = [];
+  [global.crops, global.animalProducts, global.cooking].forEach((list) => {
+    (list || []).forEach((e) => {
+      let v = tvTradeValue(e.item);
+      if (v >= TV.requestValueMin && v <= TV.requestValueMax) pool.push(String(e.item));
+    });
+  });
+  if (!pool.length) return cand.length ? tvRand(cand) : null;
+  return tvRand(pool);
+}
+
+function tvRequestStart(player) {
+  let mem = tvMem(player);
+  if (mem.mission || !tvIsOn(player)) return;
+  let id = tvRequestPick(player);
+  if (!id) return;
+  let value = tvTradeValue(id);
+  let target = Math.min(TV.requestTargetMax, TV.requestTargetBase + tvViewers(player) * 3);
+  let goal = Math.max(1, Math.min(64, Math.round(target / value)));
+  let viewer = tvRand(global.TV_VIEWERS);
+  let label = tvItemLabel(id);
+  let m = {
+    type: "request",
+    item: id,
+    label: label,
+    goal: goal,
+    progress: 0,
+    sec: TV.requestSec,
+    from: viewer.name,
+    text: `${label} ${goal}개 보내 주세요`,
+  };
+  m.ends = tvNow() + m.sec * 1000;
+  m.reward = tvRoundCoins(Math.min(TV.requestRewardMax, value * goal * TV.requestPriceMult));
+  mem.mission = m;
+  let bid = tvBossbarId(player);
+  let s = player.server;
+  s.runCommandSilent(`bossbar remove ${bid}`);
+  s.runCommandSilent(`bossbar add ${bid} ${tvJson({ text: `[사연] ${m.text}  보상 ${tvFmt(m.reward)}`, color: "#FFB3E6" })}`);
+  s.runCommandSilent(`bossbar set ${bid} color pink`);
+  s.runCommandSilent(`bossbar set ${bid} max ${m.sec}`);
+  s.runCommandSilent(`bossbar set ${bid} value ${m.sec}`);
+  s.runCommandSilent(`bossbar set ${bid} players ${tvName(player)}`);
+  let story = tvFill(tvRand(global.TV_REQUEST_STORIES), { item: label, n: goal, p: tvName(player) });
+  tvPushChat(player, "[사연] " + viewer.name, viewer.color, `${story} (보상 ${tvFmt(m.reward)})`, true);
+  s.runCommandSilent(
+    `tellraw ${tvName(player)} ${tvJson([
+      { text: "[사연] ", color: "#FFB3E6" },
+      { text: `${viewer.name}: ${label} ${goal}개를 보내 주면 ${tvFmt(m.reward)} 후원 (출하가의 ${TV.requestPriceMult}배, ${Math.round(m.sec / 60)}분 안에) `, color: "#FFFFFF" },
+      { text: "[보내기]", color: "#FFB3E6", bold: true, clickEvent: { action: "run_command", value: "/stream send" }, hoverEvent: { action: "show_text", contents: "가방에서 꺼내서 보내요" } },
+    ])}`
+  );
+}
+
+function tvRequestHint(player) {
+  let m = tvMem(player).mission;
+  if (!m || m.type != "request") return;
+  player.server.runCommandSilent(
+    `tellraw ${tvName(player)} ${tvJson([
+      { text: "[사연] ", color: "#FFB3E6" },
+      { text: `${m.label} ${m.goal}개가 모였어요! `, color: "#FFFFFF" },
+      { text: "[보내기]", color: "#FFB3E6", bold: true, clickEvent: { action: "run_command", value: "/stream send" }, hoverEvent: { action: "show_text", contents: `${m.from}님에게 보내고 ${tvFmt(m.reward)} 받기` } },
+    ])}`
+  );
+}
+
+function tvRequestSend(player) {
+  let mem = tvMem(player);
+  let m = mem.mission;
+  if (!m || m.type != "request") {
+    player.tell(Text.of("[사연] 지금 받은 사연이 없어요.").gray());
+    return 0;
+  }
+  let have = tvCountItem(player, m.item);
+  if (have < m.goal) {
+    player.tell(Text.of(`[사연] ${m.label}이(가) 모자라요 (${have}/${m.goal})`).red());
+    return 0;
+  }
+  tvTakeItem(player, m.item, m.goal);
+  tvPushChat(player, m.from, "#FFB3E6", tvFill(tvRand(global.TV_REQUEST_THANKS), { item: m.label, p: tvName(player) }));
+  tvMissionEnd(player, true);
+  return 1;
+}
+
 function tvMissionTick(player) {
   let m = tvMem(player).mission;
   if (!m) return;
   let left = Math.max(0, Math.ceil((m.ends - tvNow()) / 1000));
   player.server.runCommandSilent(`bossbar set ${tvBossbarId(player)} value ${left}`);
-  if (m.type == "goto") {
+  if (m.type == "request") {
+    let have = tvCountItem(player, m.item);
+    player.server.runCommandSilent(
+      `bossbar set ${tvBossbarId(player)} name ${tvJson({ text: `[사연] ${m.label} ${m.goal}개 보내 주세요 (보유 ${Math.min(have, m.goal)}/${m.goal})  보상 ${tvFmt(m.reward)}`, color: "#FFB3E6" })}`
+    );
+    if (have >= m.goal && !m.readyNotified) {
+      m.readyNotified = true;
+      tvRequestHint(player);
+    }
+  } else if (m.type == "goto") {
     let dx = player.x - m.tx, dz = player.z - m.tz;
     if (Math.sqrt(dx * dx + dz * dz) < 8) return tvMissionEnd(player, true);
   } else {
@@ -665,7 +837,9 @@ function tvSecond(player) {
   if (afk < TV.afkHardSec) {
     let perMin = Math.min(TV.donationRateMax, TV.donationRateBase + tvViewers(player) / TV.donationRatePerViewers);
     if (Math.random() < perMin / 60) tvDonate(player, null);
-    if (!mem.mission && now - mem.lastMissionEnd > TV.missionMinGapSec * 1000 && Math.random() < TV.missionChancePerMin / 60) {
+    if (!mem.mission && now - mem.lastMissionEnd > TV.missionMinGapSec * 1000 && Math.random() < TV.requestChancePerMin / 60) {
+      tvRequestStart(player);
+    } else if (!mem.mission && now - mem.lastMissionEnd > TV.missionMinGapSec * 1000 && Math.random() < TV.missionChancePerMin / 60) {
       tvMissionStart(player);
     }
   }
@@ -739,7 +913,7 @@ EntityEvents.death((e) => {
     if (boss) tvEvent(entity, 10, 0, "보스전 사망 (레전드 장면)", "death_boss", {});
     else tvEvent(entity, -30, 0, "사망", "death", {});
     let m = tvMem(entity).mission;
-    if (m) tvMissionEnd(entity, false);
+    if (m && m.type != "request") tvMissionEnd(entity, false); // 사연은 죽어도 유지
     return;
   }
   let player = e.source ? e.source.player : null;
@@ -1001,7 +1175,26 @@ function tvSessionEnd(player, loggingOut) {
     tvData(player).tvLastRecap = tvJson(recap); // 다음 접속 때 보여줌
   } else {
     tvRecapLines(recap).forEach((l) => player.tell(l));
+    tvRecapAi(player, recap);
   }
+}
+
+// AI 한 줄 평 (방송을 끌 때만, AI가 켜져 있으면)
+function tvRecapAi(player, recap) {
+  if (!global.tvAiRequest) return;
+  let min = Math.max(1, Math.round(recap.durationSec / 60));
+  let parts = [
+    `방송 ${min}분`,
+    `최고 시청자 ${recap.peak}명`,
+    `구독자 ${recap.subsStart}→${recap.subsEnd}`,
+    `후원 ${recap.donations}회 ${recap.donated}원`,
+    `미션 성공 ${recap.missions}번`,
+  ];
+  if (recap.highlights.length) parts.push("주요 장면: " + recap.highlights.map((h) => h.reason).join(", "));
+  global.tvAiRequest(player, "recap", parts.join(" / "), {}, (p, lines) => {
+    if (!p || !lines.length || !lines[0].m) return;
+    p.tell(Text.of("[오늘의 한 줄 평] ").color("#FF77FF").append(Text.of(lines[0].m.slice(0, 60)).white()));
+  });
 }
 
 function tvShowStoredRecap(player) {
@@ -1274,6 +1467,7 @@ ServerEvents.commandRegistry((event) => {
       .then(Commands.literal(words.off).executes(run((p) => tvSetOn(p, false))))
       .then(Commands.literal(words.stats).executes(run(tvStats)))
       .then(Commands.literal(words.settle).executes(run(tvSettle)))
+      .then(Commands.literal(words.send).executes(run(tvRequestSend)))
       .then(Commands.literal("ai").requires((src) => src.hasPermission(2)).executes(run((p) => (global.tvAiStats ? global.tvAiStats(p) : 0))))
       .then(
         Commands.literal(words.reset)
@@ -1298,8 +1492,8 @@ ServerEvents.commandRegistry((event) => {
           .then(Commands.literal(words.on).executes(run((p) => tvToggleChat(p, true))))
           .then(Commands.literal(words.off).executes(run((p) => tvToggleChat(p, false))))
       );
-  event.register(build("stream", { on: "on", off: "off", stats: "stats", settle: "settle", chat: "chat", reset: "reset", all: "all" }));
-  event.register(build("방송", { on: "켜기", off: "끄기", stats: "통계", settle: "정산", chat: "채팅", reset: "초기화", all: "전원" }));
+  event.register(build("stream", { on: "on", off: "off", stats: "stats", settle: "settle", chat: "chat", reset: "reset", all: "all", send: "send" }));
+  event.register(build("방송", { on: "켜기", off: "끄기", stats: "통계", settle: "정산", chat: "채팅", reset: "초기화", all: "전원", send: "보내기" }));
 });
 
 ServerEvents.loaded((e) => {
