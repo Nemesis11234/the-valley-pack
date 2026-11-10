@@ -13,6 +13,7 @@ const TV_AI = {
   eventMinHype: 15, // 이 이상 화제성인 장면만 AI로 (작은 일은 템플릿)
   idleEverySec: 180, // 조용할 때 AI 잡담 간격
   chatReply: true, // 스트리머가 채팅 치면 AI가 반응
+  maxPerHour: 60, // 한 사람당 시간당 최대 AI 호출 (한 명이 한도를 다 쓰지 못하게)
   aliveSec: 30, // thevalley-ai.jar 신호가 이 시간 안에 있어야 사용
 };
 
@@ -44,6 +45,9 @@ global.tvAiRequest = (player, kind, text) => {
   let now = Date.now();
   if (kind != "chat" && mem.aiLastAt && now - mem.aiLastAt < TV_AI.minGapSec * 1000) return false;
   if (kind == "chat" && mem.aiLastAt && now - mem.aiLastAt < 4000) return false;
+  mem.aiTimes = (mem.aiTimes || []).filter((t) => now - t < 3600000);
+  if (mem.aiTimes.length >= TV_AI.maxPerHour) return false;
+  mem.aiTimes.push(now);
   mem.aiLastAt = now;
   TV_AI_STATE.seq++;
   let recent = mem.chat.slice(-8).map((l) => `${l.name}: ${l.msg}`);
