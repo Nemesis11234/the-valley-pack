@@ -8,6 +8,9 @@ global.TV_CONFIG = {
   // 채널 시작 구독자
   startSubs: 10,
 
+  // 화제성 최대치 (시청자 = 구독자 × (1 + 화제성/100), 최대 3배)
+  hypeMax: 200,
+
   // 화제성: 이 시간(초)마다 절반으로 식음
   hypeHalfLifeSec: 600,
   // 잠수·방송 OFF일 때 식는 속도 배율
@@ -32,21 +35,34 @@ global.TV_CONFIG = {
   // 계좌에서 먼저 빼고, 모자란 만큼만 미정산금에서 뺌 (streamFeeHook.js)
 
   // 랜덤 후원: 분당 기대 횟수 = min(max, base + 시청자 / perViewers)
-  donationRateBase: 0.2,
-  donationRatePerViewers: 300,
-  donationRateMax: 3,
-  // 후원 금액 ≈ 시청자 × 이 값 (랜덤 폭 있음)
-  donationPerViewer: 1.5,
-  donationMin: 8,
-  // 가끔 오는 큰 후원
-  bigDonationChance: 0.03,
-  bigDonationMult: 10,
+  //   시청자 10명 ≈ 시간당 3번, 100명 ≈ 4.5번, 1,000명 ≈ 18번, 3,000명 이상 ≈ 30번(최대)
+  donationRateBase: 0.05,
+  donationRatePerViewers: 4000,
+  donationRateMax: 0.5,
+  // 후원 금액 구간 (100원 단위). weight가 작을수록 드묾, minViewers 이상일 때만 나옴
+  //   시청자 적을 때 평균 약 240원, 많을 때 평균 약 600원
+  donationTiers: [
+    { amount: 100, weight: 100, minViewers: 0 },
+    { amount: 200, weight: 50, minViewers: 0 },
+    { amount: 500, weight: 25, minViewers: 0 },
+    { amount: 1000, weight: 12, minViewers: 0 },
+    { amount: 2000, weight: 6, minViewers: 50 },
+    { amount: 5000, weight: 3, minViewers: 100 },
+    { amount: 10000, weight: 1.2, minViewers: 300 },
+    { amount: 30000, weight: 0.4, minViewers: 1000 },
+    { amount: 50000, weight: 0.15, minViewers: 3000 },
+  ],
+  // 큰 장면 축하 후원: 이 화제성 이상일 때만, 확률은 최대 이 값
+  eventDonationMinHype: 25,
+  eventDonationMaxChance: 0.5,
   // 후원 중 억까 비율
   trollChance: 0.15,
 
   // 미션: 분당 등장 확률, 진행 중이 아닐 때만
   missionChancePerMin: 0.08,
   missionMinGapSec: 300,
+  missionRewardMin: 300,
+  missionRewardMax: 5000,
 
   // 집(리스폰 지점)에서 이 거리 안이면 억까 금지
   homeSafeRadius: 24,
@@ -54,6 +70,7 @@ global.TV_CONFIG = {
   // 일간 순위: 매일 자정(UTC+9, 한국·일본 시간)에 정산, 1·2·3등 보너스 = 그날 최고 시청자 × 배수
   rankUtcOffsetHours: 9,
   rankRewards: [10, 5, 2],
+  rankRewardCaps: [20000, 10000, 5000], // 1·2·3등 보너스 최대
 
   // 구독자 달성 트로피 (Trofers 모드 트로피 블록으로 지급)
   trophies: [
@@ -73,6 +90,13 @@ global.TV_CONFIG = {
   // AI 잡담 간격(초)
   aiIdleMaxSec: 90,
   aiIdleMinSec: 25,
+
+  // 업적: 등급별 화제성·구독자 (레시피 해금·숨은 업적은 무시)
+  advancement: {
+    task: { hype: 3, subs: 0 }, // 일반 업적 (같은 날 반복할수록 줄어듦)
+    goal: { hype: 10, subs: 1 }, // 목표 (테두리가 둥근 업적)
+    challenge: { hype: 25, subs: 3 }, // 도전 과제 (보라색)
+  },
 
   // 방송 채팅창: 보이는 줄 수, 줄이 사라지는 시간(초)
   chatLines: 6,
