@@ -273,7 +273,9 @@ function tvEvent(player, hype, subs, reason, category, vars) {
   if (!tvIsOn(player)) return;
   tvMarkActive(player);
   tvChange(player, hype, subs, reason);
-  if (category) tvViewerChat(player, category, vars || {}, null, hype >= 50 ? 10 : 6);
+  // 큰 장면은 AI가 이어서 반응 (템플릿은 1줄만 먼저)
+  let aiUsed = Math.abs(hype) >= 15 && global.tvAiRequest && global.tvAiRequest(player, "event", reason);
+  if (category) tvViewerChat(player, category, vars || {}, aiUsed ? 1 : null, hype >= 50 ? 10 : 6);
   if (hype >= 20 && Math.random() < Math.min(0.8, hype / 100)) {
     player.server.scheduleInTicks(40 + Math.floor(Math.random() * 120), () => {
       if (player.isRemoved()) return;
@@ -600,7 +602,11 @@ function tvSecond(player) {
   // 조용할 때 잡담
   if (afk < TV.afkSoftSec && now - mem.lastIdleChat > 45000 && Math.random() < 0.05) {
     mem.lastIdleChat = now;
-    tvViewerChat(player, "idle", {}, 1, 2);
+    if (!(now - (mem.aiIdleAt || 0) > 180000 && global.tvAiRequest && global.tvAiRequest(player, "idle", "특별한 일 없이 플레이 중"))) {
+      tvViewerChat(player, "idle", {}, 1, 2);
+    } else {
+      mem.aiIdleAt = now;
+    }
   }
 
   // 해골 광산 깊이 기록
@@ -730,6 +736,7 @@ PlayerEvents.chat((e) => {
   tvMarkActive(player);
   if (!tvIsOn(player)) return;
   let msg = String(e.message);
+  if (global.tvAiRequest && global.tvAiRequest(player, "chat", msg)) return; // AI가 답함
   let matched = null;
   global.TV_CHAT_REPLIES.forEach((r) => {
     if (!matched && r.keys.some((k) => msg.indexOf(k) >= 0)) matched = r;
@@ -1146,6 +1153,7 @@ ServerEvents.commandRegistry((event) => {
       .then(Commands.literal(words.off).executes(run((p) => tvSetOn(p, false))))
       .then(Commands.literal(words.stats).executes(run(tvStats)))
       .then(Commands.literal(words.settle).executes(run(tvSettle)))
+      .then(Commands.literal("ai").requires((src) => src.hasPermission(2)).executes(run((p) => (global.tvAiStats ? global.tvAiStats(p) : 0))))
       .then(
         Commands.literal(words.chat)
           .then(Commands.literal(words.on).executes(run((p) => tvToggleChat(p, true))))
