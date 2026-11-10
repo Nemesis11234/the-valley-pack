@@ -1,8 +1,9 @@
 {
-  "_comment": "팩에서 뺄 파일. 재배포가 금지돼 자동 설치가 안 되고, 진행에 영향이 없어서 제외함 (2026-11-10 결정).",
+  "_comment": "팩에서 뺄 파일. 재배포 금지로 자동 설치가 안 되는 것(진행 영향 없음)과, 접속이 끊길 때마다 게임 안 MS 로그인 창을 띄워 헷갈리게 하는 NeoAuth (2026-11-10 결정).",
   "files": [
     "BalloonBox1.20.1(Forge)vs.1.0.3.jar",
     "Lopy-Create-Pipez.zip",
-    "Create Style for Refined Storage.zip"
+    "Create Style for Refined Storage.zip",
+    "NeoAuth-1.20.1-1.0.3.jar"
   ]
 }
