@@ -1,0 +1,35 @@
+name: 몬스터 능력치 분석
+
+on:
+  workflow_dispatch:
+    inputs:
+      mods:
+        description: 분석할 모드 메타파일 이름 (공백 구분, pack/mods/<이름>.pw.toml)
+        required: true
+        default: "dragons-den irons-spells-n-spellbooks legendary-creatures illage-and-spillage-finally-ported friends-and-foes-forge rotten-creatures deeper-and-slimier create-deep-dark guard-villagers"
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: 분석
+        env:
+          MODS: ${{ inputs.mods }}
+        run: |
+          python3 scripts/scan_mobs.py pack $MODS
+          cat mob-stats.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mob-stats
+          path: |
+            mob-stats.json
+            mob-stats.md
