@@ -47,6 +47,8 @@ global.TV_CONFIG = {
   donationMax: 100000,
   donationAlphaLow: 1.3,
   donationAlphaHigh: 1.15,
+  // 이 금액 이상 후원은 AI가 상황에 맞는 후원 메시지를 씀 (AI 켜져 있을 때)
+  aiDonationMin: 5000,
   // 큰 장면 축하 후원: 이 화제성 이상일 때만, 확률은 최대 이 값
   eventDonationMinHype: 25,
   eventDonationMaxChance: 0.5,
@@ -57,6 +59,17 @@ global.TV_CONFIG = {
   missionChancePerMin: 0.08,
   missionMinGapSec: 300,
   missionRewardMin: 300,
+  // 시청자 사연(아이템 보내 달라는 요청): 분당 등장 확률, 제한 시간, 출하가 대비 배수
+  requestChancePerMin: 0.06,
+  requestSec: 1200,
+  requestPriceMult: 1.5,
+  requestRewardMax: 10000,
+  // 요청 개수는 "목표 가치 ÷ 아이템 가격": 목표 가치 = base + 시청자 × 3 (최대 targetMax)
+  requestTargetBase: 400,
+  requestTargetMax: 5000,
+  // 요청 대상 아이템 가격 범위 (출하가)
+  requestValueMin: 10,
+  requestValueMax: 1000,
   missionRewardMax: 5000,
 
   // 집(리스폰 지점)에서 이 거리 안이면 억까 금지

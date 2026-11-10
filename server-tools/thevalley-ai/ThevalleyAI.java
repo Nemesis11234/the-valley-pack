@@ -148,6 +148,12 @@ public class ThevalleyAI {
         String what = switch (kind) {
             case "chat" -> "스트리머가 채팅을 침: \"" + str(req.get("text")) + "\"";
             case "idle" -> "특별한 일 없이 평범하게 플레이 중 (잡담해도 됨)";
+            case "donation" -> "시청자 '" + str(extra(req).get("donor")) + "'가 " + num(extra(req).get("amount")).intValue()
+                + "원을 후원함. 상황: " + str(req.get("text"))
+                + ". 첫 줄은 반드시 이름 '" + str(extra(req).get("donor")) + "'로, 후원과 함께 보내는 메시지(35자 이내, 방금 상황이나 스트리머를 구체적으로 언급, 재치있게)."
+                + " 나머지 줄은 다른 시청자들이 후원에 놀라는 반응";
+            case "recap" -> "방송이 끝남. 오늘 방송 기록: " + str(req.get("text"))
+                + ". 이번엔 시청자 채팅이 아니라 '오늘 방송 한 줄 평' 딱 1줄만 작성 (40자 이내, 기록을 바탕으로 재치있게, 이름은 '한줄평')";
             default -> "방금 일어난 일: " + str(req.get("text"));
         };
         StringBuilder u = new StringBuilder();
@@ -156,6 +162,8 @@ public class ThevalleyAI {
         u.append("장소: ").append(str(req.get("dimension"))).append('\n');
         double busy = Math.max(0, Math.min(1, num(req.get("busy")).doubleValue()));
         int lineCount = 2 + (int) Math.round(busy * 4);
+        if ("recap".equals(kind)) lineCount = 1;
+        if ("donation".equals(kind)) lineCount = Math.min(lineCount, 3);
         String mood = busy < 0.4 ? "조용함 (시청자 적음)" : busy < 0.7 ? "보통" : busy < 0.9 ? "북적임" : "난리남 (시청자 아주 많음)";
         u.append("채팅 분위기: ").append(mood).append(" → ").append(lineCount).append("줄 작성\n");
         u.append(what).append('\n');
@@ -293,6 +301,11 @@ public class ThevalleyAI {
     }
 
     static String str(Object o) { return o == null ? "" : String.valueOf(o); }
+    @SuppressWarnings("unchecked")
+    static Map<String, Object> extra(Map<String, Object> req) {
+        Object e = req.get("extra");
+        return e instanceof Map ? (Map<String, Object>) e : new LinkedHashMap<>();
+    }
     static Number num(Object o) {
         if (o instanceof Number n) return n;
         try { return Double.parseDouble(str(o)); } catch (Exception e) { return 0; }
