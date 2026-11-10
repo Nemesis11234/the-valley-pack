@@ -63,8 +63,8 @@ public class ThevalleyAI {
             Map<String, Object> def = new LinkedHashMap<>();
             def.put("apiKey", "");
             def.put("model", "claude-haiku-5-5");
-            def.put("dailyLimitUsd", 0.5);
-            def.put("monthlyLimitUsd", 5.0);
+            def.put("dailyLimitUsd", 1.5);
+            def.put("monthlyLimitUsd", 25.0);
             def.put("inputUsdPerMTok", 0.10);
             def.put("outputUsdPerMTok", 0.50);
             def.put("maxTokens", 300);
