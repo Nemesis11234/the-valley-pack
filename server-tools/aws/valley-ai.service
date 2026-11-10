@@ -1,0 +1,13 @@
+[Unit]
+Description=The Valley AI viewer chat helper
+After=network-online.target valley.service
+
+[Service]
+User=minecraft
+WorkingDirectory=/opt/valley/server
+ExecStart=/opt/java17/bin/java -Xmx128m -jar /opt/valley/server/thevalley_ai/thevalley-ai.jar
+Restart=always
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target

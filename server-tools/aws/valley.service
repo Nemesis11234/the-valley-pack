@@ -1,0 +1,20 @@
+[Unit]
+Description=The Valley Minecraft server
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=forking
+User=minecraft
+WorkingDirectory=/opt/valley/server
+# 켜기 전에 저장소에서 최신 모드·설정·스크립트를 받아 맞춤 (root로 실행)
+ExecStartPre=+/usr/bin/python3 /opt/valley/repo/server-tools/aws/sync_server.py
+ExecStart=/usr/bin/tmux new-session -d -s mc /opt/valley/server/start-valley.sh
+ExecStop=/opt/valley/repo/server-tools/aws/stop.sh
+TimeoutStartSec=1200
+TimeoutStopSec=200
+Restart=always
+RestartSec=20
+
+[Install]
+WantedBy=multi-user.target

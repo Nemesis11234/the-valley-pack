@@ -1,0 +1,55 @@
+name: AWS 설치 스크립트 테스트
+
+# setup.sh를 깨끗한 Ubuntu(GitHub 러너)에서 그대로 실행해 보고, 서버가 열리는지 확인한다.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "server-tools/aws/**"
+      - ".github/workflows/aws-setup-test.yml"
+
+concurrency:
+  group: aws-setup-test
+  cancel-in-progress: true
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: setup.sh 실행 (저장소의 최신 파일 사용)
+        env:
+          VALLEY_HEAP_MAX: 10G
+          VALLEY_HEAP_MIN: 4G
+        run: |
+          curl -fsSL "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/server-tools/aws/setup.sh" -o setup.sh
+          sed -i "s#git clone -q --depth 1 \"\$REPO_URL\"#git clone -q \"\$REPO_URL\"#" setup.sh
+          sudo -E bash setup.sh
+          sudo git -C /opt/valley/repo checkout -q ${{ github.sha }}
+
+      - name: 서버 열릴 때까지 기다리기 (최대 25분)
+        run: |
+          for i in $(seq 1 150); do
+            if timeout 3 bash -c "</dev/tcp/127.0.0.1/25565" 2>/dev/null; then echo "서버 열림 (${i}0초)"; exit 0; fi
+            if ! systemctl is-active --quiet valley && [ $i -gt 6 ]; then echo "서비스 상태:"; systemctl status valley --no-pager | head -20; fi
+            sleep 10
+          done
+          echo "25분 안에 안 열림"; exit 1
+
+      - name: 기록
+        if: always()
+        run: |
+          sudo journalctl -u valley --no-pager | grep -E "valley-sync|Started|Stopped|error|Error" | tail -40
+          echo "===== kubejs 오류 ====="
+          sudo grep -h "ERR" /opt/valley/server/logs/kubejs/*.log 2>/dev/null | head -40 || true
+          sudo grep -h "TheValley" /opt/valley/server/logs/kubejs/server.log 2>/dev/null | head -20 || true
+          echo "===== AI 도우미 ====="
+          sudo journalctl -u valley-ai --no-pager | tail -5
+          sudo cat /opt/valley/server/thevalley_ai/status.json 2>/dev/null || true
+
+      - name: 정상 종료 확인 (stop → 월드 저장)
+        run: |
+          sudo systemctl stop valley
+          sudo grep -h "Saving worlds\|ThreadedAnvilChunkStorage\|All dimensions are saved" /opt/valley/server/logs/latest.log | tail -3
+          systemctl is-active valley || echo "꺼짐 확인"
