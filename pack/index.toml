@@ -25666,6 +25666,18 @@ file = "kubejs/server_scripts/thevalley/pauseWhenEmpty.js"
 hash = "d8f4c5a71bfbb550002ce28ac5a17ccf6bb676a3cc0f989241d057e9408517e5"
 
 [[files]]
+file = "kubejs/server_scripts/thevalley/stream/stream.js"
+hash = "f5c110f913e4d9ac74d42e5b788677645a10e2c67f2bdbdf46215a8f5687ab53"
+
+[[files]]
+file = "kubejs/server_scripts/thevalley/stream/streamConfig.js"
+hash = "8065a45e866c7219f3adde74906fd4e53f892309ce1182424167fb0c46d4afd6"
+
+[[files]]
+file = "kubejs/server_scripts/thevalley/stream/streamTemplates.js"
+hash = "550be754c816aa435768d62ab3024cd9a6080b50d50b790b5dd7a143fbe6ee93"
+
+[[files]]
 file = "kubejs/startup_scripts/_config.js"
 hash = "55ec6a27ee084373cb893026af3ddfa4f8b5252b55236b506902c7c7555ac1f1"
 
@@ -26084,6 +26096,10 @@ hash = "4a6b0213d15adb076e9aff3164ee298649128bc98fa65097bc0fc2ba40eba241"
 [[files]]
 file = "kubejs/startup_scripts/sveSlimeShipping.js"
 hash = "06acac92b0033b14b3285ce5c39a650fc73729f8267992b08ff839f87fbc1b81"
+
+[[files]]
+file = "kubejs/startup_scripts/thevalley/streamFishing.js"
+hash = "f2b16033f4977f8727134e2913e748bda498aefc8d00889040900700d016b8a7"
 
 [[files]]
 file = "manual-mods.json"
