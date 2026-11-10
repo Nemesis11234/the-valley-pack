@@ -7470,6 +7470,18 @@ file = "kubejs/assets/terrablender/lang/ko_kr.json"
 hash = "a5110290311a5256c6f5e34574ea9315fb1762a7d30ef2ddde190479ce16817d"
 
 [[files]]
+file = "kubejs/assets/thevalley/textures/item/enhance_stone_high.png"
+hash = "1fcfacc8f1ee7b8ee50992e1e368e189745e836c1d7fa2faad9e481244eb32b4"
+
+[[files]]
+file = "kubejs/assets/thevalley/textures/item/enhance_stone_low.png"
+hash = "597b042ef56a6994fb3655a37967b2d97edfbb86fbbd973eb554c4520b7909ca"
+
+[[files]]
+file = "kubejs/assets/thevalley/textures/item/enhance_stone_mid.png"
+hash = "8e0b85de1f24d8af64b6bad4bd0217eaeb1c43cf84a9316919b87c030e037221"
+
+[[files]]
 file = "kubejs/assets/toms_storage/lang/ko_kr.json"
 hash = "6e288a0b5ce3aabaa081acb0897ac2e11538ac52420594e25860c176aba0280b"
 
@@ -7968,6 +7980,10 @@ hash = "84189bc7613c2433973476e8359230dd9e1283f69b4e6f18d3e5ce320b86adf0"
 [[files]]
 file = "kubejs/client_scripts/sveMinceDisplay.js"
 hash = "c8abefeb22d55fa637a8d428093646561a0d410979a78c93a20a736456d1bb5e"
+
+[[files]]
+file = "kubejs/client_scripts/thevalley/enhanceTooltip.js"
+hash = "247dae37a81205c7521a5a0f924aa965666455aba12da3b5c76cb4f9fc2b5488"
 
 [[files]]
 file = "kubejs/client_scripts/tooltips/addAdvancedTooltips.js"
@@ -16038,6 +16054,26 @@ file = "kubejs/data/dialog/dialogs/shepherd_unique_five_gift.json"
 hash = "e5f8e962c4da6ed67e01608d1bfb953f86d3162cc73ffe5541508adcdc4a24f2"
 
 [[files]]
+file = "kubejs/data/dialog/dialogs/thevalley_enhance_high_break.json"
+hash = "193464046803636cc8ed0459689bbd56800ef3687b97c5a42a9889e2385cb666"
+
+[[files]]
+file = "kubejs/data/dialog/dialogs/thevalley_enhance_low_down.json"
+hash = "eced3ee824cb826d84162e7d1bd88c0cb9fbe1f6ef8239e25dc9ab28a20cc5bb"
+
+[[files]]
+file = "kubejs/data/dialog/dialogs/thevalley_enhance_low_keep.json"
+hash = "ddd169ec12d31b10f50215c6dbb0a42faf88b9262686374539f7006d1e7371cf"
+
+[[files]]
+file = "kubejs/data/dialog/dialogs/thevalley_enhance_mid_break.json"
+hash = "f5e07d467257490fd49eb932713e9546e03c2db23e2041459b14362644b13c66"
+
+[[files]]
+file = "kubejs/data/dialog/dialogs/thevalley_enhance_mid_down.json"
+hash = "237867ca7fb0cd41fd3d43f72a1865ecfc8ac015d1917c0e5900a2325d0b3376"
+
+[[files]]
 file = "kubejs/data/dialog/dialogs/thevalley_stream_menu.json"
 hash = "c7ac3248958d1ea0e492312f731b835388992052470b191983cce24804fb6fb6"
 
@@ -23290,6 +23326,18 @@ file = "kubejs/data/tanukidecor/loot_tables/blocks/cabana_bed.json"
 hash = "06a2a47f9ff9bd198ab1f56f625155c43e6a7affeeca0d99ada5630c87a295cf"
 
 [[files]]
+file = "kubejs/data/thevalley/trofers/button_diamond.json"
+hash = "64c8a6777d2a8a414bf65c46e8f0d5181358e8d4ebb7c43a29e859d57e53592e"
+
+[[files]]
+file = "kubejs/data/thevalley/trofers/button_gold.json"
+hash = "a3429587b42c5d2dd5e233fd0ad672d89d3003486c308bf9d6d164195ba939fb"
+
+[[files]]
+file = "kubejs/data/thevalley/trofers/button_silver.json"
+hash = "47159c0ca71b0baf68c56b31f6f0844846f003e62fed07619820fb1971130312"
+
+[[files]]
 file = "kubejs/data/toolbelt/recipes/belt_via_sewing.json"
 hash = "e86e0073a1ded5235e0b108a8b79eb584b1c10acce2abaf97e10c9c94902da9f"
 
@@ -25666,24 +25714,28 @@ file = "kubejs/server_scripts/tags/sveVoidSteelMaterialTags.js"
 hash = "7131d239e4d5ff79d7a84b38812621a38b7b8b106b4c97027ab616394ed0acab"
 
 [[files]]
+file = "kubejs/server_scripts/thevalley/enhance/enhance.js"
+hash = "7cb02c54bc32e20e95b89c029fdfe2be62a5022cf7d12e727e1fc9e9a6d56f1e"
+
+[[files]]
 file = "kubejs/server_scripts/thevalley/pauseWhenEmpty.js"
 hash = "d8f4c5a71bfbb550002ce28ac5a17ccf6bb676a3cc0f989241d057e9408517e5"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/stream.js"
-hash = "2300d8fb95e93c703e45d8b34f906131238e7a3999ae2fc662fd1466bd538a9a"
+hash = "51ae0a6707e22fa7ad7028d3587c0932bac955ffd3d48a8a9986d30993e864bc"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamConfig.js"
-hash = "08d008c2190adc080b7fb2b2c9a1fff973f5db85e59ee4e2e4f51883253401f2"
+hash = "d15fe521c4c503c1fb491fe203967e0b05d9b66f572f7ed1993106ef467c4f6e"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamFeeHook.js"
-hash = "90168515c8e9c0e3cc79c835a663c0db919c558184b2f9441ca0cea2d9010cbd"
+hash = "058af6c226b82461aebd4a202b6a28fd410c236b870e0ebd74b9f86f6a23e58a"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamTemplates.js"
-hash = "de1d4415c7018b2c1ffb53187d0bc8b3762ff6abbdf499a7aec7fc66713af6d9"
+hash = "207d3241a55600d98415df6e78e54a7f8121ffa36ecceadc9d3070485effcc5b"
 
 [[files]]
 file = "kubejs/startup_scripts/_config.js"
@@ -26104,6 +26156,10 @@ hash = "4a6b0213d15adb076e9aff3164ee298649128bc98fa65097bc0fc2ba40eba241"
 [[files]]
 file = "kubejs/startup_scripts/sveSlimeShipping.js"
 hash = "06acac92b0033b14b3285ce5c39a650fc73729f8267992b08ff839f87fbc1b81"
+
+[[files]]
+file = "kubejs/startup_scripts/thevalley/enhance.js"
+hash = "21b935dbe89f2616345569209a558345dc0b9cd1352b25f7724baa1710e1c29a"
 
 [[files]]
 file = "kubejs/startup_scripts/thevalley/streamFishing.js"

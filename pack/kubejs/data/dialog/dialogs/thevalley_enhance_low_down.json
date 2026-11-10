@@ -1,0 +1,127 @@
+{
+  "id": "thevalley_enhance_low_down",
+  "title": "강화",
+  "description": "The Valley 강화",
+  "entries": [
+    {
+      "id": "start",
+      "text": [
+        {
+          "text": "⚒ 강화\n",
+          "color": "#FFAA00",
+          "bold": true
+        },
+        {
+          "text": "+"
+        },
+        {
+          "score": {
+            "name": "@s",
+            "objective": "tv_e_lvl"
+          },
+          "color": "#FFFFFF"
+        },
+        {
+          "text": "  →  +"
+        },
+        {
+          "score": {
+            "name": "@s",
+            "objective": "tv_e_target"
+          },
+          "color": "#7EE0A1"
+        },
+        {
+          "text": "     성공 확률 "
+        },
+        {
+          "score": {
+            "name": "@s",
+            "objective": "tv_e_rate"
+          },
+          "color": "#7EE0A1"
+        },
+        {
+          "text": "%\n"
+        },
+        {
+          "text": "실패하면 1단계 떨어져요.",
+          "color": "#AAAAAA"
+        },
+        {
+          "text": "\n필요: 하급 강화석 1개 (보유 "
+        },
+        {
+          "score": {
+            "name": "@s",
+            "objective": "tv_e_have"
+          },
+          "color": "#FFD54F"
+        },
+        {
+          "text": "개) · "
+        },
+        {
+          "score": {
+            "name": "@s",
+            "objective": "tv_e_cost"
+          },
+          "color": "#FFD54F"
+        },
+        {
+          "text": "원 (잔고 "
+        },
+        {
+          "score": {
+            "name": "@s",
+            "objective": "tv_e_bal"
+          },
+          "color": "#FFD54F"
+        },
+        {
+          "text": "원)"
+        }
+      ],
+      "options": [
+        {
+          "text": {
+            "text": "강화하기",
+            "color": "#FFAA00",
+            "bold": true
+          },
+          "target": "end",
+          "command": [
+            "tvenhance confirm"
+          ],
+          "visibility_command": "execute if score @s tv_e_ok matches 1"
+        },
+        {
+          "text": {
+            "text": "하급 강화석이 모자라요",
+            "color": "#777777"
+          },
+          "target": "end",
+          "visibility_command": "execute if score @s tv_e_ok matches 2"
+        },
+        {
+          "text": {
+            "text": "잔고가 모자라요",
+            "color": "#777777"
+          },
+          "target": "end",
+          "visibility_command": "execute if score @s tv_e_ok matches 3"
+        },
+        {
+          "text": {
+            "text": "닫기",
+            "color": "gray"
+          },
+          "target": "end"
+        }
+      ]
+    },
+    {
+      "id": "end"
+    }
+  ]
+}

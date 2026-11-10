@@ -28,8 +28,8 @@ global.TV_CONFIG = {
     { name: "파트너", minSubs: 3000, fee: 0.2 },
   ],
 
-  // 미정산 후원금 한도 없음. 죽거나 해골 광산에서 기절하면 병원비가 미정산 금액에서도 빠짐
-  // (비율·상한은 계좌 병원비와 같음, stream.js의 global.tvPendingFee)
+  // 미정산 후원금 한도 없음. 병원비는 (계좌 + 미정산금) 기준으로 계산해서
+  // 계좌에서 먼저 빼고, 모자란 만큼만 미정산금에서 뺌 (streamFeeHook.js)
 
   // 랜덤 후원: 분당 기대 횟수 = min(max, base + 시청자 / perViewers)
   donationRateBase: 0.2,
@@ -50,6 +50,17 @@ global.TV_CONFIG = {
 
   // 집(리스폰 지점)에서 이 거리 안이면 억까 금지
   homeSafeRadius: 24,
+
+  // 일간 순위: 매일 자정(UTC+9, 한국·일본 시간)에 정산, 1·2·3등 보너스 = 그날 최고 시청자 × 배수
+  rankUtcOffsetHours: 9,
+  rankRewards: [10, 5, 2],
+
+  // 구독자 달성 트로피 (Trofers 모드 트로피 블록으로 지급)
+  trophies: [
+    { subs: 100, id: "thevalley:button_silver", name: "실버 버튼", color: "#D9D9D9", block: "trofers:medium_pillar" },
+    { subs: 1000, id: "thevalley:button_gold", name: "골드 버튼", color: "#FFD54F", block: "trofers:medium_pillar" },
+    { subs: 10000, id: "thevalley:button_diamond", name: "다이아 버튼", color: "#7FE7FF", block: "trofers:large_pillar" },
+  ],
 
   // 방송 채팅창: 보이는 줄 수, 줄이 사라지는 시간(초)
   chatLines: 6,
