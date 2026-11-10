@@ -140,6 +140,9 @@ def boot():
             if re.search(r"Loading|Preparing|Done|ERROR|Exception|Crash", line) and time.time() - last_progress > 30:
                 print(f"[{int(time.time() - start)}s] {line.rstrip()[:200]}", flush=True)
                 last_progress = time.time()
+            if "Failed to start the minecraft server" in line:
+                print("서버가 시작에 실패함", flush=True)
+                break
             if "Done (" in line and not done:
                 done = True
                 print(f"서버 켜짐 ({int(time.time() - start)}초)", flush=True)
