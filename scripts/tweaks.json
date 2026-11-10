@@ -1,0 +1,17 @@
+{
+  "_comment": "팩을 가져온 뒤 항상 적용하는 설정 변경. 원본에서 찾을 문자열이 없으면 변환 작업이 실패해서 알려줌.",
+  "replace": [
+    {
+      "file": "config/sereneseasons/seasons.toml",
+      "find": "sub_season_duration = 10",
+      "with": "sub_season_duration = 20",
+      "why": "계절 한 단계 20일 (2026-11-10 결정)"
+    },
+    {
+      "file": "kubejs/startup_scripts/_config.js",
+      "find": "global.subSeasonDuration = 10;",
+      "with": "global.subSeasonDuration = 20;",
+      "why": "seasons.toml과 같은 값이어야 함 (팩 제작자 주석)"
+    }
+  ]
+}
