@@ -26107,7 +26107,7 @@ hash = "06acac92b0033b14b3285ce5c39a650fc73729f8267992b08ff839f87fbc1b81"
 
 [[files]]
 file = "manual-mods.json"
-hash = "957a9871faf44a754ab4dfe5f2a20faba60179ea82e73dd02360914d5e7fa2dd"
+hash = "04953b0ec9f054377c118074f15878e630b0c98209be786bf9bf89cf64046b5b"
 
 [[files]]
 file = "mods/additional-attributes.pw.toml"
@@ -26202,11 +26202,6 @@ metafile = true
 [[files]]
 file = "mods/badpackets.pw.toml"
 hash = "64bf8b278979f6e2aa9dc0fb5d2168212bc9337e41fb9a9f7e114fe91695194a"
-metafile = true
-
-[[files]]
-file = "mods/balloon-box.pw.toml"
-hash = "5040f2ef7f4b94e177dcec899a48cb3d593340bc0e9dfec6dbc9893033e5f835"
 metafile = true
 
 [[files]]
@@ -27946,7 +27941,7 @@ metafile = true
 
 [[files]]
 file = "mods/trek-mod.pw.toml"
-hash = "284e1bce9a8d8898f958b760af793ab1dec42d7c474ae8fe7dfcab0851f2e909"
+hash = "274139e327b9fedfaf86849dc07fb0a33e572880d43a0b1a26a9c2bda138ad1a"
 metafile = true
 
 [[files]]
