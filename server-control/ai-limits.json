@@ -1,0 +1,5 @@
+{
+  "_comment": "AWS 서버가 켜질 때 thevalley_ai/config.json의 한도를 이 값으로 맞춤 (API 키는 건드리지 않음)",
+  "dailyLimitUsd": 2.5,
+  "monthlyLimitUsd": 40.0
+}

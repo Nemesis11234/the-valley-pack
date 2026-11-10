@@ -81,8 +81,8 @@ public class ThevalleyAI {
             Map<String, Object> def = new LinkedHashMap<>();
             def.put("apiKey", "");
             def.put("model", "claude-haiku-5-5");
-            def.put("dailyLimitUsd", 1.5);
-            def.put("monthlyLimitUsd", 25.0);
+            def.put("dailyLimitUsd", 2.5);
+            def.put("monthlyLimitUsd", 40.0);
             def.put("inputUsdPerMTok", 0.10);
             def.put("outputUsdPerMTok", 0.50);
             def.put("maxTokens", 300);
@@ -101,6 +101,18 @@ public class ThevalleyAI {
         // 빠진 값은 기본값으로
         Map<String, Object> merged = new LinkedHashMap<>(defaults());
         for (Map.Entry<String, Object> e : raw.entrySet()) if (e.getValue() != null) merged.put(e.getKey(), e.getValue());
+        // AWS 서버: 저장소의 한도 파일이 있으면 그 값이 우선 (/opt/valley/repo/server-control/ai-limits.json)
+        Path limits = Paths.get("..", "repo", "server-control", "ai-limits.json");
+        if (Files.exists(limits)) {
+            try {
+                Object o = Json.parse(Files.readString(limits, StandardCharsets.UTF_8));
+                if (o instanceof Map) {
+                    Map<String, Object> lm = (Map<String, Object>) o;
+                    for (String k : List.of("dailyLimitUsd", "monthlyLimitUsd")) if (lm.get(k) != null) merged.put(k, lm.get(k));
+                }
+            } catch (Exception ignored) {
+            }
+        }
         config = merged;
     }
 
@@ -110,8 +122,8 @@ public class ThevalleyAI {
         Map<String, Object> def = new LinkedHashMap<>();
         def.put("apiKey", "");
         def.put("model", "claude-haiku-5-5");
-        def.put("dailyLimitUsd", 1.5);
-        def.put("monthlyLimitUsd", 25.0);
+        def.put("dailyLimitUsd", 2.5);
+        def.put("monthlyLimitUsd", 40.0);
         def.put("inputUsdPerMTok", 0.10);
         def.put("outputUsdPerMTok", 0.50);
         def.put("maxTokens", 300);

@@ -136,6 +136,29 @@ def sync_pack_files():
     log("설정·스크립트 최신으로 맞춤")
 
 
+def apply_ai_limits():
+    """저장소의 server-control/ai-limits.json 한도를 AI 도우미 설정에 반영 (API 키는 그대로)."""
+    src = f"{REPO}/server-control/ai-limits.json"
+    dst = f"{SERVER}/thevalley_ai/config.json"
+    if not os.path.exists(src) or not os.path.exists(dst):
+        return
+    try:
+        limits = json.load(open(src))
+        cfg = json.load(open(dst, encoding="utf-8-sig"))
+    except Exception as e:  # noqa: BLE001
+        log(f"AI 한도 반영 실패 (config.json 확인): {e}")
+        return
+    changed = False
+    for k in ["dailyLimitUsd", "monthlyLimitUsd"]:
+        if k in limits and cfg.get(k) != limits[k]:
+            cfg[k] = limits[k]
+            changed = True
+    if changed:
+        with open(dst, "w", encoding="utf-8") as f:
+            json.dump(cfg, f, ensure_ascii=False, indent=2)
+        log(f"AI 한도: 하루 ${cfg.get('dailyLimitUsd')}, 한 달 ${cfg.get('monthlyLimitUsd')}")
+
+
 def maybe_reset_world():
     flag = f"{REPO}/server-control/reset-world.txt"
     done = f"{SERVER}/.reset-done"
@@ -165,11 +188,17 @@ def write_start_script(ver):
 
 
 def main():
+    before = open(__file__, "rb").read()
     git_pull()
+    if open(__file__, "rb").read() != before and os.environ.get("VALLEY_SYNC_REEXEC") != "1":
+        log("동기화 스크립트가 바뀌어서 새 버전으로 다시 실행")
+        os.environ["VALLEY_SYNC_REEXEC"] = "1"
+        os.execv(sys.executable, [sys.executable, __file__])
     ver = install_forge()
     sync_mods()
     sync_pack_files()
     maybe_reset_world()
+    apply_ai_limits()
     write_start_script(ver)
     subprocess.run(["chown", "-R", "minecraft:minecraft", SERVER], check=True)
     log("준비 끝, 서버 시작")
