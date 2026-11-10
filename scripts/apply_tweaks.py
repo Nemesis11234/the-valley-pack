@@ -30,10 +30,15 @@ def main():
     for t in tweaks["replace"]:
         p = pack / t["file"]
         raw = p.read_bytes().decode("utf-8")
-        if t["find"] in raw:
-            p.write_bytes(raw.replace(t["find"], t["with"]).encode("utf-8"))
-            print(f"  ~ {t['file']}: {t['find']} → {t['with']}")
-        elif t["with"] in raw:
+        find, repl = t["find"], t["with"]
+        # 원본이 CRLF 줄바꿈이면 그에 맞춰서 찾는다
+        if find not in raw and "\r\n" in raw:
+            find, repl = find.replace("\n", "\r\n"), repl.replace("\n", "\r\n")
+        label = t.get("why") or f"{t['find'][:40]} → {t['with'][:40]}"
+        if find in raw:
+            p.write_bytes(raw.replace(find, repl).encode("utf-8"))
+            print(f"  ~ {t['file']}: {label}")
+        elif repl in raw:
             print(f"  = {t['file']}: 이미 적용됨")
         else:
             print(f"  ! {t['file']}: '{t['find']}'를 찾지 못함 (팩이 바뀐 듯, tweaks.json 확인 필요)")

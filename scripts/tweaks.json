@@ -12,6 +12,12 @@
       "find": "global.subSeasonDuration = 10;",
       "with": "global.subSeasonDuration = 20;",
       "why": "seasons.toml과 같은 값이어야 함 (팩 제작자 주석)"
+    },
+    {
+      "file": "kubejs/server_scripts/globalServer.js",
+      "find": "  let maxFee = 0;\n  let minimumFee = 512;\n  \n  if (reason === \"death\") {\n    maxFee = 4096;\n    if (player.stages.has(\"first_aid_guide\")) maxFee = 2048;\n    amountToDeduct = Math.min(Math.round(balance * 0.1), maxFee);\n  }\n  if (reason === \"skull_cavern\") {\n    minimumFee = 1024;\n    maxFee = 8192;\n\n    amountToDeduct = Math.min(Math.round(balance * 0.15), maxFee);\n  }\n  if (amountToDeduct < minimumFee) amountToDeduct = minimumFee;\n  if (balance < maxFee && player.stages.has(\"entered_skull_cavern\")) amountToDeduct = maxFee;",
+      "with": "  let maxFee = 0;\n  let minimumFee = 512;\n  // The Valley: 원래 상한(4,096 / 8,192)은 해골 광산 이후 최소 청구액으로만 유지\n  let legacyFloor = 0;\n  \n  if (reason === \"death\") {\n    // The Valley: 잔고의 15%, 최대 50,000 (응급 처치 안내서: 7.5%, 최대 25,000)\n    maxFee = player.stages.has(\"first_aid_guide\") ? 25000 : 50000;\n    let deathRate = player.stages.has(\"first_aid_guide\") ? 0.075 : 0.15;\n    legacyFloor = player.stages.has(\"first_aid_guide\") ? 2048 : 4096;\n    amountToDeduct = Math.min(Math.round(balance * deathRate), maxFee);\n  }\n  if (reason === \"skull_cavern\") {\n    // The Valley: 잔고의 20%, 최대 100,000\n    minimumFee = 1024;\n    maxFee = 100000;\n    legacyFloor = 8192;\n\n    amountToDeduct = Math.min(Math.round(balance * 0.2), maxFee);\n  }\n  if (amountToDeduct < minimumFee) amountToDeduct = minimumFee;\n  if (balance < legacyFloor && player.stages.has(\"entered_skull_cavern\")) amountToDeduct = legacyFloor;",
+      "why": "병원비 15%/최대 5만(안내서 7.5%/최대 2.5만), 해골 광산 20%/최대 10만 (2026-11-10 결정)"
     }
   ]
 }
