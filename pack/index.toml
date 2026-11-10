@@ -27329,11 +27329,6 @@ hash = "464e83a35e22e9bbdf7be38cf7a7a98c39462a0a50b01d2a1355bcae9167ea7a"
 metafile = true
 
 [[files]]
-file = "mods/neoauth.pw.toml"
-hash = "dbf9f7d8a3460cc820854358f2e8b9afc6e06bb7017f7cdff08b2d453eacbb82"
-metafile = true
-
-[[files]]
 file = "mods/nether-depths-upgrade.pw.toml"
 hash = "19bcecfa3d942e4dddda2f84987b10718809ee9b09ee8461d993b951b538810d"
 metafile = true
