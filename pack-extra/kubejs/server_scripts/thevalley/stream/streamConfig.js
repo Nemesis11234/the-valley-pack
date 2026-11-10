@@ -62,6 +62,11 @@ global.TV_CONFIG = {
     { subs: 10000, id: "thevalley:button_diamond", name: "다이아 버튼", color: "#7FE7FF", block: "trofers:large_pillar" },
   ],
 
+  // 비속어: 채팅에 섞이면 시청자가 빠짐. 같은 날 반복할수록 더 많이 빠지고, 3번째부터 구독자도 줄어듦
+  swearWords: ["시발", "씨발", "ㅅㅂ", "ㅆㅂ", "병신", "ㅂㅅ", "좆", "존나", "ㅈㄴ", "개새", "새끼", "미친놈", "미친년", "꺼져", "닥쳐", "지랄", "ㅈㄹ", "fuck", "shit"],
+  swearHype: 15, // 1번째 -15, 2번째 -30 ... (최대 -60)
+  swearSubsFrom: 3, // 이 횟수부터 구독자 -1씩
+
   // 방송 채팅창: 보이는 줄 수, 줄이 사라지는 시간(초)
   chatLines: 6,
   chatLineLifeSec: 40,
