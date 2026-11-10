@@ -2287,7 +2287,7 @@ hash = "6458c6244c0daa2daf33d955bfd928fbee6d7f5d9cd983954a13c628c9257b0f"
 
 [[files]]
 file = "config/missing_mods_checker.json"
-hash = "1c9350df388926e292ce735cc1b5653882b5dfabae4e062204ade996ce93aa8b"
+hash = "0e6d1489e217ddd058de6f2ddb13b393f11cb7233343a506a985631ae3594cc3"
 
 [[files]]
 file = "config/moblassos-server.toml"
@@ -3235,7 +3235,7 @@ hash = "1ded33a0b874217fda0e75655d3b238406b75c042aa4d0c7365df809f1a487ad"
 
 [[files]]
 file = "config/resourcepackoverrides.json"
-hash = "a8e9ac3a40c5b031dac78a2b5114271f19fe6d85ec64bced9fe4a393a52fd457"
+hash = "776cac4b42ef252b5fbd71a16d08b8030337da18be9380e1d1e189e995d79fed"
 
 [[files]]
 file = "config/ribbits-forge-1_20_1.toml"
@@ -4159,7 +4159,7 @@ hash = "3564851fbc00c4d297a11c69089d02c3cda033eede11b843f1e62da37cbf6ab2"
 
 [[files]]
 file = "configureddefaults/options.txt"
-hash = "47f31161a2d3a5fb74a0e5ec8e3507689491e568ab27b779ed414cdd1ccfa687"
+hash = "1cd22497874cb6ac016f95fdcf79e3201fef7562d13563f5501447446579b4fd"
 
 [[files]]
 file = "datapacks/SimpleCreateRadiosDatapack/data/simpleradio/recipes/copper_wire_cutting.json"
@@ -26083,7 +26083,7 @@ hash = "06acac92b0033b14b3285ce5c39a650fc73729f8267992b08ff839f87fbc1b81"
 
 [[files]]
 file = "manual-mods.json"
-hash = "53b89cbe49824e01c66a2914c305c213ee4e8c1a13005b22fbb1620ab4152d94"
+hash = "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
 
 [[files]]
 file = "mods/additional-attributes.pw.toml"

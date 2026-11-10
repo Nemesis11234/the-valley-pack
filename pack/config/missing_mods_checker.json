@@ -1,10 +1,5 @@
 [
     {
-        "pattern": "BalloonBox.*",
-        "displayName": "BalloonBox",
-        "url": "https://edge.forgecdn.net/files/4715/994/BalloonBox1.20.1(Forge)vs.1.0.3.jar"
-    },
-    {
         "pattern": "connectivity-1.20.1-7.2.*",
         "displayName": "Connectivity",
         "url": "https://edge.forgecdn.net/files/7032/387/connectivity-1.20.1-7.2.jar"
