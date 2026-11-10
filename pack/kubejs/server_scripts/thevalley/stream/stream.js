@@ -61,6 +61,7 @@ function tvMem(player) {
       mission: null,
       lastMissionEnd: 0,
       lastIdleChat: tvNow(),
+      idleGap: 15000,
       afkAnnounced: false,
       lastViewers: -1,
     };
@@ -96,6 +97,12 @@ function tvSubs(player) {
 function tvHype(player) {
   return Number(tvData(player).tvHype) || 0;
 }
+// 채팅 분주함 0~1: 시청자 10명 0.33, 100명 0.67, 1,000명 이상 1
+function tvBusy(player) {
+  let v = Math.max(1, tvViewers(player));
+  return Math.max(0, Math.min(1, Math.log(v) / Math.LN10 / 3));
+}
+
 function tvViewers(player) {
   return Math.round(tvSubs(player) * (1 + tvHype(player) / 100));
 }
@@ -205,7 +212,7 @@ function tvViewerChat(player, category, vars, count, spreadSec) {
   let lines = global.TV_TEMPLATES[category];
   if (!lines) return;
   let mem = tvMem(player);
-  let n = count || 2 + Math.floor(Math.random() * 3);
+  let n = count || 2 + Math.floor(Math.random() * 3) + Math.round(tvBusy(player) * 4);
   let used = {};
   for (let i = 0; i < n; i++) {
     let line = tvRand(lines);
@@ -607,13 +614,17 @@ function tvSecond(player) {
     ready.forEach((q) => tvPushChat(player, q.name, q.color, q.msg));
   }
 
-  // 조용할 때 잡담
-  if (afk < TV.afkSoftSec && now - mem.lastIdleChat > 45000 && Math.random() < 0.05) {
+  // 평소 잡담: 시청자가 많을수록 자주, 여러 명이 (10명 약 15초마다 1줄 → 1,000명 2~3초마다 여러 줄)
+  let busy = tvBusy(player);
+  if (afk < TV.afkSoftSec && now - mem.lastIdleChat > mem.idleGap) {
     mem.lastIdleChat = now;
-    if (!(now - (mem.aiIdleAt || 0) > 180000 && global.tvAiRequest && global.tvAiRequest(player, "idle", "특별한 일 없이 플레이 중"))) {
-      tvViewerChat(player, "idle", {}, 1, 2);
-    } else {
+    mem.idleGap = (TV.idleChatMaxSec - (TV.idleChatMaxSec - TV.idleChatMinSec) * busy) * 1000 * (0.6 + Math.random() * 0.8);
+    let aiIdleGap = (TV.aiIdleMaxSec - (TV.aiIdleMaxSec - TV.aiIdleMinSec) * busy) * 1000;
+    if (now - (mem.aiIdleAt || 0) > aiIdleGap && global.tvAiRequest && global.tvAiRequest(player, "idle", "특별한 일 없이 플레이 중")) {
       mem.aiIdleAt = now;
+    } else {
+      let n = 1 + Math.floor(Math.random() * (1 + busy * 3));
+      tvViewerChat(player, Math.random() < 0.6 ? "idle" : "chat_generic", {}, n, 3);
     }
   }
 

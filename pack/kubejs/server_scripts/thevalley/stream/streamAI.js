@@ -9,11 +9,11 @@
 const TV_AI = {
   dir: "thevalley_ai",
   enabled: true,
-  minGapSec: 12, // 한 사람에게 AI 요청 최소 간격
+  minGapSec: 12, // 한 사람에게 AI 요청 최소 간격 (시청자가 많으면 5초까지 줄어듦)
   eventMinHype: 15, // 이 이상 화제성인 장면만 AI로 (작은 일은 템플릿)
   idleEverySec: 180, // 조용할 때 AI 잡담 간격
   chatReply: true, // 스트리머가 채팅 치면 AI가 반응
-  maxPerHour: 60, // 한 사람당 시간당 최대 AI 호출 (한 명이 한도를 다 쓰지 못하게)
+  maxPerHour: 60, // 한 사람당 시간당 최대 AI 호출: 시청자 적을 때 60 → 1,000명 이상 120
   aliveSec: 30, // thevalley-ai.jar 신호가 이 시간 안에 있어야 사용
 };
 
@@ -46,10 +46,12 @@ global.tvAiRequest = (player, kind, text) => {
   if (!tvAiAlive()) return false;
   let mem = tvMem(player);
   let now = Date.now();
-  if (kind != "chat" && mem.aiLastAt && now - mem.aiLastAt < TV_AI.minGapSec * 1000) return false;
+  let busy = tvBusy(player);
+  let gap = Math.max(5, TV_AI.minGapSec - 7 * busy);
+  if (kind != "chat" && mem.aiLastAt && now - mem.aiLastAt < gap * 1000) return false;
   if (kind == "chat" && mem.aiLastAt && now - mem.aiLastAt < 4000) return false;
   mem.aiTimes = (mem.aiTimes || []).filter((t) => now - t < 3600000);
-  if (mem.aiTimes.length >= TV_AI.maxPerHour) return false;
+  if (mem.aiTimes.length >= TV_AI.maxPerHour * (1 + busy)) return false;
   mem.aiTimes.push(now);
   mem.aiLastAt = now;
   TV_AI_STATE.seq++;
@@ -66,6 +68,7 @@ global.tvAiRequest = (player, kind, text) => {
     dimension: String(player.level.dimension),
     recent: recent,
     names: global.TV_VIEWERS.map((v) => v.name),
+    busy: busy,
   });
   if (TV_AI_STATE.outbox.length > 30) TV_AI_STATE.outbox = TV_AI_STATE.outbox.slice(-30);
   TV_AI_STATE.dirty = true;
