@@ -1,0 +1,75 @@
+name: AWS 서버 켜기·끄기
+
+# 저장소에 쓰기 권한이 있는 사람만 실행할 수 있다 (재현).
+# AWS 열쇠는 저장소 Secrets(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)에 있고,
+# IAM 정책상 이 인스턴스 하나만 켜기·끄기·재시작·상태 확인할 수 있다.
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 할 일
+        required: true
+        type: choice
+        options: [status, start, stop, reboot]
+        default: status
+
+concurrency:
+  group: aws-server
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: ap-northeast-2
+  AWS_DEFAULT_REGION: ap-northeast-2
+  INSTANCE_ID: i-0c36cc5a227308e18
+  SERVER_IP: 43.202.127.139
+  MC_PORT: "25565"
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: 할 일 실행
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          ACTION: ${{ inputs.action }}
+        run: |
+          set -euo pipefail
+          state() {
+            aws ec2 describe-instances --instance-ids "$INSTANCE_ID" \
+              --query 'Reservations[0].Instances[0].State.Name' --output text
+          }
+          mc_up() { timeout 3 bash -c "</dev/tcp/$SERVER_IP/$MC_PORT" 2>/dev/null; }
+
+          echo "현재 상태: $(state)"
+          case "$ACTION" in
+            start)
+              aws ec2 start-instances --instance-ids "$INSTANCE_ID" >/dev/null
+              aws ec2 wait instance-running --instance-ids "$INSTANCE_ID"
+              echo "인스턴스 켜짐. 마인크래프트 서버 응답 기다리는 중 (최대 10분)"
+              for i in $(seq 1 60); do
+                if mc_up; then echo "RESULT: 서버 열림 ($SERVER_IP:$MC_PORT)"; exit 0; fi
+                sleep 10
+              done
+              echo "RESULT: 인스턴스는 켜졌지만 10분 안에 마인크래프트 포트가 열리지 않음"
+              ;;
+            stop)
+              aws ec2 stop-instances --instance-ids "$INSTANCE_ID" >/dev/null
+              aws ec2 wait instance-stopped --instance-ids "$INSTANCE_ID"
+              echo "RESULT: 서버 꺼짐"
+              ;;
+            reboot)
+              aws ec2 reboot-instances --instance-ids "$INSTANCE_ID"
+              echo "RESULT: 재시작 요청함"
+              ;;
+            status)
+              s=$(state)
+              if [ "$s" = "running" ] && mc_up; then
+                echo "RESULT: 켜져 있음, 마인크래프트 서버 응답함"
+              else
+                echo "RESULT: 인스턴스 상태 $s, 마인크래프트 서버 $(mc_up && echo 응답함 || echo 응답 없음)"
+              fi
+              ;;
+          esac
