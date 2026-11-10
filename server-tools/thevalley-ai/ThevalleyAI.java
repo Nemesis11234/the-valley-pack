@@ -57,6 +57,7 @@ public class ThevalleyAI {
         }
     }
 
+    @SuppressWarnings("unchecked")
     static void loadConfig() throws IOException {
         Path p = DIR.resolve("config.json");
         if (!Files.exists(p)) {
@@ -71,7 +72,33 @@ public class ThevalleyAI {
             writeAtomic(p, Json.write(def, true));
             System.out.println("[The Valley AI] config.json을 만들었어요. apiKey에 Claude API 키를 넣어 주세요.");
         }
-        config = readMap(p);
+        Map<String, Object> raw;
+        try {
+            Object o = Json.parse(Files.readString(p, StandardCharsets.UTF_8).replace("\uFEFF", ""));
+            raw = o instanceof Map ? (Map<String, Object>) o : null;
+        } catch (Exception e) {
+            raw = null;
+        }
+        configBroken = raw == null;
+        if (raw == null) raw = new LinkedHashMap<>();
+        // 빠진 값은 기본값으로
+        Map<String, Object> merged = new LinkedHashMap<>(defaults());
+        for (Map.Entry<String, Object> e : raw.entrySet()) if (e.getValue() != null) merged.put(e.getKey(), e.getValue());
+        config = merged;
+    }
+
+    static boolean configBroken = false;
+
+    static Map<String, Object> defaults() {
+        Map<String, Object> def = new LinkedHashMap<>();
+        def.put("apiKey", "");
+        def.put("model", "claude-haiku-5-5");
+        def.put("dailyLimitUsd", 1.5);
+        def.put("monthlyLimitUsd", 25.0);
+        def.put("inputUsdPerMTok", 0.10);
+        def.put("outputUsdPerMTok", 0.50);
+        def.put("maxTokens", 300);
+        return def;
     }
 
     static String apiKey() {
@@ -227,7 +254,8 @@ public class ThevalleyAI {
             Map<String, Object> st = new LinkedHashMap<>();
             st.put("heartbeat", System.currentTimeMillis());
             st.put("ok", !apiKey().isEmpty() && !overBudget() && !lastError.startsWith("API 오류 401"));
-            st.put("lastError", lastError);
+            String err = configBroken ? "config.json 형식 오류 (따옴표·쉼표 확인)" : apiKey().isEmpty() ? "API 키 없음" : lastError;
+            st.put("lastError", err);
             st.put("today", bucket("today", today()));
             st.put("month", bucket("month", month()));
             st.put("dailyLimitUsd", config.get("dailyLimitUsd"));
