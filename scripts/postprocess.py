@@ -15,22 +15,34 @@ import urllib.request
 from pathlib import Path
 
 PACK = Path.cwd()
-LINE = re.compile(r"^(?P<name>.+) \((?P<file>[^()]+)\) from (?P<url>https?://\S+)\s*$")
 
 
 def toml_str(s: str) -> str:
     return json.dumps(s, ensure_ascii=False)
 
 
-def read_manual_list(log_path: Path):
+def read_manual_list(log_path: Path, filenames):
+    """'이름 (파일명) from URL' 줄을 읽는다. 이름·파일명 모두 괄호를 포함할 수 있어서
+    정규식 대신 실제 파일명 목록과 대조해서 자른다."""
     text = log_path.read_text(encoding="utf-8", errors="replace")
     if "manual downloads" not in text:
         return []
     out = []
     for line in text.splitlines():
-        m = LINE.match(line.strip())
-        if m:
-            out.append(m.groupdict())
+        line = line.strip()
+        m = re.search(r" from (https?://\S+)$", line)
+        if not m:
+            continue
+        head = line[: m.start()]
+        url = m.group(1)
+        # 가장 긴 파일명부터 맞춰본다
+        for fn in sorted(filenames, key=len, reverse=True):
+            suffix = f" ({fn})"
+            if head.endswith(suffix):
+                out.append({"name": head[: -len(suffix)], "file": fn, "url": url})
+                break
+        else:
+            print(f"  ! 파일명을 못 찾은 줄: {line}")
     return out
 
 
@@ -77,8 +89,8 @@ def write_url_metafile(path: Path, data: dict, url: str, sha1: str):
 
 def main():
     log_path = Path(sys.argv[1])
-    manual = read_manual_list(log_path)
     meta = index_metafiles()
+    manual = read_manual_list(log_path, list(meta.keys()))
     print(f"수동 다운로드 대상: {len(manual)}개")
 
     targets = []
