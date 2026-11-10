@@ -854,6 +854,8 @@ PlayerEvents.loggedOut((e) => {
   let player = e.player;
   let id = String(player.uuid);
   player.server.runCommandSilent(`bossbar remove ${tvBossbarId(player)}`);
+  // 오른쪽 순위표에는 지금 방송 중인(접속한) 사람만
+  player.server.runCommandSilent(`scoreboard players reset ${tvName(player)} tv_viewers`);
   try {
     tvSessionEnd(player, true);
   } catch (err) {
