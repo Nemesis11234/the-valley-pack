@@ -25715,7 +25715,7 @@ hash = "dab3da2ccbbe8efbbf44c195af88d371e41b73f8bd8f1573bacfb6ba2c82b537"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamTemplates.js"
-hash = "b57b61f763cadcf38532b738ae1fa252d5dcaa574433a968339d78af4e456426"
+hash = "29f3bb97df6b1eece8be4e25c8215c6ebe82ec446626a05e5c5a4b0df443d72c"
 
 [[files]]
 file = "kubejs/startup_scripts/_config.js"
