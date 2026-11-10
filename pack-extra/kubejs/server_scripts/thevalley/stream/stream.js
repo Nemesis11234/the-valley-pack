@@ -95,6 +95,11 @@ function tvData(player) {
     pd.tvDaily = "{}";
     pd.tvDailyDay = -1;
   }
+  // 숫자가 깨졌으면(NaN) 복구
+  ["tvPending", "tvDonatedTotal", "tvHype", "tvSkullBest"].forEach((k) => {
+    if (!isFinite(Number(pd[k]))) pd[k] = 0;
+  });
+  if (!isFinite(Number(pd.tvSubs))) pd.tvSubs = TV.startSubs;
   return pd;
 }
 function tvIsOn(player) {
@@ -109,7 +114,7 @@ function tvHype(player) {
 // 채팅 분주함 0~1: 시청자 10명 0.33, 100명 0.67, 1,000명 이상 1
 function tvBusy(player) {
   let v = Math.max(1, tvViewers(player));
-  return Math.max(0, Math.min(1, Math.log(v) / Math.LN10 / 3));
+  return Math.max(0, Math.min(1, Math.log(v) / Math.log(10) / 3));
 }
 
 function tvViewers(player) {
@@ -510,7 +515,7 @@ function tvTroll(player, viewer) {
   let s = player.server;
   let around = (mob, n) => {
     for (let i = 0; i < n; i++) {
-      let a = Math.random() * Math.PI * 2;
+      let a = Math.random() * 6.283185307179586;
       let r = 4 + Math.random() * 3;
       s.runCommandSilent(`execute at ${name} run summon ${mob} ~${(Math.cos(a) * r).toFixed(1)} ~ ~${(Math.sin(a) * r).toFixed(1)}`);
     }
@@ -555,7 +560,7 @@ function tvMissionStart(player) {
   let type = tvRand(types);
   let m;
   if (type == "goto") {
-    let a = Math.random() * Math.PI * 2;
+    let a = Math.random() * 6.283185307179586;
     let r = 80 + Math.random() * 100;
     let tx = Math.round(player.x + Math.cos(a) * r), tz = Math.round(player.z + Math.sin(a) * r);
     m = { type: type, tx: tx, tz: tz, goal: 1, sec: 180, text: `3분 안에 좌표 (${tx}, ${tz})까지 와라` };
