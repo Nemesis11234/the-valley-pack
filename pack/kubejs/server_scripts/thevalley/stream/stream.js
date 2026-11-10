@@ -756,9 +756,13 @@ PlayerEvents.chat((e) => {
       let v = tvRand(global.TV_VIEWERS);
       mem.queue.push({ at: tvNow() + 1000 + Math.random() * 4000, name: v.name, color: v.color, msg: tvRand(matched.lines) });
     }
-  } else if (Math.random() < 0.3) {
-    let v = tvRand(global.TV_VIEWERS);
-    mem.queue.push({ at: tvNow() + 1500 + Math.random() * 3000, name: v.name, color: v.color, msg: tvRand(["ㅇㅇ", "ㄹㅇ", "ㅋㅋ", "맞아요", "?"]) });
+  } else {
+    // 키워드가 없어도 스트리머가 말하면 항상 1~2명은 반응
+    let n = 1 + Math.floor(Math.random() * 2);
+    for (let i = 0; i < n; i++) {
+      let v = tvRand(global.TV_VIEWERS);
+      mem.queue.push({ at: tvNow() + 1200 + Math.random() * 3500, name: v.name, color: v.color, msg: tvRand(global.TV_TEMPLATES.chat_generic) });
+    }
   }
 });
 
