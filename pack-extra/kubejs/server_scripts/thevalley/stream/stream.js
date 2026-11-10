@@ -221,7 +221,7 @@ function tvViewerChat(player, category, vars, count, spreadSec) {
   let lines = global.TV_TEMPLATES[category];
   if (!lines) return;
   let mem = tvMem(player);
-  let n = count || 2 + Math.floor(Math.random() * 3) + Math.round(tvBusy(player) * 4);
+  let n = count || 3 + Math.floor(Math.random() * 3) + Math.round(tvBusy(player) * 4);
   let used = {};
   for (let i = 0; i < n; i++) {
     let line = tvRand(lines);
@@ -834,7 +834,7 @@ function tvSecond(player) {
     if (now - (mem.aiIdleAt || 0) > aiIdleGap && global.tvAiRequest && global.tvAiRequest(player, "idle", "특별한 일 없이 플레이 중")) {
       mem.aiIdleAt = now;
     } else {
-      let n = 1 + Math.floor(Math.random() * (1 + busy * 3));
+      let n = 1 + Math.floor(Math.random() * (2 + busy * 4));
       tvViewerChat(player, Math.random() < 0.6 ? "idle" : "chat_generic", {}, n, 3);
     }
   }
@@ -990,14 +990,14 @@ PlayerEvents.chat((e) => {
   });
   let mem = tvMem(player);
   if (matched) {
-    let n = 1 + Math.floor(Math.random() * 2);
+    let n = 2 + Math.floor(Math.random() * 2);
     for (let i = 0; i < n; i++) {
       let v = tvRand(global.TV_VIEWERS);
       mem.queue.push({ at: tvNow() + 1000 + Math.random() * 4000, name: v.name, color: v.color, msg: tvRand(matched.lines) });
     }
   } else {
     // 키워드가 없어도 스트리머가 말하면 항상 1~2명은 반응
-    let n = 1 + Math.floor(Math.random() * 2);
+    let n = 2 + Math.floor(Math.random() * 2);
     for (let i = 0; i < n; i++) {
       let v = tvRand(global.TV_VIEWERS);
       mem.queue.push({ at: tvNow() + 1200 + Math.random() * 3500, name: v.name, color: v.color, msg: tvRand(global.TV_TEMPLATES.chat_generic) });
