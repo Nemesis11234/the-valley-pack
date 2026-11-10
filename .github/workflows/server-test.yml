@@ -59,4 +59,4 @@ jobs:
           fi
 
       - name: 서버 부팅 테스트
-        run: python scripts/boot_test.py "$RUNNER_TEMP/server"
+        run: python -u scripts/boot_test.py "$RUNNER_TEMP/server"

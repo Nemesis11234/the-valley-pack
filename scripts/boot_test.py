@@ -59,7 +59,7 @@ def install_mods():
         elif name.endswith(".jar"):
             if not any(name.startswith(p) for p in prefixes):
                 shutil.copy(path, os.path.join(mods, name))
-    print(f"서버 모드 {len(jobs)}개 다운로드")
+    print(f"서버 모드 {len(jobs)}개 다운로드", flush=True)
     errors = []
 
     def worker(chunk):
@@ -103,35 +103,64 @@ def install_forge():
 
 
 def boot():
+    import queue
     proc = subprocess.Popen(["bash", "run.sh", "nogui"], cwd=SERVER, stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
-    done = False
+    lines = queue.Queue()
+
+    def reader():
+        for line in proc.stdout:
+            lines.put(line)
+        lines.put(None)
+
+    threading.Thread(target=reader, daemon=True).start()
     start = time.time()
+    done = False
+    stop_sent_at = None
     tail = []
+    last_progress = time.time()
 
     def send(cmd):
-        proc.stdin.write(cmd + "\n")
-        proc.stdin.flush()
+        try:
+            proc.stdin.write(cmd + "\n")
+            proc.stdin.flush()
+        except Exception:  # noqa: BLE001
+            pass
 
-    for line in proc.stdout:
-        tail.append(line)
-        tail = tail[-200:]
-        if "Done (" in line and not done:
-            done = True
-            print(f"서버 켜짐 ({int(time.time() - start)}초)")
-            for cmd in ["scoreboard objectives list", "team list", "kubejs errors", "stop"]:
-                send(cmd)
-                time.sleep(2)
-        if done and re.search(r"objectives|team|tv_|kubejs", line, re.I):
-            print("  " + line.rstrip())
-        if time.time() - start > 1500:
-            print("시간 초과")
-            proc.kill()
+    while True:
+        try:
+            line = lines.get(timeout=5)
+        except queue.Empty:
+            line = ""
+        if line is None:
             break
-    proc.wait()
+        if line:
+            tail.append(line)
+            tail = tail[-300:]
+            if re.search(r"Loading|Preparing|Done|ERROR|Exception|Crash", line) and time.time() - last_progress > 30:
+                print(f"[{int(time.time() - start)}s] {line.rstrip()[:200]}", flush=True)
+                last_progress = time.time()
+            if "Done (" in line and not done:
+                done = True
+                print(f"서버 켜짐 ({int(time.time() - start)}초)", flush=True)
+                for cmd in ["scoreboard objectives list", "team list"]:
+                    send(cmd)
+                    time.sleep(2)
+                send("stop")
+                stop_sent_at = time.time()
+            if done and re.search(r"objectives|teams? ", line, re.I):
+                print("  " + line.rstrip(), flush=True)
+        elapsed = time.time() - start
+        if not done and elapsed > 1200:
+            print("20분 안에 서버가 켜지지 않음", flush=True)
+            break
+        if stop_sent_at and time.time() - stop_sent_at > 120:
+            print("종료가 2분 넘게 걸려서 강제 종료", flush=True)
+            break
+    if proc.poll() is None:
+        proc.kill()
     if not done:
-        print("".join(tail))
-        print("서버가 켜지지 않았어요")
+        print("".join(tail[-150:]), flush=True)
     return done
 
 
@@ -159,9 +188,11 @@ def report():
 
 if __name__ == "__main__":
     os.makedirs(SERVER, exist_ok=True)
+    print("Forge 설치", flush=True)
     install_forge()
     install_mods()
     copy_pack_files()
+    print("서버 시작", flush=True)
     booted = boot()
     good = report()
     print("\n===== 결과:", "통과" if booted and good else "실패", "=====")
