@@ -739,11 +739,24 @@ EntityEvents.death((e) => {
   }
 });
 
+// 비속어 → 시청자 이탈 (공백·숫자·특수문자를 빼고 검사)
+function tvSwearCheck(player, msg) {
+  let words = TV.swearWords || [];
+  let norm = String(msg).toLowerCase().replace(/[\s0-9.,!?~_\-*^@#$%&()\[\]{}'"]/g, "");
+  if (!words.some((w) => norm.indexOf(w) >= 0)) return false;
+  let mult = Math.round(1 / tvDaily(player, "swear")); // 오늘 몇 번째인지
+  let hype = -Math.min(60, TV.swearHype * mult);
+  let subs = mult >= TV.swearSubsFrom ? -1 : 0;
+  tvEvent(player, hype, subs, mult > 1 ? `비속어 (오늘 ${mult}번째)` : "비속어", "swear", {});
+  return true;
+}
+
 PlayerEvents.chat((e) => {
   let player = e.player;
   tvMarkActive(player);
   if (!tvIsOn(player)) return;
   let msg = String(e.message);
+  if (tvSwearCheck(player, msg)) return;
   if (global.tvAiRequest && global.tvAiRequest(player, "chat", msg)) return; // AI가 답함
   let matched = null;
   global.TV_CHAT_REPLIES.forEach((r) => {

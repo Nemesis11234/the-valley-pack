@@ -25699,7 +25699,7 @@ hash = "ce756bcd339389cc58a49fed302602430fb84a3fac6954e45295b47bf1b351c4"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/stream.js"
-hash = "695c59ee351bc6776bf87940ecfbff5d99dfe59976d25d08fe06545d37442d5f"
+hash = "fd7414251e4827fb0052e2f8836b380b7bcd7400980c84edc095c9de7c876da8"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamAI.js"
@@ -25707,7 +25707,7 @@ hash = "02c838f9572fab1bacb249de00cc200ccb50ea0a96a6d6592ce792e5f5df4843"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamConfig.js"
-hash = "d15fe521c4c503c1fb491fe203967e0b05d9b66f572f7ed1993106ef467c4f6e"
+hash = "9c06f5f58c452774ae6c0898a951d48eb818baa89b773e6a26f8c6eec40496d2"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamFeeHook.js"
@@ -25715,7 +25715,7 @@ hash = "a1a2a3f79ac47d92186f6bc6c86417bd7c218ab025060443d9212b26c2147882"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamTemplates.js"
-hash = "2aa5665e28b48809b128c457fc9ec35216d10f0e50de091a67535fdf0ffb9955"
+hash = "e3c5d37f6b9cdfe0befa09f83789dd0fe1e5bc45e9c3615213caaf230c3ae656"
 
 [[files]]
 file = "kubejs/startup_scripts/_config.js"
