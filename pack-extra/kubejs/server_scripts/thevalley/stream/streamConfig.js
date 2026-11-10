@@ -67,6 +67,13 @@ global.TV_CONFIG = {
   swearHype: 15, // 1번째 -15, 2번째 -30 ... (최대 -60)
   swearSubsFrom: 3, // 이 횟수부터 구독자 -1씩
 
+  // 평소 잡담 간격(초): 시청자 적을 때 max ↔ 1,000명 이상일 때 min
+  idleChatMaxSec: 15,
+  idleChatMinSec: 2.5,
+  // AI 잡담 간격(초)
+  aiIdleMaxSec: 90,
+  aiIdleMinSec: 25,
+
   // 방송 채팅창: 보이는 줄 수, 줄이 사라지는 시간(초)
   chatLines: 6,
   chatLineLifeSec: 40,

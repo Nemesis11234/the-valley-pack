@@ -32,7 +32,7 @@ public class ThevalleyAI {
         "너는 한국 인터넷 방송(치지직·트위치) 채팅창의 시청자 여러 명을 연기한다.",
         "방송은 마인크래프트 농사·생활 모드팩(스타듀밸리 비슷함) 플레이 방송이다. 시청자들은 이 게임을 잘 아는 편이다.",
         "규칙:",
-        "- 2~4줄. 한 줄은 25자 이내. 실제 채팅처럼 짧고 가볍게, 반말과 인터넷 말투(ㅋㅋ, ㄷㄷ, ㄹㅇ, ?, ㅠㅠ)를 섞는다.",
+        "- 줄 수는 요청에 적힌 만큼. 한 줄은 25자 이내. 실제 채팅처럼 짧고 가볍게, 반말과 인터넷 말투(ㅋㅋ, ㄷㄷ, ㄹㅇ, ?, ㅠㅠ)를 섞는다.",
         "- 방금 일어난 일에 구체적으로 반응한다. 같은 말을 반복하지 않고, 최근 채팅과 겹치지 않게 한다.",
         "- 사람마다 성격이 다르게: 감탄, 놀림, 훈수, 딴소리, 질문 등을 섞는다. 가끔 스트리머 이름을 부른다.",
         "- 스트리머가 채팅을 쳤으면 그 말에 대답하는 줄을 포함한다.",
@@ -154,6 +154,10 @@ public class ThevalleyAI {
         u.append("스트리머: ").append(str(req.get("streamer"))).append('\n');
         u.append("시청자 수: ").append(num(req.get("viewers")).intValue()).append(", 구독자: ").append(num(req.get("subs")).intValue()).append('\n');
         u.append("장소: ").append(str(req.get("dimension"))).append('\n');
+        double busy = Math.max(0, Math.min(1, num(req.get("busy")).doubleValue()));
+        int lineCount = 2 + (int) Math.round(busy * 4);
+        String mood = busy < 0.4 ? "조용함 (시청자 적음)" : busy < 0.7 ? "보통" : busy < 0.9 ? "북적임" : "난리남 (시청자 아주 많음)";
+        u.append("채팅 분위기: ").append(mood).append(" → ").append(lineCount).append("줄 작성\n");
         u.append(what).append('\n');
         Object recent = req.get("recent");
         if (recent instanceof List && !((List<Object>) recent).isEmpty()) {
@@ -164,7 +168,7 @@ public class ThevalleyAI {
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("model", str(config.get("model")));
-        body.put("max_tokens", num(config.getOrDefault("maxTokens", 300)).intValue());
+        body.put("max_tokens", Math.max(num(config.getOrDefault("maxTokens", 300)).intValue(), 120 + lineCount * 50));
         body.put("system", SYSTEM);
         body.put("messages", List.of(Map.of("role", "user", "content", u.toString())));
 
@@ -207,7 +211,7 @@ public class ThevalleyAI {
             l.put("n", str(m.get("n")));
             l.put("m", str(m.get("m")));
             lines.add(l);
-            if (lines.size() >= 5) break;
+            if (lines.size() >= 7) break;
         }
         return lines;
     }
