@@ -4,6 +4,8 @@
 // 방법: 잠깐 미정산금을 잔고에 더한 상태로 원래 병원비를 걷고, 남은 잔고를 계좌/미정산금으로 다시 나눈다.
 // 우선순위를 낮춰 globalServer.js보다 늦게 불러온다.
 
+// Rhino는 최상위 if 블록 안의 const를 전역으로 취급해서 "redeclaration" 오류가 나므로 함수로 감싼다
+(function () {
 if (global.handleFee && !global.handleFee.tvWrapped) {
   const tvOriginalHandleFee = global.handleFee;
   const tvFeeFmt = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -47,3 +49,4 @@ if (global.handleFee && !global.handleFee.tvWrapped) {
 } else {
   console.warn("[TheValley] streamFeeHook.js: global.handleFee 없음 또는 이미 연결됨");
 }
+})();
