@@ -856,7 +856,7 @@ function tvStats(player) {
     `§c[방송 통계]§r ${tvIsOn(player) ? "§aON" : "§7OFF"}`,
     `§f시청자 §e${tvFmt(tvViewers(player))}§f = 구독자 §e${tvFmt(tvSubs(player))}§f × 화제성 §e${(1 + tvHype(player) / 100).toFixed(2)}배`,
     `§f등급 §e${tier.name}§f (정산 수수료 ${Math.round(tier.fee * 100)}%)`,
-    `§f미정산 후원금 §e${tvFmt(pd.tvPending)}§7 (죽거나 기절하면 병원비가 여기서도 빠져요)`,
+    `§f미정산 후원금 §e${tvFmt(pd.tvPending)}§7 (병원비는 계좌에서 먼저, 모자라면 여기서)`,
     `§f누적 후원 §e${tvFmt(pd.tvDonatedTotal)}§f · 해골 광산 최고 ${pd.tvSkullBest}구간`,
     "§7최근 변동:",
   ];
@@ -876,30 +876,8 @@ function tvToggleChat(player, on) {
   return 1;
 }
 
-// ───────────── 병원비 (미정산 후원금에도 적용) ─────────────
-// streamFeeHook.js가 팩의 global.handleFee 뒤에 이 함수를 부른다.
-// 미정산금도 계좌에 있는 돈처럼 취급: 비율은 같고, 상한은 계좌 병원비와 합쳐서 한 번만 적용.
-global.tvPendingFee = (player, reason, chargedFromAccount) => {
-  if (!player || player.isFake()) return;
-  const pd = tvData(player);
-  const pending = Number(pd.tvPending) || 0;
-  if (pending <= 0) return;
-  const guide = player.stages.has("first_aid_guide");
-  let rate = 0, cap = 0;
-  if (reason === "death") {
-    rate = guide ? 0.075 : 0.15;
-    cap = guide ? 25000 : 50000;
-  } else if (reason === "skull_cavern") {
-    rate = 0.2;
-    cap = 100000;
-  }
-  // 상한은 계좌 병원비와 합쳐서 한 번만: 계좌에서 이미 걷힌 만큼 상한에서 뺌
-  const room = Math.max(0, cap - (Number(chargedFromAccount) || 0));
-  const fee = Math.min(Math.round(pending * rate), room);
-  if (fee <= 0) return;
-  pd.tvPending = pending - fee;
-  player.tell(Text.of(`[방송] 병원비: 미정산 후원금에서 ${tvFmt(fee)} 빠짐 (남은 금액 ${tvFmt(pd.tvPending)})`).red());
-};
+// ───────────── 병원비 ─────────────
+// streamFeeHook.js: 미정산금도 계좌에 있는 돈으로 쳐서 병원비를 계산하고, 계좌에서 먼저 뺀다.
 
 // ───────────── 메뉴 (SVDialog 창) ─────────────
 // 창 글자는 서버에서 점수판 값으로 채워지므로, 열기 직전에 점수를 맞춰 둔다.
