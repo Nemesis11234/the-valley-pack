@@ -86,7 +86,7 @@ global.TV_CONFIG = {
   aiIdleMaxSec: 90,
   aiIdleMinSec: 25,
 
-  // 업적: 선릿 밸리(society) 주요 업적만 반응. 위에서부터 처음 맞는 규칙 적용, 없으면 무시
+  // 업적: 선릿 밸리(society) 업적 위주 + 마인크래프트 주요 업적만 반응. 위에서부터 처음 맞는 규칙 적용, 없으면 무시
   advancementRules: [
     { id: "society:main/money/obtain_prismatic_coin", hype: 150, subs: 20 },
     { id: "society:main/money/obtain_ancient_coin", hype: 80, subs: 10 },
@@ -95,6 +95,27 @@ global.TV_CONFIG = {
     { id: "society:main/obtain_prismatic_shard", hype: 40, subs: 5 },
     { prefix: "society:main/machines/", hype: 10, subs: 1 },
     { prefix: "society:main/materials/", hype: 8, subs: 1 },
+    // 마인크래프트 주요 업적
+    { id: "minecraft:end/kill_dragon", hype: 150, subs: 15 },
+    { id: "minecraft:adventure/adventuring_time", hype: 60, subs: 5 },
+    { id: "minecraft:nether/netherite_armor", hype: 60, subs: 5 },
+    { id: "minecraft:adventure/kill_all_mobs", hype: 50, subs: 5 },
+    { id: "minecraft:nether/create_full_beacon", hype: 40, subs: 4 },
+    { id: "minecraft:nether/all_effects", hype: 40, subs: 4 },
+    { id: "minecraft:end/elytra", hype: 40, subs: 4 },
+    { id: "minecraft:end/respawn_dragon", hype: 40, subs: 3 },
+    { id: "minecraft:story/enter_the_end", hype: 40, subs: 3 },
+    { id: "minecraft:nether/summon_wither", hype: 30, subs: 2 },
+    { id: "minecraft:adventure/hero_of_the_village", hype: 30, subs: 3 },
+    { id: "minecraft:husbandry/balanced_diet", hype: 30, subs: 3 },
+    { id: "minecraft:adventure/totem_of_undying", hype: 25, subs: 2 },
+    { id: "minecraft:husbandry/bred_all_animals", hype: 25, subs: 2 },
+    { id: "minecraft:husbandry/complete_catalogue", hype: 20, subs: 2 },
+    { id: "minecraft:story/enter_the_nether", hype: 20, subs: 2 },
+    { id: "minecraft:story/follow_ender_eye", hype: 20, subs: 2 },
+    { id: "minecraft:nether/find_fortress", hype: 15, subs: 1 },
+    { id: "minecraft:nether/find_bastion", hype: 15, subs: 1 },
+    { id: "minecraft:story/cure_zombie_villager", hype: 15, subs: 1 },
   ],
 
   // 방송 채팅창: 보이는 줄 수, 줄이 사라지는 시간(초)
