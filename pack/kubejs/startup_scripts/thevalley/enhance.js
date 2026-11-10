@@ -25,6 +25,7 @@ const $TvAttributeModifier = Java.loadClass("net.minecraft.world.entity.ai.attri
 const $TvOperation = Java.loadClass("net.minecraft.world.entity.ai.attributes.AttributeModifier$Operation");
 const $TvArmorItem = Java.loadClass("net.minecraft.world.item.ArmorItem");
 const $TvUUID = Java.loadClass("java.util.UUID");
+const $TvEquipSlot = Java.loadClass("net.minecraft.world.entity.EquipmentSlot");
 
 const TV_ENH_UUID = {
   mainhand: $TvUUID.fromString("7a3c1e52-1f0b-4c6e-9a51-2b7d0c9e1001"),
@@ -40,36 +41,49 @@ const TV_ENH_HP_UUID = {
   feet: $TvUUID.fromString("7a3c1e52-1f0b-4c6e-9a51-2b7d0c9e1015"),
 };
 
+// 이 서버의 Rhino는 일부 함수(getTag, getType 등)를 못 찾고 같은 이름의 필드만 보여줌 → 함수 없으면 필드
+const tvEnhG = (obj, field, method) => {
+  if (obj == null) return undefined;
+  if (typeof obj[method] === "function") return obj[method]();
+  return obj[field];
+};
+let tvEnhErrLogged = false;
+
 ForgeEvents.onEvent("net.minecraftforge.event.ItemAttributeModifierEvent", (e) => {
   try {
     let stack = e.getItemStack();
-    let tag = stack.getTag();
+    let tag = stack.nbt;
     if (!tag || !tag.contains("tvEnhance")) return;
     let level = Math.max(0, Math.min(15, tag.getInt("tvEnhance")));
     if (level <= 0) return;
-    let slot = String(e.getSlotType().getName());
+    let slotObj = e.getSlotType();
+    let slot = String(slotObj).toLowerCase(); // 열거형 이름: MAINHAND, HEAD ...
     let item = stack.getItem();
     let st = global.TV_ENHANCE_STATS;
 
     if (item instanceof $TvArmorItem) {
-      if (String(item.getType().getSlot().getName()) != slot) return;
+      let armorSlot = tvEnhG(tvEnhG(item, "type", "getType"), "slot", "getSlot");
+      if (armorSlot != slotObj) return;
       e.addModifier($TvAttributes.ARMOR, new $TvAttributeModifier(TV_ENH_UUID[slot], "tv_enhance_armor", st.armor[level], $TvOperation.ADDITION));
       if (st.health[level] > 0) {
         e.addModifier($TvAttributes.MAX_HEALTH, new $TvAttributeModifier(TV_ENH_HP_UUID[slot], "tv_enhance_health", st.health[level], $TvOperation.ADDITION));
       }
       return;
     }
-    if (slot != "mainhand") return;
+    if (slotObj != $TvEquipSlot.MAINHAND) return;
     // 원래 공격력(플레이어 기본 1 + 무기 덧셈 보정) 기준으로 % 만큼 더함
     let base = 1;
     e.getOriginalModifiers().get($TvAttributes.ATTACK_DAMAGE).forEach((m) => {
-      if (m.getOperation() == $TvOperation.ADDITION) base += m.getAmount();
+      if (tvEnhG(m, "operation", "getOperation") == $TvOperation.ADDITION) base += Number(tvEnhG(m, "amount", "getAmount"));
     });
     let bonus = Math.round(base * st.weaponPct[level]) / 100;
     if (bonus > 0) {
       e.addModifier($TvAttributes.ATTACK_DAMAGE, new $TvAttributeModifier(TV_ENH_UUID.mainhand, "tv_enhance_damage", bonus, $TvOperation.ADDITION));
     }
   } catch (err) {
-    console.error("[TheValley] enhance attribute error: " + err);
+    if (!tvEnhErrLogged) {
+      tvEnhErrLogged = true; // 아이템마다 반복해서 로그가 쌓이지 않게 한 번만
+      console.error("[TheValley] enhance attribute error: " + err);
+    }
   }
 });

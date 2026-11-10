@@ -16054,30 +16054,6 @@ file = "kubejs/data/dialog/dialogs/shepherd_unique_five_gift.json"
 hash = "e5f8e962c4da6ed67e01608d1bfb953f86d3162cc73ffe5541508adcdc4a24f2"
 
 [[files]]
-file = "kubejs/data/dialog/dialogs/thevalley_enhance_high_break.json"
-hash = "193464046803636cc8ed0459689bbd56800ef3687b97c5a42a9889e2385cb666"
-
-[[files]]
-file = "kubejs/data/dialog/dialogs/thevalley_enhance_low_down.json"
-hash = "eced3ee824cb826d84162e7d1bd88c0cb9fbe1f6ef8239e25dc9ab28a20cc5bb"
-
-[[files]]
-file = "kubejs/data/dialog/dialogs/thevalley_enhance_low_keep.json"
-hash = "ddd169ec12d31b10f50215c6dbb0a42faf88b9262686374539f7006d1e7371cf"
-
-[[files]]
-file = "kubejs/data/dialog/dialogs/thevalley_enhance_mid_break.json"
-hash = "f5e07d467257490fd49eb932713e9546e03c2db23e2041459b14362644b13c66"
-
-[[files]]
-file = "kubejs/data/dialog/dialogs/thevalley_enhance_mid_down.json"
-hash = "237867ca7fb0cd41fd3d43f72a1865ecfc8ac015d1917c0e5900a2325d0b3376"
-
-[[files]]
-file = "kubejs/data/dialog/dialogs/thevalley_stream_menu.json"
-hash = "c7ac3248958d1ea0e492312f731b835388992052470b191983cce24804fb6fb6"
-
-[[files]]
 file = "kubejs/data/dialog/dialogs/trader_chatter_friendship0_0.json"
 hash = "5090fd018dbae25e18ac0a02c4eea0738c3d94b57a693c8bd9684c641452e3d5"
 
@@ -25715,7 +25691,7 @@ hash = "7131d239e4d5ff79d7a84b38812621a38b7b8b106b4c97027ab616394ed0acab"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/enhance/enhance.js"
-hash = "6b98b0c029c5963ec9e263bccc95b5ccc24d83983ccde01205ab1b0c0cc21e59"
+hash = "882c9529ca6a85d98f0035c00b9bd658af69271de7c526842c415164da81fea4"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/pauseWhenEmpty.js"
@@ -25723,7 +25699,7 @@ hash = "ce756bcd339389cc58a49fed302602430fb84a3fac6954e45295b47bf1b351c4"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/stream.js"
-hash = "e6f829495f43d6cbd09f9b10894ed35d3c520a7543dd6360eea6a28e84ecb5d6"
+hash = "ddd66303d5ae33def6ef8604aa5c85468788cf6eb737ef7b62f761ccd2eb5b1a"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamAI.js"
@@ -26163,7 +26139,7 @@ hash = "06acac92b0033b14b3285ce5c39a650fc73729f8267992b08ff839f87fbc1b81"
 
 [[files]]
 file = "kubejs/startup_scripts/thevalley/enhance.js"
-hash = "b6647c1283f314a901e754dbcc858fb90a77658e53b342808f32e0ac6d19d212"
+hash = "182a48a968310203a3d5d2aea0d80f760045d0576fa60935a77e7c498dc84686"
 
 [[files]]
 file = "kubejs/startup_scripts/thevalley/streamFishing.js"
