@@ -1,0 +1,11 @@
+{
+  "_comment": "CurseForge 자동 다운로드가 막혔지만 라이선스상 재배포가 허용된 파일. 팩 변환 때 CDN에서 받아 저장소에 함께 올린다.",
+  "ftbquestlocalizer-1.20.1-forge-3.2.3.jar": {
+    "license": "MIT",
+    "source": "https://www.curseforge.com/minecraft/mc-mods/ftb-quest-localizer"
+  },
+  "moreoverlays-1.24.1-mc1.20.1-forge.jar": {
+    "license": "MIT",
+    "source": "https://github.com/r8420/MoreOverlays-updated"
+  }
+}

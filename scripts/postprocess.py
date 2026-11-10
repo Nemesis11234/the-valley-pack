@@ -72,6 +72,28 @@ def modrinth_lookup(sha1s):
         return json.load(r)
 
 
+REDIST = json.loads((Path(__file__).parent / "redistributable.json").read_text(encoding="utf-8"))
+
+
+def bundle_from_cdn(cf_url: str, filename: str, sha1: str, dest: Path) -> bool:
+    """재배포 허용(MIT 등) 파일을 CurseForge CDN에서 받아 팩 폴더에 그대로 넣는다."""
+    import hashlib
+    import urllib.parse
+    m = re.search(r"/files/(\d+)", cf_url)
+    if not m:
+        return False
+    fid = int(m.group(1))
+    url = f"https://mediafilez.forgecdn.net/files/{fid // 1000}/{fid % 1000}/{urllib.parse.quote(filename)}"
+    req = urllib.request.Request(url, headers={"User-Agent": "Nemesis11234/the-valley-pack (pack build)"})
+    with urllib.request.urlopen(req, timeout=120) as r:
+        data = r.read()
+    if sha1 and hashlib.sha1(data).hexdigest() != sha1:
+        print(f"  ! 해시 불일치: {filename}")
+        return False
+    dest.write_bytes(data)
+    return True
+
+
 def write_url_metafile(path: Path, data: dict, url: str, sha1: str):
     lines = [
         f"name = {toml_str(data.get('name', ''))}",
@@ -107,6 +129,7 @@ def main():
     found = modrinth_lookup([t[3] for t in targets if t[3]])
 
     manual_out = []
+    bundled = []
     switched = 0
     for m, p, data, sha1 in targets:
         ver = found.get(sha1) if sha1 else None
@@ -120,6 +143,10 @@ def main():
             write_url_metafile(p, data, url, sha1)
             switched += 1
             print(f"  → Modrinth로 대체: {data['filename']}")
+        elif data["filename"] in REDIST and bundle_from_cdn(m["url"], data["filename"], sha1, p.parent / data["filename"]):
+            p.unlink()
+            bundled.append(data["filename"])
+            print(f"  → 저장소에 포함 ({REDIST[data['filename']]['license']}): {data['filename']}")
         else:
             rel_dir = p.parent.relative_to(PACK).as_posix()
             manual_out.append({
@@ -133,7 +160,7 @@ def main():
             print(f"  → 런처 수동 안내: {data['filename']}")
 
     (PACK / "manual-mods.json").write_text(json.dumps(manual_out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    summary = f"Modrinth로 대체 {switched}개, 수동 다운로드 {len(manual_out)}개"
+    summary = f"Modrinth로 대체 {switched}개, 저장소에 포함 {len(bundled)}개, 수동 다운로드 {len(manual_out)}개"
     print(summary)
     gh = Path(sys.argv[2]) if len(sys.argv) > 2 else None
     if gh:
