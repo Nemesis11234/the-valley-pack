@@ -71,9 +71,18 @@ function tvMem(player) {
 
 // ───────────── 저장 상태 ─────────────
 
+// 전원 초기화 번호: 서버에 저장된 번호와 플레이어 번호가 다르면 다음 접속 때 방송 데이터를 새로 시작
+function tvServerEpoch(server) {
+  let ep = server.persistentData.tvResetEpoch;
+  return ep ? String(ep) : "0";
+}
+
 function tvData(player) {
   let pd = player.persistentData;
+  let epoch = tvServerEpoch(player.server);
+  if (pd.tvInit == 1 && String(pd.tvEpoch || "0") != epoch) pd.tvInit = 0;
   if (pd.tvInit != 1) {
+    pd.tvEpoch = epoch;
     pd.tvInit = 1;
     pd.tvOn = TV.defaultOn ? 1 : 0;
     pd.tvChatOn = 1;
@@ -250,7 +259,7 @@ function tvChange(player, hypeDelta, subsDelta, reason) {
   if (!tvIsOn(player)) return;
   let pd = tvData(player);
   let before = tvViewers(player);
-  pd.tvHype = Math.max(0, tvHype(player) + hypeDelta);
+  pd.tvHype = Math.max(0, Math.min(TV.hypeMax, tvHype(player) + hypeDelta));
   if (subsDelta) pd.tvSubs = Math.max(TV.startSubs, tvSubs(player) + subsDelta);
   let after = tvViewers(player);
   let diff = after - before;
@@ -291,21 +300,39 @@ function tvEvent(player, hype, subs, reason, category, vars) {
   // 큰 장면은 AI가 이어서 반응 (템플릿은 1줄만 먼저)
   let aiUsed = Math.abs(hype) >= 15 && global.tvAiRequest && global.tvAiRequest(player, "event", reason);
   if (category) tvViewerChat(player, category, vars || {}, aiUsed ? 1 : null, hype >= 50 ? 10 : 6);
-  if (hype >= 20 && Math.random() < Math.min(0.8, hype / 100)) {
+  if (hype >= TV.eventDonationMinHype && Math.random() < Math.min(TV.eventDonationMaxChance, hype / 200)) {
     player.server.scheduleInTicks(40 + Math.floor(Math.random() * 120), () => {
       if (player.isRemoved()) return;
-      tvDonate(player, { reason: reason, mult: 1 + hype / 50 });
+      tvDonate(player, { reason: reason, boost: hype >= 100 ? 2 : 1 });
     });
   }
 }
 
 // ───────────── 후원 ─────────────
 
+// 금액은 100원 단위 (십의 자리 없음)
 function tvRoundCoins(n) {
-  // 코인 단위에 맞게 반올림 (8, 64, 512 ...)
-  if (n < 64) return Math.max(TV.donationMin, Math.round(n / 8) * 8);
-  if (n < 4096) return Math.round(n / 64) * 64;
-  return Math.round(n / 512) * 512;
+  return Math.max(100, Math.round(n / 100) * 100);
+}
+
+// 후원 금액 뽑기: 금액이 클수록 드물게. 시청자가 많을수록 큰 금액 구간이 열림
+// boost: 큰 장면 보너스 (가중치를 한 단계 큰 쪽으로)
+function tvPickDonation(player, boost) {
+  let v = tvViewers(player);
+  let tiers = TV.donationTiers.filter((t) => v >= t.minViewers);
+  let shift = boost || 0;
+  let total = 0;
+  let weights = tiers.map((t, i) => {
+    let w = t.weight * Math.pow(2, Math.min(shift, i));
+    total += w;
+    return w;
+  });
+  let roll = Math.random() * total;
+  for (let i = 0; i < tiers.length; i++) {
+    roll -= weights[i];
+    if (roll <= 0) return tiers[i].amount;
+  }
+  return tiers[0].amount;
 }
 
 function tvDonate(player, opt) {
@@ -314,11 +341,7 @@ function tvDonate(player, opt) {
   let pd = tvData(player);
   let mem = tvMem(player);
   let viewer = tvRand(global.TV_VIEWERS);
-  let base = Math.max(TV.donationMin, tvViewers(player) * TV.donationPerViewer);
-  base *= (opt && opt.mult) || 1;
-  base *= 0.4 + Math.random() * 1.2;
-  if (Math.random() < TV.bigDonationChance) base *= TV.bigDonationMult;
-  let amount = tvRoundCoins(base);
+  let amount = tvPickDonation(player, (opt && opt.boost) || 0);
 
   let troll = !(opt && opt.reason) && Math.random() < TV.trollChance;
   pd.tvPending = Number(pd.tvPending) + amount;
@@ -339,7 +362,7 @@ function tvDonate(player, opt) {
   player.server.runCommandSilent(
     `execute as ${tvName(player)} at @s run playsound minecraft:block.note_block.bell player @s ~ ~ ~ 0.6 ${troll ? 0.6 : 1.4}`
   );
-  if (amount >= 2048) {
+  if (amount >= 10000) {
     player.server.runCommandSilent(
       global.getEmbersTextAPICommand(
         tvName(player),
@@ -377,7 +400,7 @@ function tvSettle(player) {
     return 0;
   }
   let tier = tvTier(player);
-  let fee = Math.round(pending * tier.fee);
+  let fee = Math.min(pending, Math.ceil((pending * tier.fee) / 100) * 100); // 수수료도 100원 단위
   let net = pending - fee;
   let account;
   try {
@@ -504,7 +527,7 @@ function tvMissionStart(player) {
   m.progress = 0;
   m.from = viewer.name;
   m.ends = tvNow() + m.sec * 1000;
-  m.reward = tvRoundCoins(Math.max(64, tvViewers(player) * 3));
+  m.reward = tvRoundCoins(Math.min(TV.missionRewardMax, Math.max(TV.missionRewardMin, tvViewers(player) * 2)));
   mem.mission = m;
 
   let id = tvBossbarId(player);
@@ -634,7 +657,7 @@ function tvSecond(player) {
     if (depth > Number(pd.tvSkullBest)) {
       let gained = depth - Number(pd.tvSkullBest);
       pd.tvSkullBest = depth;
-      tvEvent(player, 5 * gained, 3 * gained, `해골 광산 ${depth}구간 신기록`, "skull_depth", { depth: depth });
+      tvEvent(player, 4 * gained, gained, `해골 광산 ${depth}구간 신기록`, "skull_depth", { depth: depth });
     }
   }
 
@@ -703,7 +726,7 @@ BlockEvents.broken((e) => {
   if (!tvIsOn(player)) return;
   let id = String(e.block.id);
   if (id == "minecraft:diamond_ore" || id == "minecraft:deepslate_diamond_ore") {
-    if (tvFirst(player, "diamond")) tvEvent(player, 25, 10, "생애 첫 다이아몬드!", "diamond_first", {});
+    if (tvFirst(player, "diamond")) tvEvent(player, 25, 5, "생애 첫 다이아몬드!", "diamond_first", {});
     else tvEvent(player, Math.round(25 * tvDaily(player, "diamond")), 0, "다이아몬드", "diamond", {});
   } else if (TV_RARE_ORES[id] || id.indexOf("iridium") >= 0) {
     let label = TV_RARE_ORES[id] || "이리듐";
@@ -741,10 +764,10 @@ EntityEvents.death((e) => {
   if (hostile) tvMissionProgress(player, "kill", 1);
   if (hp >= 500) {
     let first = tvFirst(player, "boss:" + typeId);
-    tvEvent(player, first ? 300 : 120, first ? 50 : 5, `${mobName} 처치!`, "kill_boss", { mob: mobName });
+    tvEvent(player, first ? 150 : 60, first ? 30 : 3, `${mobName} 처치!`, "kill_boss", { mob: mobName });
   } else if (hp >= 100) {
     let first = tvFirst(player, "mini:" + typeId);
-    tvEvent(player, first ? 50 : 20, first ? 10 : 0, `${mobName} 처치`, "kill_mini", { mob: mobName });
+    tvEvent(player, first ? 40 : Math.round(15 * tvDaily(player, "mini")), first ? 5 : 0, `${mobName} 처치`, "kill_mini", { mob: mobName });
   } else if (hostile && tvFirst(player, "kill:" + typeId)) {
     tvChange(player, 3, 1, `처음 잡은 몹: ${mobName}`);
   }
@@ -800,17 +823,41 @@ BlockEvents.placed((e) => {
   if (e.player && !e.player.isFake()) tvMarkActive(e.player);
 });
 
+// 업적: 레시피 해금·숨은 업적은 무시, 화면에 뜨는 업적만 등급별로
+//   일반(task): 화제성 조금, 같은 날 반복할수록 줄어듦 / 목표(goal): 중간 + 구독자 1 / 도전(challenge): 크게 + 구독자 3
+function tvAdvFrame(adv) {
+  try {
+    let display = tvG(adv.advancement, "display", "getDisplay");
+    if (!display) return null;
+    let frame = String(tvG(display, "frame", "getFrame")).toLowerCase();
+    if (frame.indexOf("challenge") >= 0) return "challenge";
+    if (frame.indexOf("goal") >= 0) return "goal";
+    return "task";
+  } catch (err) {
+    return "task";
+  }
+}
+
 if (PlayerEvents.advancement) {
   PlayerEvents.advancement((e) => {
     let player = e.player;
-    if (!player || !tvIsOn(player)) return;
+    if (!player || player.isFake() || !tvIsOn(player)) return;
+    let adv = e.advancement;
+    let id = String(adv.id());
+    if (id.indexOf("recipes/") >= 0 || !adv.hasDisplay()) return;
+    let frame = tvAdvFrame(adv);
+    if (!frame) return;
     let title = "업적";
     try {
-      title = String(e.advancement.displayText.string).replace(/[\[\]]/g, "");
+      title = String(adv.getTitle().string).replace(/[\[\]]/g, "");
     } catch (err) {
       title = "업적";
     }
-    tvEvent(player, 8, 3, `업적: ${title}`, "advancement", { item: title });
+    let cfg = TV.advancement[frame];
+    let hype = Math.round(cfg.hype * (frame == "task" ? tvDaily(player, "adv_task") : 1));
+    if (hype <= 0 && !cfg.subs) return;
+    let label = frame == "challenge" ? `도전 과제: ${title}` : frame == "goal" ? `목표 달성: ${title}` : `업적: ${title}`;
+    tvEvent(player, hype, cfg.subs, label, "advancement", { item: title });
   });
 }
 
@@ -1044,7 +1091,7 @@ function tvRankCheck(server) {
   if (ranked.length) {
     server.runCommandSilent(`tellraw @a ${tvJson({ text: "━━━━ [방송] 오늘의 시청자 순위 ━━━━", color: "#FF5555" })}`);
     ranked.forEach((r, i) => {
-      let award = tvRoundCoins(r.peak * TV.rankRewards[i]);
+      let award = tvRoundCoins(Math.min(TV.rankRewardCaps[i], r.peak * TV.rankRewards[i]));
       data.awards[r.id] = (data.awards[r.id] || 0) + award;
       server.runCommandSilent(
         `tellraw @a ${tvJson([{ text: `${i + 1}등 `, color: "#FFD54F", bold: true }, { text: `${r.name} · 최고 ${tvFmt(r.peak)}명 · 보너스 후원 ${tvFmt(award)}`, color: "#FFFFFF" }])}`
@@ -1166,7 +1213,7 @@ function tvOpenMenu(player) {
       let on = tvIsOn(player);
       let tier = tvTier(player);
       let pending = Number(pd.tvPending) || 0;
-      let fee = Math.round(pending * tier.fee);
+      let fee = Math.min(pending, Math.ceil((pending * tier.fee) / 100) * 100);
       gui.slot(4, 0, (slot) => {
         slot.resetClickHandlers();
         slot.item = tvMenuItem(on ? "minecraft:redstone_torch" : "minecraft:lever", on ? "● 방송 중" : "방송 꺼짐", on ? "#FF5555" : "#AAAAAA", [
@@ -1200,8 +1247,37 @@ function tvOpenMenu(player) {
   return 1;
 }
 
+// ───────────── 초기화 (OP) ─────────────
+// 구독자·화제성·미정산 후원금·누적 후원·첫 기록·트로피 기록·해골 광산 기록을 처음 상태로 (방송 켜짐/채팅창 설정은 유지)
+function tvResetPlayer(player) {
+  let pd = player.persistentData;
+  let on = pd.tvOn, chatOn = pd.tvChatOn;
+  pd.tvInit = 0;
+  tvData(player);
+  if (on != null) pd.tvOn = on;
+  if (chatOn != null) pd.tvChatOn = chatOn;
+  let mem = tvMem(player);
+  mem.changes = [];
+  mem.session = tvIsOn(player) ? null : mem.session;
+  if (tvIsOn(player)) tvSessionStart(player);
+  if (mem.mission) {
+    mem.mission = null;
+    player.server.runCommandSilent(`bossbar remove ${tvBossbarId(player)}`);
+  }
+  tvSetSidebarScore(player);
+  tvRenderChat(player);
+  player.tell(Text.of("[방송] 방송 데이터가 초기화됐어요 (구독자·후원금·기록).").yellow());
+}
+
+function tvResetAll(server, by) {
+  server.persistentData.tvResetEpoch = String(Date.now());
+  server.persistentData.tvRankJson = "";
+  server.players.forEach((p) => tvResetPlayer(p));
+  server.runCommandSilent(`tellraw @a ${tvJson({ text: `[방송] ${by}님이 모든 방송 데이터를 초기화했어요. 접속하지 않은 사람은 다음 접속 때 초기화돼요.`, color: "#FFD54F" })}`);
+}
+
 ServerEvents.commandRegistry((event) => {
-  let { commands: Commands } = event;
+  let { commands: Commands, arguments: Arguments } = event;
   let run = (fn) => (ctx) => {
     let player = ctx.source.player;
     if (!player) return 0;
@@ -1216,12 +1292,30 @@ ServerEvents.commandRegistry((event) => {
       .then(Commands.literal(words.settle).executes(run(tvSettle)))
       .then(Commands.literal("ai").requires((src) => src.hasPermission(2)).executes(run((p) => (global.tvAiStats ? global.tvAiStats(p) : 0))))
       .then(
+        Commands.literal(words.reset)
+          .requires((src) => src.hasPermission(2))
+          .then(
+            Commands.literal(words.all).executes((ctx) => {
+              tvResetAll(ctx.source.server, ctx.source.player ? tvName(ctx.source.player) : "관리자");
+              return 1;
+            })
+          )
+          .then(
+            Commands.argument("target", Arguments.PLAYER.create(event)).executes((ctx) => {
+              let target = Arguments.PLAYER.getResult(ctx, "target");
+              tvResetPlayer(target);
+              if (ctx.source.player && ctx.source.player != target) ctx.source.player.tell(Text.of(`[방송] ${tvName(target)} 방송 데이터 초기화 완료`).yellow());
+              return 1;
+            })
+          )
+      )
+      .then(
         Commands.literal(words.chat)
           .then(Commands.literal(words.on).executes(run((p) => tvToggleChat(p, true))))
           .then(Commands.literal(words.off).executes(run((p) => tvToggleChat(p, false))))
       );
-  event.register(build("stream", { on: "on", off: "off", stats: "stats", settle: "settle", chat: "chat" }));
-  event.register(build("방송", { on: "켜기", off: "끄기", stats: "통계", settle: "정산", chat: "채팅" }));
+  event.register(build("stream", { on: "on", off: "off", stats: "stats", settle: "settle", chat: "chat", reset: "reset", all: "all" }));
+  event.register(build("방송", { on: "켜기", off: "끄기", stats: "통계", settle: "정산", chat: "채팅", reset: "초기화", all: "전원" }));
 });
 
 ServerEvents.loaded((e) => {

@@ -11,6 +11,12 @@
   "notices": [
     {
       "tag": "공지",
+      "text": "게임 안에서 채팅창에 /방송 을 치면 방송을 할 수 있어요",
+      "date": "",
+      "highlight": true
+    },
+    {
+      "tag": "공지",
       "text": "버그 제보는 디스코드 popopopo_ 로 보내주세요",
       "date": "",
       "highlight": true

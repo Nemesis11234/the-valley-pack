@@ -35,10 +35,11 @@ if (global.handleFee && !global.handleFee.tvWrapped) {
       } else {
         // 계좌가 0이 되고 모자란 만큼 미정산금에서
         account.setBalance(0);
-        let fromPending = pending - after;
-        player.persistentData.tvPending = after;
+        let left = Math.floor(after / 100) * 100; // 미정산금은 100원 단위로
+        let fromPending = pending - left;
+        player.persistentData.tvPending = left;
         player.tell(
-          Text.of(`[방송] 병원비 ${tvFeeFmt(paid)}: 계좌 ${tvFeeFmt(balance)} + 미정산 후원금 ${tvFeeFmt(fromPending)} (남은 미정산금 ${tvFeeFmt(after)})`).red()
+          Text.of(`[방송] 병원비 ${tvFeeFmt(balance + fromPending)}: 계좌 ${tvFeeFmt(balance)} + 미정산 후원금 ${tvFeeFmt(fromPending)} (남은 미정산금 ${tvFeeFmt(left)})`).red()
         );
       }
     }
