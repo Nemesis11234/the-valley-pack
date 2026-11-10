@@ -3279,7 +3279,7 @@ hash = "fb2eed01e1aa823332893215e35093a08c0a219acb9924e1d03cb376ed20213c"
 
 [[files]]
 file = "config/sereneseasons/seasons.toml"
-hash = "7a67adb30a867dc62920b5c7aa729381fe8fba5df59164044383540c2d9000cd"
+hash = "c5ad9c9d599e2ecb7a817ead68444220593355b14962af9d66a70097616c2a21"
 
 [[files]]
 file = "config/serializer_debug-common.toml"
@@ -25662,8 +25662,12 @@ file = "kubejs/server_scripts/tags/sveVoidSteelMaterialTags.js"
 hash = "7131d239e4d5ff79d7a84b38812621a38b7b8b106b4c97027ab616394ed0acab"
 
 [[files]]
+file = "kubejs/server_scripts/thevalley/pauseWhenEmpty.js"
+hash = "d8f4c5a71bfbb550002ce28ac5a17ccf6bb676a3cc0f989241d057e9408517e5"
+
+[[files]]
 file = "kubejs/startup_scripts/_config.js"
-hash = "fc40dde6098edd7f1deebca47401cf1b5ef97532741f23626e9bc0dd76a211f8"
+hash = "55ec6a27ee084373cb893026af3ddfa4f8b5252b55236b506902c7c7555ac1f1"
 
 [[files]]
 file = "kubejs/startup_scripts/creativeTab.js"
