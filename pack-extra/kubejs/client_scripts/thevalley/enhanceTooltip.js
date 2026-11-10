@@ -1,11 +1,11 @@
 // The Valley 강화 시스템: 강화된 아이템 이름 앞에 +단계, 아래에 강화 정보 표시
 
 const tvEnhanceTooltip = (item, advanced, text) => {
-  const nbt = item.nbt;
+  let nbt = item.nbt;
   if (!nbt || !nbt.contains("tvEnhance")) return;
-  const level = nbt.getInt("tvEnhance");
+  let level = nbt.getInt("tvEnhance");
   if (level <= 0) return;
-  const color = level >= 13 ? "#FF5555" : level >= 10 ? "#FFAA00" : level >= 5 ? "#C77DFF" : "#7EE0A1";
+  let color = level >= 13 ? "#FF5555" : level >= 10 ? "#FFAA00" : level >= 5 ? "#C77DFF" : "#7EE0A1";
   text.set(0, Text.of(`+${level} `).color(color).bold(true).append(text.get(0)));
   text.add(1, Text.of(`강화 +${level} / 15`).color(color));
 };

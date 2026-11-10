@@ -38,19 +38,19 @@ function tvEnhFmt(n) {
 
 function tvEnhKind(stack) {
   if (!stack || stack.isEmpty()) return null;
-  const item = stack.getItem();
+  let item = stack.getItem();
   if (item instanceof $TvEnhArmorItem) return "armor";
   if (item instanceof $TvEnhSwordItem || item instanceof $TvEnhTridentItem) return "weapon";
   return null;
 }
 
 function tvEnhLevel(stack) {
-  const tag = stack.getTag();
+  let tag = stack.getTag();
   return tag && tag.contains("tvEnhance") ? tag.getInt("tvEnhance") : 0;
 }
 
 function tvEnhSetLevel(stack, level) {
-  const tag = stack.getOrCreateTag();
+  let tag = stack.getOrCreateTag();
   if (level <= 0) tag.remove("tvEnhance");
   else tag.putInt("tvEnhance", level);
 }
@@ -60,7 +60,7 @@ function tvEnhStone(target) {
 }
 
 function tvEnhCountItem(player, id) {
-  const inv = player.inventory;
+  let inv = player.inventory;
   let n = 0;
   for (let i = 0; i < inv.getContainerSize(); i++) {
     let st = inv.getItem(i);
@@ -70,7 +70,7 @@ function tvEnhCountItem(player, id) {
 }
 
 function tvEnhTakeItem(player, id) {
-  const inv = player.inventory;
+  let inv = player.inventory;
   for (let i = 0; i < inv.getContainerSize(); i++) {
     let st = inv.getItem(i);
     if (!st.isEmpty() && String(st.id) == id) {
@@ -109,17 +109,17 @@ function tvEnhDialogId(target) {
 }
 
 function tvEnhOpen(player, stack, level) {
-  const s = player.server;
-  const name = player.username;
+  let s = player.server;
+  let name = player.username;
   TV_ENH_OBJECTIVES.forEach((o) => s.runCommandSilent(`scoreboard objectives add ${o} dummy`));
-  const target = level + 1;
-  const stone = tvEnhStone(target);
-  const cost = TV_ENH.costPerLevelSq * target * target;
-  const have = tvEnhCountItem(player, stone.id);
-  const account = tvEnhAccount(player);
-  const balance = account ? Number(account.getBalance()) || 0 : 0;
-  const ok = have <= 0 ? 2 : balance < cost ? 3 : 1;
-  const vals = {
+  let target = level + 1;
+  let stone = tvEnhStone(target);
+  let cost = TV_ENH.costPerLevelSq * target * target;
+  let have = tvEnhCountItem(player, stone.id);
+  let account = tvEnhAccount(player);
+  let balance = account ? Number(account.getBalance()) || 0 : 0;
+  let ok = have <= 0 ? 2 : balance < cost ? 3 : 1;
+  let vals = {
     tv_e_lvl: level,
     tv_e_target: target,
     tv_e_rate: Math.round(TV_ENH.success[target] * 100),
@@ -150,15 +150,15 @@ function tvEnhResultTitle(player, text, color) {
 }
 
 function tvEnhTry(player, stack, level) {
-  const target = level + 1;
-  const stone = tvEnhStone(target);
-  const cost = TV_ENH.costPerLevelSq * target * target;
+  let target = level + 1;
+  let stone = tvEnhStone(target);
+  let cost = TV_ENH.costPerLevelSq * target * target;
   if (tvEnhCountItem(player, stone.id) <= 0) {
     tvEnhSay(player, { text: `[강화] ${stone.name}이 없어요.`, color: "#FF5555" });
     return;
   }
-  const account = tvEnhAccount(player);
-  const balance = account ? Number(account.getBalance()) || 0 : 0;
+  let account = tvEnhAccount(player);
+  let balance = account ? Number(account.getBalance()) || 0 : 0;
   if (!account || balance < cost) {
     tvEnhSay(player, { text: `[강화] 계좌 잔고가 모자라요 (필요 ${tvEnhFmt(cost)}원)`, color: "#FF5555" });
     return;
@@ -166,7 +166,7 @@ function tvEnhTry(player, stack, level) {
   tvEnhTakeItem(player, stone.id);
   account.setBalance(balance - cost);
 
-  const name = String(stack.hoverName.string);
+  let name = String(stack.hoverName.string);
   if (Math.random() < TV_ENH.success[target]) {
     tvEnhSetLevel(stack, target);
     tvEnhSound(player, "minecraft:block.anvil.use", 1.4);
@@ -195,7 +195,7 @@ function tvEnhTry(player, stack, level) {
     return;
   }
 
-  const down = target > TV_ENH.keepUntil ? level - 1 : level;
+  let down = target > TV_ENH.keepUntil ? level - 1 : level;
   tvEnhSetLevel(stack, down);
   tvEnhSound(player, "minecraft:block.anvil.land", 0.8);
   tvEnhResultTitle(player, down < level ? `실패 +${level} → +${down}` : `실패 +${level} 유지`, "#F28B82");
@@ -207,11 +207,11 @@ function tvEnhTry(player, stack, level) {
 }
 
 BlockEvents.rightClicked("minecraft:smithing_table", (e) => {
-  const player = e.player;
+  let player = e.player;
   if (!player || player.isFake() || e.hand == "OFF_HAND") return;
   if (!player.isCrouching()) return;
-  const stack = player.mainHandItem;
-  const kind = tvEnhKind(stack);
+  let stack = player.mainHandItem;
+  let kind = tvEnhKind(stack);
   if (!kind) {
     if (!stack.isEmpty()) {
       player.server.runCommandSilent(
@@ -221,7 +221,7 @@ BlockEvents.rightClicked("minecraft:smithing_table", (e) => {
     return;
   }
   e.cancel();
-  const level = tvEnhLevel(stack);
+  let level = tvEnhLevel(stack);
   if (level >= 15) {
     tvEnhSay(player, { text: "[강화] 이미 최대 단계(+15)예요.", color: "#FFD54F" });
     return;
@@ -231,12 +231,12 @@ BlockEvents.rightClicked("minecraft:smithing_table", (e) => {
 
 // 강화 창의 [강화하기] 버튼이 부르는 명령. 창을 연 뒤 손에 든 아이템이 바뀌었으면 취소.
 function tvEnhConfirm(player) {
-  const id = String(player.uuid);
-  const pending = TV_ENH_CONFIRM[id];
+  let id = String(player.uuid);
+  let pending = TV_ENH_CONFIRM[id];
   delete TV_ENH_CONFIRM[id];
-  const stack = player.mainHandItem;
+  let stack = player.mainHandItem;
   if (!tvEnhKind(stack)) return 0;
-  const level = tvEnhLevel(stack);
+  let level = tvEnhLevel(stack);
   if (!pending || pending.key != tvEnhKey(player, stack, level) || Date.now() - pending.at > 120000) {
     tvEnhSay(player, { text: "[강화] 손에 든 아이템이 바뀌어서 취소했어요. 다시 열어 주세요.", color: "#FF5555" });
     return 0;
@@ -246,18 +246,18 @@ function tvEnhConfirm(player) {
   // 결과를 잠깐 보여준 뒤, 아직 강화할 수 있으면 창을 다시 연다
   player.server.scheduleInTicks(30, () => {
     if (player.isRemoved()) return;
-    const st = player.mainHandItem;
+    let st = player.mainHandItem;
     if (tvEnhKind(st) && tvEnhLevel(st) < 15) tvEnhOpen(player, st, tvEnhLevel(st));
   });
   return 1;
 }
 
 ServerEvents.commandRegistry((event) => {
-  const { commands: Commands } = event;
+  let { commands: Commands } = event;
   event.register(
     Commands.literal("tvenhance").then(
       Commands.literal("confirm").executes((ctx) => {
-        const player = ctx.source.player;
+        let player = ctx.source.player;
         return player ? tvEnhConfirm(player) : 0;
       })
     )
@@ -271,12 +271,12 @@ function tvEnhRand(range) {
 }
 
 EntityEvents.death((e) => {
-  const entity = e.entity;
+  let entity = e.entity;
   if (!entity.isLiving() || entity.isPlayer()) return;
-  const player = e.source ? e.source.player : null;
+  let player = e.source ? e.source.player : null;
   if (!player || !player.isPlayer() || player.isFake()) return;
-  const hp = Number(entity.maxHealth) || 0;
-  const drops = [];
+  let hp = Number(entity.maxHealth) || 0;
+  let drops = [];
   if (hp >= 500) {
     drops.push(["thevalley:enhance_stone_mid", tvEnhRand(TV_ENH.drops.boss.mid)]);
     drops.push(["thevalley:enhance_stone_high", tvEnhRand(TV_ENH.drops.boss.high)]);

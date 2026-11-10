@@ -4,7 +4,7 @@
 ForgeEvents.onEvent("net.minecraftforge.event.entity.player.ItemFishedEvent", (e) => {
   try {
     if (!global.tvOnFished) return;
-    const ids = [];
+    let ids = [];
     e.getDrops().forEach((drop) => {
       if (drop.hasTag("minecraft:fishes")) ids.push(String(drop.id));
     });

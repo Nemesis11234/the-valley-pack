@@ -39,7 +39,7 @@ function tvFill(text, vars) {
 }
 
 function tvMem(player) {
-  const id = String(player.uuid);
+  let id = String(player.uuid);
   if (!TV_ACTIVE[id]) {
     TV_ACTIVE[id] = {
       lastActive: tvNow(),
@@ -63,7 +63,7 @@ function tvMem(player) {
 // ───────────── 저장 상태 ─────────────
 
 function tvData(player) {
-  const pd = player.persistentData;
+  let pd = player.persistentData;
   if (pd.tvInit != 1) {
     pd.tvInit = 1;
     pd.tvOn = TV.defaultOn ? 1 : 0;
@@ -92,7 +92,7 @@ function tvViewers(player) {
   return Math.round(tvSubs(player) * (1 + tvHype(player) / 100));
 }
 function tvTier(player) {
-  const subs = tvSubs(player);
+  let subs = tvSubs(player);
   let tier = TV.tiers[0];
   TV.tiers.forEach((t) => {
     if (subs >= t.minSubs) tier = t;
@@ -112,7 +112,7 @@ function tvSetObj(player, key, obj) {
 
 // 처음이면 true를 돌려주고 기록
 function tvFirst(player, key) {
-  const firsts = tvGetObj(player, "tvFirsts");
+  let firsts = tvGetObj(player, "tvFirsts");
   if (firsts[key]) return false;
   firsts[key] = 1;
   tvSetObj(player, "tvFirsts", firsts);
@@ -121,8 +121,8 @@ function tvFirst(player, key) {
 
 // 같은 행동 반복 시 효과 감소 (아침마다 초기화): 1, 1/2, 1/3 ...
 function tvDaily(player, key) {
-  const pd = tvData(player);
-  const day = tvDay(player.server);
+  let pd = tvData(player);
+  let day = tvDay(player.server);
   let daily = tvGetObj(player, "tvDaily");
   if (Number(pd.tvDailyDay) != day) {
     daily = {};
@@ -143,12 +143,12 @@ const TV_MC_COLORS = [
   ["c", 255, 85, 85], ["d", 255, 85, 255], ["e", 255, 255, 85], ["f", 255, 255, 255],
 ];
 function tvMcCode(hex) {
-  const h = String(hex || "#FFFFFF").replace("#", "");
-  const r = parseInt(h.substr(0, 2), 16), g = parseInt(h.substr(2, 2), 16), b = parseInt(h.substr(4, 2), 16);
+  let h = String(hex || "#FFFFFF").replace("#", "");
+  let r = parseInt(h.substr(0, 2), 16), g = parseInt(h.substr(2, 2), 16), b = parseInt(h.substr(4, 2), 16);
   let best = "f", bestD = 1e9;
   TV_MC_COLORS.forEach((c) => {
     if (c[0] == "0" || c[0] == "1" || c[0] == "8") return; // 너무 어두운 색 제외
-    const d = (c[1] - r) * (c[1] - r) + (c[2] - g) * (c[2] - g) + (c[3] - b) * (c[3] - b);
+    let d = (c[1] - r) * (c[1] - r) + (c[2] - g) * (c[2] - g) + (c[3] - b) * (c[3] - b);
     if (d < bestD) { bestD = d; best = c[0]; }
   });
   return "§" + best;
@@ -161,11 +161,11 @@ function tvActionbar(player, text, color) {
 }
 
 function tvRenderChat(player) {
-  const mem = tvMem(player);
-  const now = tvNow();
+  let mem = tvMem(player);
+  let now = tvNow();
   mem.chat = mem.chat.filter((l) => now - l.t < TV.chatLineLifeSec * 1000).slice(-TV.chatLines);
-  const show = Number(tvData(player).tvChatOn) == 1 && tvIsOn(player);
-  const paint = {};
+  let show = Number(tvData(player).tvChatOn) == 1 && tvIsOn(player);
+  let paint = {};
   for (let i = 0; i < TV.chatLines; i++) {
     let line = show ? mem.chat[mem.chat.length - TV.chatLines + i] : null;
     let y = -36 + i * 11;
@@ -179,14 +179,14 @@ function tvRenderChat(player) {
       paint[id] = { type: "text", x: 5, y: y, text: "", alignX: "left", alignY: "center" };
     }
   }
-  const title = show ? `● LIVE  시청자 ${tvFmt(tvViewers(player))}` : "";
+  let title = show ? `● LIVE  시청자 ${tvFmt(tvViewers(player))}` : "";
   paint.tvChatTitleShadow = { type: "text", x: 6, z: -1, y: -49, text: title, color: "#000000", alignX: "left", alignY: "center" };
   paint.tvChatTitle = { type: "text", x: 5, y: -50, text: title, color: "#FF5555", alignX: "left", alignY: "center" };
   player.paint(paint);
 }
 
 function tvPushChat(player, name, color, msg, gold) {
-  const mem = tvMem(player);
+  let mem = tvMem(player);
   mem.chat.push({ t: tvNow(), name: name, color: color, msg: msg, gold: !!gold });
   tvRenderChat(player);
 }
@@ -194,11 +194,11 @@ function tvPushChat(player, name, color, msg, gold) {
 // 시청자 채팅 n줄을 0~spread초에 걸쳐 흘려보냄
 function tvViewerChat(player, category, vars, count, spreadSec) {
   if (!tvIsOn(player)) return;
-  const lines = global.TV_TEMPLATES[category];
+  let lines = global.TV_TEMPLATES[category];
   if (!lines) return;
-  const mem = tvMem(player);
-  const n = count || 2 + Math.floor(Math.random() * 3);
-  const used = {};
+  let mem = tvMem(player);
+  let n = count || 2 + Math.floor(Math.random() * 3);
+  let used = {};
   for (let i = 0; i < n; i++) {
     let line = tvRand(lines);
     let tries = 0;
@@ -220,7 +220,7 @@ function tvUpdateSidebar(server) {
 }
 
 function tvSetSidebarScore(player) {
-  const server = player.server;
+  let server = player.server;
   if (tvIsOn(player)) {
     server.runCommandSilent(`scoreboard players set ${tvName(player)} tv_viewers ${tvViewers(player)}`);
   } else {
@@ -233,18 +233,18 @@ function tvSetSidebarScore(player) {
 // hypeDelta: 화제성 점수, subsDelta: 구독자, reason: 화면에 보일 이유
 function tvChange(player, hypeDelta, subsDelta, reason) {
   if (!tvIsOn(player)) return;
-  const pd = tvData(player);
-  const before = tvViewers(player);
+  let pd = tvData(player);
+  let before = tvViewers(player);
   pd.tvHype = Math.max(0, tvHype(player) + hypeDelta);
   if (subsDelta) pd.tvSubs = Math.max(TV.startSubs, tvSubs(player) + subsDelta);
-  const after = tvViewers(player);
-  const diff = after - before;
-  const mem = tvMem(player);
+  let after = tvViewers(player);
+  let diff = after - before;
+  let mem = tvMem(player);
   mem.changes.push({ t: tvNow(), diff: diff, subs: subsDelta || 0, reason: reason });
   if (mem.changes.length > 12) mem.changes.shift();
   if (diff != 0 || subsDelta) {
-    const sign = diff >= 0 ? "+" : "";
-    const subsText = subsDelta ? `  (구독자 ${subsDelta > 0 ? "+" : ""}${subsDelta})` : "";
+    let sign = diff >= 0 ? "+" : "";
+    let subsText = subsDelta ? `  (구독자 ${subsDelta > 0 ? "+" : ""}${subsDelta})` : "";
     tvActionbar(player, `${sign}${tvFmt(diff)} 시청자 · ${reason}${subsText}`, diff >= 0 ? "#7EE0A1" : "#F28B82");
   }
   tvSessionNote(player, diff, reason);
@@ -254,8 +254,8 @@ function tvChange(player, hypeDelta, subsDelta, reason) {
 }
 
 function tvMarkActive(player) {
-  const mem = tvMem(player);
-  const wasAfk = tvNow() - mem.lastActive > TV.afkHardSec * 1000;
+  let mem = tvMem(player);
+  let wasAfk = tvNow() - mem.lastActive > TV.afkHardSec * 1000;
   mem.lastActive = tvNow();
   if (wasAfk) {
     player.server.runCommandSilent(`team leave ${tvName(player)}`);
@@ -294,23 +294,23 @@ function tvRoundCoins(n) {
 function tvDonate(player, opt) {
   if (!tvIsOn(player)) return;
   if (tvAfkSec(player) > TV.afkHardSec) return;
-  const pd = tvData(player);
-  const mem = tvMem(player);
-  const viewer = tvRand(global.TV_VIEWERS);
+  let pd = tvData(player);
+  let mem = tvMem(player);
+  let viewer = tvRand(global.TV_VIEWERS);
   let base = Math.max(TV.donationMin, tvViewers(player) * TV.donationPerViewer);
   base *= (opt && opt.mult) || 1;
   base *= 0.4 + Math.random() * 1.2;
   if (Math.random() < TV.bigDonationChance) base *= TV.bigDonationMult;
-  const amount = tvRoundCoins(base);
+  let amount = tvRoundCoins(base);
 
-  const troll = !(opt && opt.reason) && Math.random() < TV.trollChance;
+  let troll = !(opt && opt.reason) && Math.random() < TV.trollChance;
   pd.tvPending = Number(pd.tvPending) + amount;
   pd.tvDonatedTotal = Number(pd.tvDonatedTotal) + amount;
   tvSessionDonation(player, amount, viewer.name);
 
   let message;
   if (troll) {
-    const done = tvTroll(player, viewer);
+    let done = tvTroll(player, viewer);
     message = done ? done : tvRand(global.TV_TEMPLATES.troll_skip);
   } else if (opt && opt.reason) {
     message = tvRand([`${opt.reason} 축하합니다!`, "이건 못참지", "보너스입니다", "레전드 기념"]);
@@ -336,7 +336,7 @@ function tvDonate(player, opt) {
 }
 
 function tvSettleHint(player, full) {
-  const pd = tvData(player);
+  let pd = tvData(player);
   player.server.runCommandSilent(
     `tellraw ${tvName(player)} ${tvJson([
       { text: "[방송] ", color: "#FF5555" },
@@ -353,15 +353,15 @@ function tvSettleHint(player, full) {
 }
 
 function tvSettle(player) {
-  const pd = tvData(player);
-  const pending = Number(pd.tvPending) || 0;
+  let pd = tvData(player);
+  let pending = Number(pd.tvPending) || 0;
   if (pending <= 0) {
     player.tell(Text.of("[방송] 정산할 후원금이 없어요.").gray());
     return 0;
   }
-  const tier = tvTier(player);
-  const fee = Math.round(pending * tier.fee);
-  const net = pending - fee;
+  let tier = tvTier(player);
+  let fee = Math.round(pending * tier.fee);
+  let net = pending - fee;
   let account;
   try {
     account = global.getPersonalOrCurioAccount(player.level, player);
@@ -374,7 +374,7 @@ function tvSettle(player) {
   }
   account.setBalance(Number(account.getBalance()) + net);
   pd.tvPending = 0;
-  const mem = tvMem(player);
+  let mem = tvMem(player);
   if (mem.lastBalance != null) mem.lastBalance += net; // 수입 감지에서 제외
   player.server.runCommandSilent(
     `tellraw ${tvName(player)} ${tvJson([
@@ -404,13 +404,13 @@ function tvBossNearby(player) {
 
 function tvTrollSafe(player) {
   if (player.isCreative() || player.isSpectator()) return false;
-  const dim = String(player.level.dimension);
+  let dim = String(player.level.dimension);
   if (dim != "minecraft:overworld") return false; // 해골 광산·네더 등은 제외
   if (player.health < player.maxHealth * 0.6) return false;
   if (player.isSleeping()) return false;
-  const home = player.getRespawnPosition();
+  let home = player.getRespawnPosition();
   if (home) {
-    const dx = player.x - home.x, dz = player.z - home.z;
+    let dx = player.x - home.x, dz = player.z - home.z;
     if (Math.sqrt(dx * dx + dz * dz) < TV.homeSafeRadius) return false;
   }
   if (tvBossNearby(player)) return false;
@@ -420,30 +420,30 @@ function tvTrollSafe(player) {
 // 실행했으면 메시지, 못 했으면 null
 function tvTroll(player, viewer) {
   if (!tvTrollSafe(player)) return null;
-  const subs = tvSubs(player);
-  const name = tvName(player);
-  const s = player.server;
-  const around = (mob, n) => {
+  let subs = tvSubs(player);
+  let name = tvName(player);
+  let s = player.server;
+  let around = (mob, n) => {
     for (let i = 0; i < n; i++) {
       let a = Math.random() * Math.PI * 2;
       let r = 4 + Math.random() * 3;
       s.runCommandSilent(`execute at ${name} run summon ${mob} ~${(Math.cos(a) * r).toFixed(1)} ~ ~${(Math.sin(a) * r).toFixed(1)}`);
     }
   };
-  const light = [
+  let light = [
     () => { around("minecraft:chicken", 8); return "닭 선물입니다 ㅋㅋ"; },
     () => { s.runCommandSilent(`effect give ${name} minecraft:levitation 3 0`); return "날아라~"; },
     () => { s.runCommandSilent(`effect give ${name} minecraft:slowness 10 1`); return "천천히 가세요"; },
     () => { around("minecraft:zombie", 2); return "좀비 친구 보내드림"; },
     () => { s.runCommandSilent(`execute at ${name} run summon minecraft:firework_rocket ~ ~1 ~`); return "축하 폭죽!"; },
   ];
-  const mid = [
+  let mid = [
     () => { around("minecraft:zombie", 3); around("minecraft:skeleton", 1); return "좀비 파티 ㅋㅋ"; },
     () => { around("minecraft:creeper", 1); return "크리퍼 선물입니다 ㅋㅋ"; },
     () => { around("minecraft:spider", 2); return "거미 2마리 배달"; },
     () => { s.runCommandSilent(`execute at ${name} run spreadplayers ~ ~ 0 30 false ${name}`); return "어디로 갈까~"; },
   ];
-  const hard = [
+  let hard = [
     () => { around("minecraft:vindicator", 2); return "일리저 형님들 출동"; },
     () => { around("minecraft:witch", 1); around("minecraft:zombie", 3); return "마녀와 친구들"; },
     () => { around("minecraft:creeper", 2); return "크리퍼 2마리 ㅋㅋㅋ"; },
@@ -461,27 +461,27 @@ function tvBossbarId(player) {
 }
 
 function tvMissionStart(player) {
-  const mem = tvMem(player);
+  let mem = tvMem(player);
   if (mem.mission || !tvIsOn(player)) return;
   if (String(player.level.dimension) != "minecraft:overworld" && Math.random() < 0.7) return;
-  const viewer = tvRand(global.TV_VIEWERS);
-  const types = ["kill", "mine", "fish"];
+  let viewer = tvRand(global.TV_VIEWERS);
+  let types = ["kill", "mine", "fish"];
   if (String(player.level.dimension) == "minecraft:overworld") types.push("goto");
-  const type = tvRand(types);
+  let type = tvRand(types);
   let m;
   if (type == "goto") {
-    const a = Math.random() * Math.PI * 2;
-    const r = 80 + Math.random() * 100;
-    const tx = Math.round(player.x + Math.cos(a) * r), tz = Math.round(player.z + Math.sin(a) * r);
+    let a = Math.random() * Math.PI * 2;
+    let r = 80 + Math.random() * 100;
+    let tx = Math.round(player.x + Math.cos(a) * r), tz = Math.round(player.z + Math.sin(a) * r);
     m = { type: type, tx: tx, tz: tz, goal: 1, sec: 180, text: `3분 안에 좌표 (${tx}, ${tz})까지 와라` };
   } else if (type == "kill") {
-    const n = 5 + Math.floor(Math.random() * 6);
+    let n = 5 + Math.floor(Math.random() * 6);
     m = { type: type, goal: n, sec: 300, text: `5분 안에 적대 몹 ${n}마리 잡기` };
   } else if (type == "mine") {
-    const n = 16 + Math.floor(Math.random() * 17);
+    let n = 16 + Math.floor(Math.random() * 17);
     m = { type: type, goal: n, sec: 180, text: `3분 안에 원목이나 광석 ${n}개 캐기` };
   } else {
-    const n = 1 + Math.floor(Math.random() * 3);
+    let n = 1 + Math.floor(Math.random() * 3);
     m = { type: type, goal: n, sec: 300, text: `5분 안에 물고기 ${n}마리 낚기` };
   }
   m.progress = 0;
@@ -490,8 +490,8 @@ function tvMissionStart(player) {
   m.reward = tvRoundCoins(Math.max(64, tvViewers(player) * 3));
   mem.mission = m;
 
-  const id = tvBossbarId(player);
-  const s = player.server;
+  let id = tvBossbarId(player);
+  let s = player.server;
   s.runCommandSilent(`bossbar remove ${id}`);
   s.runCommandSilent(`bossbar add ${id} ${tvJson({ text: `[미션] ${m.text}  보상 ${tvFmt(m.reward)}`, color: "#FFD54F" })}`);
   s.runCommandSilent(`bossbar set ${id} color yellow`);
@@ -503,21 +503,21 @@ function tvMissionStart(player) {
 }
 
 function tvMissionProgress(player, type, amount) {
-  const m = tvMem(player).mission;
+  let m = tvMem(player).mission;
   if (!m || m.type != type) return;
   m.progress += amount || 1;
   if (m.progress >= m.goal) tvMissionEnd(player, true);
 }
 
 function tvMissionEnd(player, success) {
-  const mem = tvMem(player);
-  const m = mem.mission;
+  let mem = tvMem(player);
+  let m = mem.mission;
   if (!m) return;
   mem.mission = null;
   mem.lastMissionEnd = tvNow();
   player.server.runCommandSilent(`bossbar remove ${tvBossbarId(player)}`);
   if (success) {
-    const pd = tvData(player);
+    let pd = tvData(player);
     pd.tvPending = Number(pd.tvPending) + m.reward;
     pd.tvDonatedTotal = Number(pd.tvDonatedTotal) + m.reward;
     tvSessionDonation(player, m.reward, m.from);
@@ -533,12 +533,12 @@ function tvMissionEnd(player, success) {
 }
 
 function tvMissionTick(player) {
-  const m = tvMem(player).mission;
+  let m = tvMem(player).mission;
   if (!m) return;
-  const left = Math.max(0, Math.ceil((m.ends - tvNow()) / 1000));
+  let left = Math.max(0, Math.ceil((m.ends - tvNow()) / 1000));
   player.server.runCommandSilent(`bossbar set ${tvBossbarId(player)} value ${left}`);
   if (m.type == "goto") {
-    const dx = player.x - m.tx, dz = player.z - m.tz;
+    let dx = player.x - m.tx, dz = player.z - m.tz;
     if (Math.sqrt(dx * dx + dz * dz) < 8) return tvMissionEnd(player, true);
   } else {
     player.server.runCommandSilent(
@@ -551,23 +551,23 @@ function tvMissionTick(player) {
 // ───────────── 주기 처리 (플레이어마다 1초) ─────────────
 
 function tvSecond(player) {
-  const pd = tvData(player);
-  const mem = tvMem(player);
-  const on = tvIsOn(player);
+  let pd = tvData(player);
+  let mem = tvMem(player);
+  let on = tvIsOn(player);
 
   // 잠수 판정: 시점 회전만 이동으로 인정 (물줄기 잠수 방지)
-  const yaw = Number(player.getYRot()), pitch = Number(player.getXRot());
+  let yaw = Number(player.getYRot()), pitch = Number(player.getXRot());
   if (Math.abs(yaw - mem.lastYaw) > 0.5 || Math.abs(pitch - mem.lastPitch) > 0.5) tvMarkActive(player);
   mem.lastYaw = yaw;
   mem.lastPitch = pitch;
   if (player.isSleeping()) mem.lastActive = tvNow();
-  const afk = tvAfkSec(player);
+  let afk = tvAfkSec(player);
 
   // 화제성 식기
   let mult = 1;
   if (!on) mult = TV.offDecayMult;
   else if (afk > TV.afkSoftSec) mult = TV.afkDecayMult;
-  const factor = Math.pow(0.5, mult / TV.hypeHalfLifeSec);
+  let factor = Math.pow(0.5, mult / TV.hypeHalfLifeSec);
   pd.tvHype = tvHype(player) * factor;
   if (pd.tvHype < 0.05) pd.tvHype = 0;
 
@@ -590,9 +590,9 @@ function tvSecond(player) {
   }
 
   // 채팅 대기열 흘려보내기
-  const now = tvNow();
+  let now = tvNow();
   if (mem.queue.length) {
-    const ready = mem.queue.filter((q) => q.at <= now);
+    let ready = mem.queue.filter((q) => q.at <= now);
     mem.queue = mem.queue.filter((q) => q.at > now);
     ready.forEach((q) => tvPushChat(player, q.name, q.color, q.msg));
   }
@@ -605,9 +605,9 @@ function tvSecond(player) {
 
   // 해골 광산 깊이 기록
   if (String(player.level.dimension) == "society:skull_cavern") {
-    const depth = Math.max(0, Math.floor((511 - player.y) / 16));
+    let depth = Math.max(0, Math.floor((511 - player.y) / 16));
     if (depth > Number(pd.tvSkullBest)) {
-      const gained = depth - Number(pd.tvSkullBest);
+      let gained = depth - Number(pd.tvSkullBest);
       pd.tvSkullBest = depth;
       tvEvent(player, 5 * gained, 3 * gained, `해골 광산 ${depth}구간 신기록`, "skull_depth", { depth: depth });
     }
@@ -621,7 +621,7 @@ function tvSecond(player) {
 
   // 랜덤 후원
   if (afk < TV.afkHardSec) {
-    const perMin = Math.min(TV.donationRateMax, TV.donationRateBase + tvViewers(player) / TV.donationRatePerViewers);
+    let perMin = Math.min(TV.donationRateMax, TV.donationRateBase + tvViewers(player) / TV.donationRatePerViewers);
     if (Math.random() < perMin / 60) tvDonate(player, null);
     if (!mem.mission && now - mem.lastMissionEnd > TV.missionMinGapSec * 1000 && Math.random() < TV.missionChancePerMin / 60) {
       tvMissionStart(player);
@@ -630,7 +630,7 @@ function tvSecond(player) {
 
   // 순위·채팅창 갱신 (5초마다, 시청자 수가 바뀌었을 때)
   if (player.age % (TV_TICKS_PER_SEC * 5) < TV_TICKS_PER_SEC) {
-    const v = tvViewers(player);
+    let v = tvViewers(player);
     if (v != mem.lastViewers) {
       mem.lastViewers = v;
       tvSetSidebarScore(player);
@@ -647,17 +647,17 @@ function tvCheckBalance(player) {
     return;
   }
   if (!account) return;
-  const mem = tvMem(player);
-  const bal = Number(account.getBalance()) || 0;
+  let mem = tvMem(player);
+  let bal = Number(account.getBalance()) || 0;
   if (mem.lastBalance == null) {
     mem.lastBalance = bal;
     return;
   }
-  const diff = bal - mem.lastBalance;
+  let diff = bal - mem.lastBalance;
   mem.lastBalance = bal;
   if (diff >= 500) {
-    const big = diff >= 20000;
-    const hype = Math.min(60, Math.round(Math.log(diff) * 3)) * tvDaily(player, "income");
+    let big = diff >= 20000;
+    let hype = Math.min(60, Math.round(Math.log(diff) * 3)) * tvDaily(player, "income");
     tvEvent(player, hype, 0, `수입 ${tvFmt(diff)}`, big ? "income_big" : "income_small", { amt: tvFmt(diff) });
   } else if (diff <= -2000) {
     tvViewerChat(player, "spend", {}, 1, 4);
@@ -672,41 +672,41 @@ const TV_RARE_ORES = {
 };
 
 BlockEvents.broken((e) => {
-  const player = e.player;
+  let player = e.player;
   if (!player || player.isFake()) return;
   tvMarkActive(player);
   if (!tvIsOn(player)) return;
-  const id = String(e.block.id);
+  let id = String(e.block.id);
   if (id == "minecraft:diamond_ore" || id == "minecraft:deepslate_diamond_ore") {
     if (tvFirst(player, "diamond")) tvEvent(player, 25, 10, "생애 첫 다이아몬드!", "diamond_first", {});
     else tvEvent(player, Math.round(25 * tvDaily(player, "diamond")), 0, "다이아몬드", "diamond", {});
   } else if (TV_RARE_ORES[id] || id.indexOf("iridium") >= 0) {
-    const label = TV_RARE_ORES[id] || "이리듐";
-    const first = tvFirst(player, "ore:" + id);
+    let label = TV_RARE_ORES[id] || "이리듐";
+    let first = tvFirst(player, "ore:" + id);
     tvEvent(player, Math.round(20 * tvDaily(player, "ore:" + id)), first ? 3 : 0, first ? `첫 ${label}!` : label, "rare_ore", { item: label });
   }
   if (id.indexOf("_ore") >= 0 || id == "minecraft:ancient_debris" || e.block.hasTag("minecraft:logs")) tvMissionProgress(player, "mine", 1);
 });
 
 EntityEvents.death((e) => {
-  const entity = e.entity;
+  let entity = e.entity;
   // 스트리머가 죽음
   if (entity.isPlayer()) {
     if (entity.isFake && entity.isFake()) return;
-    const boss = tvBossNearby(entity);
+    let boss = tvBossNearby(entity);
     if (boss) tvEvent(entity, 10, 0, "보스전 사망 (레전드 장면)", "death_boss", {});
     else tvEvent(entity, -30, 0, "사망", "death", {});
-    const m = tvMem(entity).mission;
+    let m = tvMem(entity).mission;
     if (m) tvMissionEnd(entity, false);
     return;
   }
-  const player = e.source ? e.source.player : null;
+  let player = e.source ? e.source.player : null;
   if (!player || !player.isPlayer() || player.isFake()) return;
   tvMarkActive(player);
   if (!entity.isLiving()) return;
-  const hp = Number(entity.maxHealth) || 0;
-  const mobName = String(entity.displayName.string);
-  const typeId = String(entity.type);
+  let hp = Number(entity.maxHealth) || 0;
+  let mobName = String(entity.displayName.string);
+  let typeId = String(entity.type);
   let hostile = false;
   try {
     hostile = String(entity.getType().getCategory().getName()) == "monster";
@@ -715,10 +715,10 @@ EntityEvents.death((e) => {
   }
   if (hostile) tvMissionProgress(player, "kill", 1);
   if (hp >= 500) {
-    const first = tvFirst(player, "boss:" + typeId);
+    let first = tvFirst(player, "boss:" + typeId);
     tvEvent(player, first ? 300 : 120, first ? 50 : 5, `${mobName} 처치!`, "kill_boss", { mob: mobName });
   } else if (hp >= 100) {
-    const first = tvFirst(player, "mini:" + typeId);
+    let first = tvFirst(player, "mini:" + typeId);
     tvEvent(player, first ? 50 : 20, first ? 10 : 0, `${mobName} 처치`, "kill_mini", { mob: mobName });
   } else if (hostile && tvFirst(player, "kill:" + typeId)) {
     tvChange(player, 3, 1, `처음 잡은 몹: ${mobName}`);
@@ -726,23 +726,23 @@ EntityEvents.death((e) => {
 });
 
 PlayerEvents.chat((e) => {
-  const player = e.player;
+  let player = e.player;
   tvMarkActive(player);
   if (!tvIsOn(player)) return;
-  const msg = String(e.message);
+  let msg = String(e.message);
   let matched = null;
   global.TV_CHAT_REPLIES.forEach((r) => {
     if (!matched && r.keys.some((k) => msg.indexOf(k) >= 0)) matched = r;
   });
-  const mem = tvMem(player);
+  let mem = tvMem(player);
   if (matched) {
-    const n = 1 + Math.floor(Math.random() * 2);
+    let n = 1 + Math.floor(Math.random() * 2);
     for (let i = 0; i < n; i++) {
       let v = tvRand(global.TV_VIEWERS);
       mem.queue.push({ at: tvNow() + 1000 + Math.random() * 4000, name: v.name, color: v.color, msg: tvRand(matched.lines) });
     }
   } else if (Math.random() < 0.3) {
-    const v = tvRand(global.TV_VIEWERS);
+    let v = tvRand(global.TV_VIEWERS);
     mem.queue.push({ at: tvNow() + 1500 + Math.random() * 3000, name: v.name, color: v.color, msg: tvRand(["ㅇㅇ", "ㄹㅇ", "ㅋㅋ", "맞아요", "?"]) });
   }
 });
@@ -759,7 +759,7 @@ BlockEvents.placed((e) => {
 
 if (PlayerEvents.advancement) {
   PlayerEvents.advancement((e) => {
-    const player = e.player;
+    let player = e.player;
     if (!player || !tvIsOn(player)) return;
     let title = "업적";
     try {
@@ -774,7 +774,7 @@ if (PlayerEvents.advancement) {
 // 강화: enhance.js가 결과마다 부름
 global.tvOnEnhance = (player, result, level, name) => {
   if (!player || !tvIsOn(player)) return;
-  const vars = { item: name, n: level };
+  let vars = { item: name, n: level };
   if (result == "success") {
     if (level >= 7) tvEvent(player, Math.round(level * level * 0.8), level >= 10 ? level : 0, `+${level} 강화 성공`, "enhance_success", vars);
     else tvViewerChat(player, "enhance_success", vars, 1, 3);
@@ -793,16 +793,16 @@ global.tvOnFished = (player, itemIds) => {
   if (!player || player.isFake() || !tvIsOn(player)) return;
   tvMarkActive(player);
   itemIds.forEach((id) => {
-    const trade = global.trades ? global.trades.get(String(id)) : null;
-    const value = trade ? Number(trade.value) : 0;
+    let trade = global.trades ? global.trades.get(String(id)) : null;
+    let value = trade ? Number(trade.value) : 0;
     let label = id;
     try {
       label = String(Item.of(id).displayName.string).replace(/[\[\]]/g, "");
     } catch (err) {
       label = id;
     }
-    const first = tvFirst(player, "fish:" + id);
-    const hype = Math.max(1, Math.min(40, Math.round(value / 16))) * (first ? 2 : 1) * tvDaily(player, "fish:" + id);
+    let first = tvFirst(player, "fish:" + id);
+    let hype = Math.max(1, Math.min(40, Math.round(value / 16))) * (first ? 2 : 1) * tvDaily(player, "fish:" + id);
     let cat = value >= 160 ? "fish_big" : "fish_small";
     if (first) cat = "fish_first";
     tvEvent(player, Math.round(hype), first ? 2 : 0, first ? `처음 낚은 ${label}` : label, cat, { item: label });
@@ -811,9 +811,9 @@ global.tvOnFished = (player, itemIds) => {
 };
 
 PlayerEvents.loggedIn((e) => {
-  const player = e.player;
+  let player = e.player;
   tvData(player);
-  const mem = tvMem(player);
+  let mem = tvMem(player);
   mem.lastActive = tvNow();
   mem.lastBalance = null;
   tvUpdateSidebar(player.server);
@@ -837,8 +837,8 @@ PlayerEvents.loggedIn((e) => {
 });
 
 PlayerEvents.loggedOut((e) => {
-  const player = e.player;
-  const id = String(player.uuid);
+  let player = e.player;
+  let id = String(player.uuid);
   player.server.runCommandSilent(`bossbar remove ${tvBossbarId(player)}`);
   try {
     tvSessionEnd(player, true);
@@ -849,7 +849,7 @@ PlayerEvents.loggedOut((e) => {
 });
 
 PlayerEvents.tick((e) => {
-  const player = e.player;
+  let player = e.player;
   if (player.age % TV_TICKS_PER_SEC != 0) return;
   if (player.isFake()) return;
   try {
@@ -863,20 +863,20 @@ PlayerEvents.tick((e) => {
 // 레전드 장면 = 이번 방송에서 시청자가 가장 많이 늘어난 순간 3개 (같은 이유는 한 번만)
 
 function tvSessionStart(player) {
-  const mem = tvMem(player);
-  const v = tvViewers(player);
+  let mem = tvMem(player);
+  let v = tvViewers(player);
   mem.session = { start: tvNow(), startViewers: v, peak: v, donated: 0, donations: 0, topDonation: null, missions: 0, highlights: [], subsStart: tvSubs(player) };
 }
 
 function tvSessionNote(player, diff, reason) {
-  const mem = tvMem(player);
+  let mem = tvMem(player);
   if (!mem.session) return;
-  const v = tvViewers(player);
+  let v = tvViewers(player);
   if (v > mem.session.peak) mem.session.peak = v;
   tvRankNote(player, v);
   if (diff <= 0 || reason == "방송 시작" || reason == "꾸준한 방송") return;
-  const h = mem.session.highlights;
-  const same = h.filter((x) => x.reason == reason)[0];
+  let h = mem.session.highlights;
+  let same = h.filter((x) => x.reason == reason)[0];
   if (same) {
     if (diff > same.diff) same.diff = diff;
   } else {
@@ -887,7 +887,7 @@ function tvSessionNote(player, diff, reason) {
 }
 
 function tvSessionDonation(player, amount, from) {
-  const mem = tvMem(player);
+  let mem = tvMem(player);
   if (!mem.session) return;
   mem.session.donated += amount;
   mem.session.donations++;
@@ -895,8 +895,8 @@ function tvSessionDonation(player, amount, from) {
 }
 
 function tvRecapLines(r) {
-  const min = Math.max(1, Math.round(r.durationSec / 60));
-  const lines = [
+  let min = Math.max(1, Math.round(r.durationSec / 60));
+  let lines = [
     "§c━━━━━━ 오늘 방송 결산 ━━━━━━",
     `§f방송 시간 §e${min >= 60 ? Math.floor(min / 60) + "시간 " + (min % 60) + "분" : min + "분"}§f · 최고 시청자 §e${tvFmt(r.peak)}§f명`,
     `§f구독자 §e${tvFmt(r.subsStart)} → ${tvFmt(r.subsEnd)}§f (${r.subsEnd - r.subsStart >= 0 ? "+" : ""}${tvFmt(r.subsEnd - r.subsStart)})`,
@@ -912,13 +912,13 @@ function tvRecapLines(r) {
 }
 
 function tvSessionEnd(player, loggingOut) {
-  const mem = tvMem(player);
-  const sess = mem.session;
+  let mem = tvMem(player);
+  let sess = mem.session;
   mem.session = null;
   if (!sess) return;
-  const durationSec = (tvNow() - sess.start) / 1000;
+  let durationSec = (tvNow() - sess.start) / 1000;
   if (durationSec < 120) return; // 2분 미만은 결산 안 함
-  const recap = {
+  let recap = {
     durationSec: durationSec, peak: sess.peak, subsStart: sess.subsStart, subsEnd: tvSubs(player),
     donated: sess.donated, donations: sess.donations, topDonation: sess.topDonation, missions: sess.missions, highlights: sess.highlights,
   };
@@ -930,8 +930,8 @@ function tvSessionEnd(player, loggingOut) {
 }
 
 function tvShowStoredRecap(player) {
-  const pd = tvData(player);
-  const raw = String(pd.tvLastRecap || "");
+  let pd = tvData(player);
+  let raw = String(pd.tvLastRecap || "");
   if (!raw) return;
   pd.tvLastRecap = "";
   try {
@@ -945,11 +945,11 @@ function tvShowStoredRecap(player) {
 // ───────────── 구독자 달성 트로피 ─────────────
 
 function tvCheckTrophies(player) {
-  const subs = tvSubs(player);
+  let subs = tvSubs(player);
   TV.trophies.forEach((t) => {
     if (subs < t.subs) return;
     if (!tvFirst(player, "trophy:" + t.id)) return;
-    const name = tvName(player);
+    let name = tvName(player);
     player.server.runCommandSilent(`give ${name} ${t.block}{BlockEntityTag:{Trophy:"${t.id}"}}`);
     player.server.runCommandSilent(
       `tellraw @a ${tvJson([{ text: "[방송] ", color: "#FF5555" }, { text: `${name}님 구독자 ${tvFmt(t.subs)}명 달성! `, color: "#FFFFFF" }, { text: t.name, color: t.color, bold: true }])}`
@@ -968,7 +968,7 @@ function tvRankWeek(server) {
 }
 function tvRankLoad(server) {
   try {
-    const raw = server.persistentData.tvRankJson;
+    let raw = server.persistentData.tvRankJson;
     if (raw) return JSON.parse(String(raw));
   } catch (err) {
     console.error("[TheValley] rank load error: " + err);
@@ -980,27 +980,27 @@ function tvRankSave(server, data) {
 }
 
 function tvRankNote(player, viewers) {
-  const server = player.server;
-  const data = tvRankLoad(server);
-  const id = String(player.uuid);
-  const cur = data.players[id];
+  let server = player.server;
+  let data = tvRankLoad(server);
+  let id = String(player.uuid);
+  let cur = data.players[id];
   if (cur && cur.peak >= viewers) return;
   data.players[id] = { name: tvName(player), peak: viewers };
   tvRankSave(server, data);
 }
 
 function tvRankCheck(server) {
-  const data = tvRankLoad(server);
-  const week = tvRankWeek(server);
+  let data = tvRankLoad(server);
+  let week = tvRankWeek(server);
   if (week == data.week) return;
-  const ranked = Object.keys(data.players)
+  let ranked = Object.keys(data.players)
     .map((id) => ({ id: id, name: data.players[id].name, peak: data.players[id].peak }))
     .sort((a, b) => b.peak - a.peak)
     .slice(0, TV.rankRewards.length);
   if (ranked.length) {
     server.runCommandSilent(`tellraw @a ${tvJson({ text: "━━━━ [방송] 오늘의 시청자 순위 ━━━━", color: "#FF5555" })}`);
     ranked.forEach((r, i) => {
-      const award = tvRoundCoins(r.peak * TV.rankRewards[i]);
+      let award = tvRoundCoins(r.peak * TV.rankRewards[i]);
       data.awards[r.id] = (data.awards[r.id] || 0) + award;
       server.runCommandSilent(
         `tellraw @a ${tvJson([{ text: `${i + 1}등 `, color: "#FFD54F", bold: true }, { text: `${r.name} · 최고 ${tvFmt(r.peak)}명 · 보너스 후원 ${tvFmt(award)}`, color: "#FFFFFF" }])}`
@@ -1014,21 +1014,21 @@ function tvRankCheck(server) {
 }
 
 function tvApplyRankAwards(player) {
-  const server = player.server;
-  const data = tvRankLoad(server);
-  const id = String(player.uuid);
-  const award = data.awards[id];
+  let server = player.server;
+  let data = tvRankLoad(server);
+  let id = String(player.uuid);
+  let award = data.awards[id];
   if (!award) return;
   delete data.awards[id];
   tvRankSave(server, data);
-  const pd = tvData(player);
+  let pd = tvData(player);
   pd.tvPending = Number(pd.tvPending) + award;
   pd.tvDonatedTotal = Number(pd.tvDonatedTotal) + award;
   player.tell(Text.of(`[방송] 일간 순위 보너스 ${tvFmt(award)}이 미정산 후원금에 들어왔어요.`).gold());
 }
 
 ServerEvents.tick((e) => {
-  const server = e.server;
+  let server = e.server;
   if (server.tickCount % 600 != 0) return; // 30초마다
   try {
     tvRankCheck(server);
@@ -1040,9 +1040,9 @@ ServerEvents.tick((e) => {
 // ───────────── 명령어 ─────────────
 
 function tvSetOn(player, on) {
-  const pd = tvData(player);
+  let pd = tvData(player);
   pd.tvOn = on ? 1 : 0;
-  const mem = tvMem(player);
+  let mem = tvMem(player);
   if (!on) {
     if (mem.mission) {
       mem.mission = null;
@@ -1062,10 +1062,10 @@ function tvSetOn(player, on) {
 }
 
 function tvStats(player) {
-  const pd = tvData(player);
-  const tier = tvTier(player);
-  const mem = tvMem(player);
-  const lines = [
+  let pd = tvData(player);
+  let tier = tvTier(player);
+  let mem = tvMem(player);
+  let lines = [
     `§c[방송 통계]§r ${tvIsOn(player) ? "§aON" : "§7OFF"}`,
     `§f시청자 §e${tvFmt(tvViewers(player))}§f = 구독자 §e${tvFmt(tvSubs(player))}§f × 화제성 §e${(1 + tvHype(player) / 100).toFixed(2)}배`,
     `§f등급 §e${tier.name}§f (정산 수수료 ${Math.round(tier.fee * 100)}%)`,
@@ -1074,7 +1074,7 @@ function tvStats(player) {
     "§7최근 변동:",
   ];
   mem.changes.slice(-6).reverse().forEach((c) => {
-    const sign = c.diff >= 0 ? "§a+" : "§c";
+    let sign = c.diff >= 0 ? "§a+" : "§c";
     lines.push(`  ${sign}${tvFmt(c.diff)}§7 · ${c.reason}${c.subs ? ` (구독자 ${c.subs > 0 ? "+" : ""}${c.subs})` : ""}`);
   });
   lines.forEach((l) => player.tell(l));
@@ -1097,12 +1097,12 @@ function tvToggleChat(player, on) {
 const TV_MENU_OBJECTIVES = ["tv_m_on", "tv_m_chat", "tv_m_viewers", "tv_m_subs", "tv_m_pending", "tv_m_fee", "tv_m_net"];
 
 function tvSyncMenuScores(player) {
-  const s = player.server;
-  const name = tvName(player);
-  const pd = tvData(player);
-  const tier = tvTier(player);
-  const pending = Number(pd.tvPending) || 0;
-  const vals = {
+  let s = player.server;
+  let name = tvName(player);
+  let pd = tvData(player);
+  let tier = tvTier(player);
+  let pending = Number(pd.tvPending) || 0;
+  let vals = {
     tv_m_on: tvIsOn(player) ? 1 : 0,
     tv_m_chat: Number(pd.tvChatOn) == 1 ? 1 : 0,
     tv_m_viewers: tvIsOn(player) ? tvViewers(player) : 0,
@@ -1130,13 +1130,13 @@ function tvMenuAction(player, fn) {
 }
 
 ServerEvents.commandRegistry((event) => {
-  const { commands: Commands } = event;
-  const run = (fn) => (ctx) => {
-    const player = ctx.source.player;
+  let { commands: Commands } = event;
+  let run = (fn) => (ctx) => {
+    let player = ctx.source.player;
     if (!player) return 0;
     return fn(player) || 1;
   };
-  const build = (root, words) =>
+  let build = (root, words) =>
     Commands.literal(root)
       .executes(run(tvOpenMenu))
       .then(Commands.literal("menu_toggle").executes(run((p) => tvMenuAction(p, (q) => tvSetOn(q, !tvIsOn(q))))))

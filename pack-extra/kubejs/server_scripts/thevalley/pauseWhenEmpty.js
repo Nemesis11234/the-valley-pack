@@ -4,7 +4,7 @@
 // (Better Days, Serene Seasons 모두 doDaylightCycle 게임룰을 따름)
 
 function theValleySetPaused(server, paused) {
-  const value = paused ? 'false' : 'true'
+  let value = paused ? 'false' : 'true'
   server.runCommandSilent(`gamerule doDaylightCycle ${value}`)
   server.runCommandSilent(`gamerule doWeatherCycle ${value}`)
   console.info(`[TheValley] ${paused ? '접속자 없음: 시간 멈춤' : '접속함: 시간 다시 흐름'}`)
@@ -20,7 +20,7 @@ PlayerEvents.loggedIn(event => {
 })
 
 PlayerEvents.loggedOut(event => {
-  const server = event.server
+  let server = event.server
   // 나가는 플레이어가 목록에서 빠진 뒤에 확인
   server.scheduleInTicks(20, () => {
     if (server.playerCount == 0) theValleySetPaused(server, true)
