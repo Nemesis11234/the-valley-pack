@@ -393,11 +393,16 @@ function runPackwiz(java, jar) {
     log('packwiz', exe, args.join(' '));
     const child = spawn(exe, args, { cwd: GAME_DIR, windowsHide: true });
     let tail = [];
+    const failures = [];
     const onLine = (line) => {
       line = line.trim();
       if (!line) return;
       log('[packwiz]', line);
       tail.push(line); if (tail.length > 30) tail.shift();
+      // 스택 트레이스(at ...)는 빼고 실제 원인 줄만 모아둠
+      if (!line.startsWith('at ') && /^(Failed|Error|Caused by|Exception|java\.|.*Exception:)/.test(line) && failures.length < 25) {
+        failures.push(line.length > 220 ? line.slice(0, 220) + '…' : line);
+      }
       const m = line.match(/\((\d+)\/(\d+)\)/);
       if (m) progress('모드 업데이트 중', `${m[1]} / ${m[2]}`, Number(m[1]) / Number(m[2]));
       else progress('모드 업데이트 중', line.slice(0, 90), null);
@@ -410,7 +415,10 @@ function runPackwiz(java, jar) {
     child.on('close', (code) => {
       if (buf) onLine(buf);
       if (code === 0) resolve();
-      else reject(new Error(`모드 업데이트 실패 (코드 ${code})\n` + tail.slice(-6).join('\n')));
+      else {
+        const detail = failures.length ? failures.join('\n') : tail.slice(-8).join('\n');
+        reject(new Error(`모드 업데이트 실패 (코드 ${code})\n\n${detail}\n\n전체 기록: 로그 폴더의 launcher.log`));
+      }
     });
   });
 }

@@ -1,7 +1,7 @@
 {
   "name": "the-valley-launcher",
   "productName": "The Valley",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "The Valley 서버 전용 런처",
   "main": "src/main.js",
   "author": "Nemesis11234",
