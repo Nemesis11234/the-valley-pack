@@ -1,0 +1,155 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "sve_dragon_den"
+	group: "0211E02D983754CA"
+	icon: "dragonden:crystallized_dragon_egg"
+	id: "7F1633C3BEAA586A"
+	order_index: 5
+	quest_links: [ ]
+	quests: [
+		{
+			description: [
+				"Look for the rare Dragon's Den ruins in the Overworld: a central perch surrounded by pillars. The fight takes place here, without the risk of falling for eternity."
+				""
+				"Survey the terrain and decide where you will retreat, resupply, and approach. This is a place to prepare before you summon anything."
+			]
+			icon: "minecraft:dragon_head"
+			id: "26697A099B271E41"
+			subtitle: "An Overworld encounter."
+			tasks: [{
+				id: "678835E596312BF5"
+				title: "Read and understood."
+				type: "checkmark"
+			}]
+			title: "Ruins with a Purpose"
+			x: 0.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["26697A099B271E41"]
+			description: [
+				"Craft a Crystallized Dragon Egg from &6a Dragon Egg, a Nether Star, four End Crystals, and an Iridium Block&r. JEI shows their arrangement."
+				""
+				"The charged and depleted eggs can also be placed as decorations. Bring the charged one when you intend to fight."
+			]
+			icon: "dragonden:crystallized_dragon_egg"
+			id: "6B139DCEC0A92141"
+			subtitle: "An investment in the first encounter."
+			tasks: [{
+				consume_items: false
+				id: "563F811C35A5EE75"
+				item: "dragonden:crystallized_dragon_egg"
+				type: "item"
+			}]
+			title: "A Crystal Heart"
+			x: 2.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["6B139DCEC0A92141"]
+			description: [
+				"Hold the &dcharged Crystallized Dragon Egg&r and &6right-click the central obsidian block on top of the Den's perch&r. Using it on the correct altar starts the encounter and returns a depleted egg."
+				""
+				"Ordinary placement elsewhere displays the egg. Keep the depleted egg after summoning: it is the basis for your next attempt."
+				""
+				"This checkmark acknowledges the instructions. It does not summon a dragon or consume your egg."
+			]
+			icon: "minecraft:end_crystal"
+			id: "21721EC77D50AB79"
+			subtitle: "When everyone is ready."
+			tasks: [{
+				id: "41A077EDCA1FB8F9"
+				title: "I know where to use the charged egg."
+				type: "checkmark"
+			}]
+			title: "Stir the Dragon"
+			x: 5.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["26697A099B271E41"]
+			description: [
+				"Watch the crystals, the dragon, and the creatures that arrive during the fight. A change in the battlefield is a reason to adjust your priorities."
+				""
+				"The scars of this fight may remain after the rewards are collected."
+				""
+				"You've fought a dragon before. The same rules apply here... mostly."
+			]
+			icon: {
+				Count: 1
+				id: "minecraft:shield"
+				tag: {
+					Damage: 0
+				}
+			}
+			id: "693EF058F11E80A8"
+			subtitle: "Watch what the encounter teaches you."
+			tasks: [{
+				id: "191E2A4E88426797"
+				title: "Read and understood."
+				type: "checkmark"
+			}]
+			title: "Read the Battlefield"
+			x: 5.0d
+			y: 2.5d
+		}
+		{
+			dependencies: ["21721EC77D50AB79"]
+			description: ["After a successful encounter, collect the rewards from the &dDragon Scale Chest&r in the middle of the altar. It is mineable and can be brought home as a working chest."]
+			icon: "dragonden:dragon_scale_chest"
+			id: "14537C31911D63F3"
+			subtitle: "Look to the center of the altar."
+			tasks: [{
+				consume_items: false
+				id: "79FA60A5E9FE522A"
+				item: "dragonden:dragon_scale_chest"
+				type: "item"
+			}]
+			title: "What the Dragon Left Behind"
+			x: 7.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["21721EC77D50AB79"]
+			description: [
+				"Keep the &6Depleted Crystallized Dragon Egg&r. Place it in the center of a crafting grid with one End Crystal above, below, left, and right to recharge it."
+				""
+				"Repeat encounters consume four more End Crystals each time."
+			]
+			icon: "dragonden:depleted_crystallized_dragon_egg"
+			id: "2D97C92ACF39CD45"
+			subtitle: "Another fight, another preparation."
+			tasks: [{
+				consume_items: false
+				id: "755CA66907EAD930"
+				item: "dragonden:depleted_crystallized_dragon_egg"
+				type: "item"
+			}]
+			title: "The Ember Remains"
+			x: 7.5d
+			y: 2.5d
+		}
+		{
+			dependencies: ["14537C31911D63F3"]
+			description: [
+				"Obtain the &dDragon Smithing Template&r from the Den reward chest. Use it to craft some seriously powerful gear"
+				""
+				"Review its equipment recipes before spending it. This milestone celebrates finding one; it does not award or duplicate the template."
+			]
+			icon: "butchery:dragon_smithing_template"
+			id: "7F27B4B7D78166C8"
+			subtitle: "Something to build toward."
+			tasks: [{
+				consume_items: false
+				id: "60D66663DA73FD32"
+				item: "butchery:dragon_smithing_template"
+				type: "item"
+			}]
+			title: "A Rare Prize"
+			x: 10.0d
+			y: 0.0d
+		}
+	]
+	title: "Dragon's Den"
+}

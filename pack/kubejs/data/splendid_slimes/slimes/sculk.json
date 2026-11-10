@@ -1,0 +1,49 @@
+{
+  "breed": "sculk",
+  "name": "slime.splendid_slimes.sculk",
+  "color": "#024050",
+  "particle": {
+    "item": "minecraft:sculk"
+  },
+  "diet": "diet.splendid_slimes.sculk",
+  "foods": [
+    {
+      "item": "minecraft:sculk"
+    },
+    {
+      "item": "minecraft:sculk_catalyst"
+    },
+    {
+      "item": "minecraft:sculk_sensor"
+    },
+    {
+      "item": "minecraft:sculk_shrieker"
+    },
+    {
+      "item": "minecraft:sculk_vein"
+    },
+    {
+      "item": "minecraft:echo_shard"
+    }
+  ],
+  "favorite_food": {
+    "item": "minecraft:echo_shard"
+  },
+  "traits": [
+    "moody",
+    "picky"
+  ],
+  "positive_emit_effects": [
+    {
+      "effect": "minecraft:night_vision",
+      "duration": 300
+    }
+  ],
+  "emit_effect_particle": "minecraft:angry_villager",
+  "negative_emit_effects": [
+    {
+      "effect": "minecraft:darkness",
+      "duration": 120
+    }
+  ]
+}

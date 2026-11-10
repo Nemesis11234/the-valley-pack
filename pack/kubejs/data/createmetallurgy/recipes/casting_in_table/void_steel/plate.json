@@ -1,0 +1,17 @@
+{
+  "type": "createmetallurgy:casting_in_table",
+  "ingredients": [
+    {
+      "item": "createmetallurgy:graphite_plate_mold"
+    },
+    {
+      "amount": 90,
+      "fluid": "createmetallurgy:molten_void_steel",
+      "nbt": {}
+    }
+  ],
+  "processingTime": 60,
+  "result": {
+    "item": "createutilities:void_steel_sheet"
+  }
+}

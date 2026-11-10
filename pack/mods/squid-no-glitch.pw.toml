@@ -1,0 +1,8 @@
+name = "Squid No Glitch"
+filename = "squidnoglitch-mc1.20.1-v1.0.3-forge.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/7No3zYTb/versions/ZSP9yA0X/squidnoglitch-mc1.20.1-v1.0.3-forge.jar"
+hash-format = "sha1"
+hash = "a4f8e186bc18b86087b0ce00c7e833e9a279c973"

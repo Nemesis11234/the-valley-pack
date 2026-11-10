@@ -1,0 +1,17 @@
+{
+  "type": "createmetallurgy:bulk_melting",
+  "ingredients": [
+    {
+      "item": "create_deep_dark:echo_block"
+    }
+  ],
+  "maxHeatRequirement": 50,
+  "minHeatRequirement": 17,
+  "processingTime": 224,
+  "results": [
+    {
+      "fluid": "create_deep_dark:molten_echo",
+      "amount": 810
+    }
+  ]
+}

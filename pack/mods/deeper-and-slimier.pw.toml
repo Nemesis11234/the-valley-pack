@@ -1,0 +1,13 @@
+name = "Deeper and Slimier"
+filename = "deeper_and_slimier-1.0.1.jar"
+side = "both"
+
+[download]
+hash-format = "sha1"
+hash = "f9e033e1a226810aec42702eb266c32687adb944"
+mode = "metadata:curseforge"
+
+[update]
+[update.curseforge]
+file-id = 6963684
+project-id = 1335549

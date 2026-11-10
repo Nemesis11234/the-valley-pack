@@ -1,0 +1,69 @@
+
+[death]
+	#Enable Death's Due death processing.
+	enabled = true
+	#Only process deaths when keepInventory is enabled.
+	require_keep_inventory = false
+	#Chance from 0.0 to 1.0 that an eligible item is taken.
+	#Range: 0.0 ~ 1.0
+	theft_chance = 0.5
+	#Chance from 0.0 to 1.0 for an eligible hotbar item to be taken.
+	#Range: 0.0 ~ 1.0
+	hotbar_theft_chance = 0.7
+	#Chance from 0.0 to 1.0 for an eligible armor item to be taken.
+	#Range: 0.0 ~ 1.0
+	armor_theft_chance = 0.4
+	#Chance from 0.0 to 1.0 for an eligible Curios item to be taken.
+	#Range: 0.0 ~ 1.0
+	curios_theft_chance = 0.2
+	include_hotbar = true
+	include_armor = true
+	#Include Curios slots when Curios is installed.
+	include_curios = true
+	#Exact item IDs or namespaces that Death's Due can never steal. Examples: minecraft:elytra, sophisticatedbackpacks
+	blacklisted_items = ["sophisticatedbackpacks", "minecraft:elytra"]
+	#Remove one item instead of the complete selected stack.
+	remove_one_item = false
+	#Maximum number of independent theft rolls per death.
+	#Range: 1 ~ 3
+	max_items_per_death = 3
+	#DESTROYED permanently removes the item; STOLEN stores it for Guild recovery.
+	#Allowed Values: DESTROYED, STOLEN
+	outcome = "STOLEN"
+
+[recovery]
+	#Range: 1 ~ 100
+	max_outstanding_records = 5
+	#Range: 1 ~ 100
+	history_limit = 10
+	#Base item value in Numismatics mode, and flat emerald cost per record in emerald mode.
+	#Range: > 0
+	recovery_cost = 8
+	#Currency used by Guild recovery. NUMISMATICS requires Create: Numismatics.
+	#Allowed Values: EMERALDS, NUMISMATICS
+	currency_mode = "NUMISMATICS"
+	#If the selected optional currency is unavailable, explicitly fall back to emeralds.
+	fallback_to_emeralds = false
+	#Maximum combined Numismatics recovery cost for claims created by one death, as a percent of the account balance.
+	#Range: 0.0 ~ 100.0
+	numismatics_death_cap_percent = 10
+	#Safety maximum for one Numismatics recovery price; the death percentage cap is applied first.
+	#Range: > 1
+	max_numismatics_recovery_cost = 2147483647
+	#Maximum claims that may be recovered during one Guild visit.
+	#Range: 1 ~ 5
+	max_buybacks_per_visit = 1
+
+[notifications]
+	show_actionbar = true
+	show_chat = true
+	reveal_item_name = true
+	reveal_killer = true
+	#Avoid selecting the same narrative twice in a row for a player.
+	avoid_repeated_messages = true
+
+[loot]
+	#Chance for an Ancient City chest to contain a Deathward enchanted book.
+	#Range: 0.0 ~ 1.0
+	ancient_city_loot_chance = 0.1
+

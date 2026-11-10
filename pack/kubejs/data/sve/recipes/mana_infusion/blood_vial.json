@@ -1,0 +1,10 @@
+{
+  "type": "botania:mana_infusion",
+  "input": {
+    "item": "butchery:bottle_of_blood"
+  },
+  "mana": 6000,
+  "output": {
+    "item": "irons_spellbooks:blood_vial"
+  }
+}

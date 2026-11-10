@@ -1,0 +1,33 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "simpleradio:items_enabled",
+          "item": "insulator"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "category": "building",
+        "key": {
+          "I": {
+            "item": "minecraft:iron_ingot"
+          },
+          "P": {
+            "tag": "minecraft:planks"
+          }
+        },
+        "pattern": [
+          "PIP"
+        ],
+        "result": {
+          "item": "simpleradio:insulator",
+	  "count": 4
+        },
+        "show_notification": true
+      }
+    }
+  ]
+}

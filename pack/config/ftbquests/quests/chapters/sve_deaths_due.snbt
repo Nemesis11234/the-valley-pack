@@ -1,0 +1,114 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "sve_deaths_due"
+	group: "0211E02D983754CA"
+	icon: "deaths_due:adventurers_guild"
+	id: "153F5AB4C8CC433D"
+	order_index: 1
+	quest_links: [ ]
+	quests: [
+		{
+			description: [
+				"&cKeep-inventory does not protect everything in SVE.&r Death's Due can take belongings when you die, including equipped items. Society's death debt and the loss of experience are separate consequences."
+				""
+				"You do not need to die to complete this page. Read these notes while you still have the luxury of preparing."
+			]
+			icon: "minecraft:totem_of_undying"
+			id: "6B91B12060F9D9DF"
+			subtitle: "Read this before setting out."
+			tasks: [{
+				id: "133526528A23EFAE"
+				title: "Read and understood."
+				type: "checkmark"
+			}]
+			title: "The Price of Coming Back"
+			x: 0.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["6B91B12060F9D9DF"]
+			description: [
+				"Visit an &6Adventurer's Guild Desk&r or Guild Agent and read the introduction. Under the Guilds enrollment rules, your first visit enrolls you for future recovery claims."
+				""
+				"&cItems stolen before enrollment cannot be recovered by joining later.&r Check the Guild screen for your access status; servers can set different enrollment requirements."
+				""
+				"This reading checkmark does not enroll you. Open the Guild interface and confirm your status before heading into danger."
+			]
+			icon: "deaths_due:adventurers_guild"
+			id: "4C5D6E7691BBAD6B"
+			subtitle: "Visit the Guild before you need it."
+			tasks: [{
+				id: "1AD8DF217786E160"
+				title: "I understand that enrollment happens at the Guild."
+				type: "checkmark"
+			}]
+			title: "Put Your Name in the Book"
+			x: 2.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["4C5D6E7691BBAD6B"]
+			description: [
+				"The Guild employes many mercenaries who travel the land in search of stolen or mishandled equipment. While the Guild reserves the right to keep all equipment found, it's usually willing to sell one piece back to you. "
+				""
+				"&cRecovery is limited.&r The Guild agent will let you know your buyback allowance. Using the final allowance will recycle all other outstanding claims; read the confirmation carefully before submitting payment."
+				""
+				"Storage is limited as well. Return promptly instead of letting several bad expeditions pile up. Guild agents only have so much space to keep found items. The Guild has agreed to hold up to 5 items at a time on a first in first out basis. "
+			]
+			icon: "minecraft:chest"
+			id: "044230FA0E48412D"
+			subtitle: "Read the confirmation before buying back."
+			tasks: [{
+				id: "7D13D5BAE135C291"
+				title: "Read and understood."
+				type: "checkmark"
+			}]
+			title: "Choose What Comes Home"
+			x: 5.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["6B91B12060F9D9DF"]
+			description: [
+				"SVE's death rule leaves only &65% of your experience&r available to recover. Treat the experience you carry as another part of what you are risking."
+				""
+				"Enchant useful equipment and plan your liquid-experience needs before dangerous trips. Iron's ink progression gives that experience a purpose beyond collecting levels."
+			]
+			icon: "minecraft:experience_bottle"
+			id: "024243DBCD99C9CE"
+			subtitle: "A level saved is a resource protected."
+			tasks: [{
+				id: "75584F3BC66D863B"
+				title: "Read and understood."
+				type: "checkmark"
+			}]
+			title: "Experience Is a Supply"
+			x: 2.5d
+			y: 2.5d
+		}
+		{
+			dependencies: [
+				"044230FA0E48412D"
+				"024243DBCD99C9CE"
+			]
+			description: [
+				"Choose a destination, bring suitable food and equipment, and leave a reserve at home. Know how you intend to get back before you spend the supplies needed to do it."
+				""
+				"You do not have to bring every valuable thing you own. Leave room for the things you hope to find."
+			]
+			icon: "minecraft:bread"
+			id: "6B6CC00A6EDBE0DF"
+			subtitle: "Preparation is part of progression."
+			tasks: [{
+				id: "7A5E66294FC236B9"
+				title: "My next trip has a return plan."
+				type: "checkmark"
+			}]
+			title: "Pack for the Return Journey"
+			x: 5.0d
+			y: 2.5d
+		}
+	]
+	title: "Death's Due"
+}

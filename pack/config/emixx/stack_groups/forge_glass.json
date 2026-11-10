@@ -1,0 +1,5 @@
+{
+  "id": "forge:glass",
+  "enabled": false,
+  "regex": "(?!)"
+}

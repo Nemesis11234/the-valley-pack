@@ -1,0 +1,112 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "sve_overview"
+	group: "0211E02D983754CA"
+	icon: "minecraft:compass"
+	id: "7ACE03C6CAFF282D"
+	order_index: 0
+	quest_links: [ ]
+	quests: [
+		{
+			description: [
+				"There is still time to tend the crops, decorate the kitchen, and watch the seasons turn. &6Sunlit Valley Expanded&r gives you more reasons to pack a bag and leave that comfortable home behind."
+				""
+				"The pages in this section follow the additions to Society: new ways to prepare food, refine resources, practice magic, and seek out dangerous encounters. Choose a craft that interests you and follow its trail."
+				""
+				"&cRead Death's Due before your first expedition.&r Preparation matters here, and coming home empty-handed is not the worst that can happen."
+			]
+			icon: "minecraft:compass"
+			id: "449AF2706F794D89"
+			subtitle: "A comfortable home is only the beginning."
+			tasks: [{
+				id: "2BADAF809AB3973B"
+				title: "Let's see what lies beyond the farm."
+				type: "checkmark"
+			}]
+			title: "Beyond the Garden Gate"
+			x: 0.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["449AF2706F794D89"]
+			description: [
+				"Open the &6Death's Due&r page in this section. Learn how Guild enrollment, recovery claims, and lost experience work before risking your favorite tools."
+				""
+				"Keep food, spare equipment, and money for recovery at home. A successful expedition ends with you bringing its discoveries back."
+			]
+			icon: "minecraft:lantern"
+			id: "48CB5E154D0E9E76"
+			subtitle: "Your first stop: Death's Due."
+			tasks: [{
+				id: "758D9BB5045E076A"
+				title: "Read and understood."
+				type: "checkmark"
+			}]
+			title: "Make It Home"
+			x: -3.0d
+			y: 2.0d
+		}
+		{
+			dependencies: ["449AF2706F794D89"]
+			description: [
+				"&6Butchery&r makes your kitchen part of your expedition planning. Learn which machine handles mince, scraps, and sausages."
+				""
+				"&6Metallurgy&r rewards a thoughtful workshop. Milling, washing, melting, and casting help precious ore go further. Both have their own pages here."
+			]
+			icon: "createmetallurgy:casting_table"
+			id: "176E7E0E672FBABC"
+			subtitle: "Butchery and Metallurgy"
+			tasks: [{
+				id: "3CB813CD56B71340"
+				title: "Read and understood."
+				type: "checkmark"
+			}]
+			title: "The Work Behind the Adventure"
+			x: 0.0d
+			y: 2.0d
+		}
+		{
+			dependencies: ["449AF2706F794D89"]
+			description: [
+				"Your garden has something to offer the spellcaster, too. Botania petals, bottled ink, and liquid experience form SVE's path toward stronger inks."
+				""
+				"Open &6Iron's Spells&r to begin. Exploring for scrolls and other magical rewards remains worthwhile alongside making your own supplies."
+			]
+			icon: "irons_spellbooks:common_ink"
+			id: "3C0160A4CD671E99"
+			subtitle: "Iron's Spells"
+			tasks: [{
+				id: "3CDA0C977518B918"
+				title: "Read and understood."
+				type: "checkmark"
+			}]
+			title: "A Different Kind of Harvest"
+			x: 3.0d
+			y: 2.0d
+		}
+		{
+			dependencies: [
+				"176E7E0E672FBABC"
+				"3C0160A4CD671E99"
+			]
+			description: [
+				"The &6Adventurers Guild&r bounty page offers hunts to work toward as you explore. These first contracts award useful supplies."
+				""
+				"&dDragon's Den&r is a larger commitment: a prepared arena, a charged egg, and a fight that can leave its mark on the landscape. Its rewards connect several of SVE's strongest crafting paths."
+			]
+			icon: "dragonden:crystallized_dragon_egg"
+			id: "32A591F5B19582B7"
+			subtitle: "The Guild and Dragon's Den"
+			tasks: [{
+				id: "16DCA4A859BB7744"
+				title: "Read and understood."
+				type: "checkmark"
+			}]
+			title: "Something Worth Preparing For"
+			x: 0.0d
+			y: 4.0d
+		}
+	]
+	title: "Sunlit Valley Expanded"
+}

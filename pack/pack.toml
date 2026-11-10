@@ -1,0 +1,13 @@
+name = "The Valley - Sunlit Valley Expanded"
+author = "Drambuie89_"
+version = "1.2.1"
+pack-format = "packwiz:1.1.0"
+
+[index]
+file = "index.toml"
+hash-format = "sha256"
+hash = "29ca437b577f1f21121fadf8d77cef95c2d00bcd7a317fd6cb8248ace1b7097b"
+
+[versions]
+forge = "47.4.0"
+minecraft = "1.20.1"

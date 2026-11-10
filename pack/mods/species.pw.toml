@@ -1,0 +1,8 @@
+name = "Species"
+filename = "species-3.5.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/s5d4P01r/versions/KwPDNMjG/species-3.5.jar"
+hash-format = "sha1"
+hash = "b4d924f4faf6eb201db04205b61fa1524a8b0178"

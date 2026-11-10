@@ -1,0 +1,241 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "sve_guild"
+	group: "0211E02D983754CA"
+	icon: {
+		Count: 1
+		id: "minecraft:iron_sword"
+		tag: {
+			Damage: 0
+		}
+	}
+	id: "0C0566ED38C20357"
+	order_index: 6
+	quest_links: [ ]
+	quests: [
+		{
+			description: [
+				"The roads, caves, and distant ruins offer plenty of work. These &6one-time bounties&r reward a few useful supplies as you learn to handle their inhabitants."
+				""
+				"Read this introduction to unlock the hunt board. Kills must count toward the active quest; old lifetime statistics are not a substitute. Quest progress follows your FTB team."
+				""
+				"&cThis board is separate from Death's Due enrollment.&r Visit the Guild Desk or Agent for recovery access before taking on dangerous work."
+			]
+			icon: {
+				Count: 1
+				id: "minecraft:iron_sword"
+				tag: {
+					Damage: 0
+				}
+			}
+			id: "079B60AB17995957"
+			subtitle: "A first set of Guild bounties."
+			tasks: [{
+				id: "15370A625FF261FB"
+				title: "I am ready to take on the hunt board."
+				type: "checkmark"
+			}]
+			title: "Work for Willing Hands"
+			x: 0.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["079B60AB17995957"]
+			description: [
+				"Defeat &625 Zombies&r for this Guild contract."
+				""
+				"Keep a lit route home and avoid letting a crowd surround you."
+				""
+				"Claim the supply reward here when the task is complete. This contract can be completed once."
+			]
+			icon: "minecraft:rotten_flesh"
+			id: "162EC9A55C79361A"
+			rewards: [{
+				count: 8
+				id: "43533F09FFCEDFF1"
+				item: "farmersdelight:roast_chicken"
+				type: "item"
+			}]
+			subtitle: "Clear the paths near home."
+			tasks: [{
+				entity: "minecraft:zombie"
+				id: "698E7B9BC88DE1BE"
+				type: "kill"
+				value: 25L
+			}]
+			title: "After Sundown"
+			x: 3.0d
+			y: -3.0d
+		}
+		{
+			dependencies: ["079B60AB17995957"]
+			description: [
+				"Defeat &625 Skeletons&r for this Guild contract."
+				""
+				"Use cover and choose your approach before stepping into the open."
+				""
+				"Claim the supply reward here when the task is complete. This contract can be completed once."
+			]
+			icon: "minecraft:bone"
+			id: "19F88E6E6C9BBDA3"
+			rewards: [{
+				count: 64
+				id: "03808E03DABA2F3E"
+				item: "quark:torch_arrow"
+				type: "item"
+			}]
+			subtitle: "Learn to close the distance."
+			tasks: [{
+				entity: "minecraft:skeleton"
+				id: "2241D0DCBF29BCEE"
+				type: "kill"
+				value: 25L
+			}]
+			title: "Keep Your Head Down"
+			x: 3.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["079B60AB17995957"]
+			description: [
+				"Defeat &620 Spiders&r for this Guild contract."
+				""
+				"Look above the route as well as along it, especially around uneven ground."
+				""
+				"Claim the supply reward here when the task is complete. This contract can be completed once."
+			]
+			icon: "minecraft:string"
+			id: "06094EC0D7C740EF"
+			rewards: [{
+				count: 2
+				id: "45C93BD3ED240EEC"
+				item: "torchmaster:megatorch"
+				type: "item"
+			}]
+			subtitle: "Watch more than the path ahead."
+			tasks: [{
+				entity: "minecraft:spider"
+				id: "4072B87B6EE32934"
+				type: "kill"
+				value: 20L
+			}]
+			title: "Along the Eaves"
+			x: 3.0d
+			y: 3.0d
+		}
+		{
+			dependencies: ["079B60AB17995957"]
+			description: [
+				"Defeat &615 Creepers&r for this Guild contract."
+				""
+				"Take this hunt away from buildings and leave yourself room to move."
+				""
+				"Claim the supply reward here when the task is complete. This contract can be completed once."
+			]
+			icon: "minecraft:gunpowder"
+			id: "628C8F34BF7CBC6D"
+			rewards: [{
+				count: 8
+				id: "1BBFA592F7CC7A1F"
+				item: "farmersdelight:honey_glazed_ham"
+				type: "item"
+			}]
+			subtitle: "Keep the farm standing."
+			tasks: [{
+				entity: "minecraft:creeper"
+				id: "3FD1661747D52779"
+				type: "kill"
+				value: 15L
+			}]
+			title: "Before the Crater"
+			x: 6.0d
+			y: -3.0d
+		}
+		{
+			dependencies: ["079B60AB17995957"]
+			description: [
+				"Defeat &620 Blazes&r for this Guild contract."
+				""
+				"Plan for fire and a difficult retreat before beginning this contract."
+				""
+				"Claim the supply reward here when the task is complete. This contract can be completed once."
+			]
+			icon: "minecraft:blaze_rod"
+			id: "68A8ED736C0A690F"
+			rewards: [{
+				count: 16
+				id: "59DFA2A81E47FA87"
+				item: "minecraft:golden_carrot"
+				type: "item"
+			}]
+			subtitle: "A hunt beyond the Overworld."
+			tasks: [{
+				entity: "minecraft:blaze"
+				id: "5EA924C1F7B8AE38"
+				type: "kill"
+				value: 20L
+			}]
+			title: "Through the Heat"
+			x: 6.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["079B60AB17995957"]
+			description: [
+				"Defeat &615 Endermen&r for this Guild contract."
+				""
+				"A suitable fighting space matters as much as a strong weapon."
+				""
+				"Claim the supply reward here when the task is complete. This contract can be completed once."
+			]
+			icon: "minecraft:ender_pearl"
+			id: "3A1BB5EB95DCE0FF"
+			rewards: [{
+				count: 16
+				id: "1B05E9F548BE9B93"
+				item: "minecraft:golden_carrot"
+				type: "item"
+			}]
+			subtitle: "Pick the ground you fight on."
+			tasks: [{
+				entity: "minecraft:enderman"
+				id: "628605C615651D16"
+				type: "kill"
+				value: 15L
+			}]
+			title: "A Measured Challenge"
+			x: 6.0d
+			y: 3.0d
+		}
+		{
+			dependencies: ["079B60AB17995957"]
+			description: [
+				"Defeat &610 Shulkers&r for this Guild contract."
+				""
+				"Shulkers have a native source in the Skull Cavern. You do not need to open The End to pursue their shells or Butchery materials."
+				""
+				"Claim the supply reward here when the task is complete. This contract can be completed once."
+			]
+			icon: "minecraft:shulker_shell"
+			id: "735DF73732F351F6"
+			rewards: [{
+				count: 8
+				id: "3E661DBB20AFCFFF"
+				item: "minecraft:golden_apple"
+				type: "item"
+			}]
+			subtitle: "A reason to explore the Skull Cavern."
+			tasks: [{
+				entity: "minecraft:shulker"
+				id: "53192522F8A2F6D3"
+				type: "kill"
+				value: 10L
+			}]
+			title: "Cavern Shells"
+			x: 9.0d
+			y: 0.0d
+		}
+	]
+	title: "Adventurers Guild"
+}

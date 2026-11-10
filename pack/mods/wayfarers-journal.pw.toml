@@ -1,0 +1,13 @@
+name = "Wayfarer's Journal"
+filename = "wayfarer-0.1.0.jar"
+side = "both"
+
+[download]
+hash-format = "sha1"
+hash = "1668765c8ba5b96fb99927b04f8d642bfd828d0c"
+mode = "metadata:curseforge"
+
+[update]
+[update.curseforge]
+file-id = 8748795
+project-id = 1670220

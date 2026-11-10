@@ -1,0 +1,28 @@
+{
+  "removed": [
+    "item:createmetallurgy:molten_tin_bucket",
+    "item:createmetallurgy:molten_nickel_bucket",
+    "item:createmetallurgy:molten_lithium_bucket",
+    "item:createmetallurgy:molten_osmium_bucket",
+    "item:createmetallurgy:molten_bronze_bucket",
+    "item:createmetallurgy:molten_constantan_bucket",
+    "item:createmetallurgy:molten_invar_bucket",
+    "item:createmetallurgy:molten_necromium_bucket",
+    "item:createdeco:brass_coinstack",
+    "item:createdeco:copper_coinstack",
+    "item:createdeco:gold_coinstack",
+    "item:createdeco:industrial_iron_coinstack",
+    "item:createdeco:iron_coinstack",
+    "item:createdeco:netherite_coinstack",
+    "item:createdeco:zinc_coinstack",
+    "item:createdeco:netherite_nugget",
+    "fluid:createmetallurgy:molten_tin",
+    "fluid:createmetallurgy:molten_nickel",
+    "fluid:createmetallurgy:molten_lithium",
+    "fluid:createmetallurgy:molten_osmium",
+    "fluid:createmetallurgy:molten_bronze",
+    "fluid:createmetallurgy:molten_constantan",
+    "fluid:createmetallurgy:molten_invar",
+    "fluid:createmetallurgy:molten_necromium"
+  ]
+}

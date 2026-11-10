@@ -1,0 +1,13 @@
+name = "Create: Deep Dark"
+filename = "create_deep_dark-1.7.0-forge-1.20.1.jar"
+side = "both"
+
+[download]
+hash-format = "sha1"
+hash = "cf113bb2f82311f0a519c0766084158f40b0e849"
+mode = "metadata:curseforge"
+
+[update]
+[update.curseforge]
+file-id = 5868515
+project-id = 1020173

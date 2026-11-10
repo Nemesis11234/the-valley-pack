@@ -1,0 +1,17 @@
+{
+  "type": "createmetallurgy:bulk_melting",
+  "ingredients": [
+    {
+      "item": "etcetera:bismuth_block"
+    }
+  ],
+  "maxHeatRequirement": 50,
+  "minHeatRequirement": 3,
+  "processingTime": 224,
+  "results": [
+    {
+      "amount": 810,
+      "fluid": "createmetallurgy:molten_aluminum"
+    }
+  ]
+}

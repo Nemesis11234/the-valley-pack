@@ -1,0 +1,221 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "sve_irons_spells"
+	group: "0211E02D983754CA"
+	icon: "irons_spellbooks:common_ink"
+	id: "662AAAC9ADBA0C43"
+	order_index: 4
+	quest_links: [ ]
+	quests: [
+		{
+			description: [
+				"Discover scrolls, build your magical workspace, and choose spells that suit the way you explore. Spells are a great way to increase your fighting potency as you take on enemies of the world."
+				""
+				"Scroll variants are hidden from the main JEI item list to reduce clutter. They still exist in the world; the Scroll Forge is part of learning what you can make."
+			]
+			icon: "irons_spellbooks:common_ink"
+			id: "0650A2B969FA7DCE"
+			subtitle: "Magic takes materials, too."
+			tasks: [{
+				id: "7F4E879827F4F322"
+				title: "Read and understood."
+				type: "checkmark"
+			}]
+			title: "A Page of Possibilities"
+			x: 0.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["0650A2B969FA7DCE"]
+			description: [
+				"Obtain a Scroll Forge and Inscription Table. Use their interfaces to explore scroll creation and adding spells to a suitable spell book."
+				""
+				"Read each spell's requirements and experiment somewhere safe before relying on it far from home."
+			]
+			icon: "irons_spellbooks:scroll_forge"
+			id: "489A04BC54AE9BC5"
+			subtitle: "Bring your discoveries to the desk."
+			tasks: [
+				{
+					consume_items: false
+					id: "0EF6D7F80C244A86"
+					item: "irons_spellbooks:scroll_forge"
+					type: "item"
+				}
+				{
+					consume_items: false
+					id: "5A5B3F886F12B38E"
+					item: "irons_spellbooks:inscription_table"
+					type: "item"
+				}
+			]
+			title: "Somewhere to Study"
+			x: 2.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["0650A2B969FA7DCE"]
+			description: [
+				"Combine &6six Antique Ink&r into &6one Society Legendary Ink&r. Surround that Society ink with &6eight Black Dye&r to make one bottle of Iron's Common Ink."
+				""
+				"Society Legendary Ink is the starting ingredient here. It is a different item from Iron's Legendary Ink at the far end of this progression."
+				""
+				"Why there are so many inks I'm not sure. If there was a red ink I would have marked this edit with a big F"
+			]
+			icon: "irons_spellbooks:common_ink"
+			id: "664B08E4CE5DC99E"
+			subtitle: "Two legendary inks, two different jobs."
+			tasks: [{
+				consume_items: false
+				id: "63ECE216AFFBAC18"
+				item: "irons_spellbooks:common_ink"
+				type: "item"
+			}]
+			title: "The First Bottle"
+			x: 2.5d
+			y: 3.0d
+		}
+		{
+			dependencies: ["664B08E4CE5DC99E"]
+			description: [
+				"In a &6heated Create mixer&r, combine &6750 mB Common Ink, 250 mB Liquid Experience, and four Green Petals&r to produce &6250 mB Uncommon Ink&r."
+				""
+				"That is three bottles of lower ink for one bottle of higher ink. Build up supplies before working toward the next tier."
+			]
+			icon: "irons_spellbooks:uncommon_ink"
+			id: "6D8140A6BDC09D06"
+			subtitle: "Green petals and a little experience."
+			tasks: [{
+				consume_items: false
+				id: "24F48E8918DC1FE8"
+				item: "irons_spellbooks:uncommon_ink"
+				type: "item"
+			}]
+			title: "Petals in the Basin"
+			x: 5.0d
+			y: 3.0d
+		}
+		{
+			dependencies: ["6D8140A6BDC09D06"]
+			description: [
+				"Heated mixing upgrades &6750 mB Uncommon Ink, 250 mB Liquid Experience, and six Blue Petals&r into &6250 mB Rare Ink&r."
+				""
+				"Ink cannot be converted in the Cauldron. Recycling scrolls into ink remains available."
+			]
+			icon: "irons_spellbooks:rare_ink"
+			id: "710C2EE3C945F360"
+			subtitle: "Keep the garden growing."
+			tasks: [{
+				consume_items: false
+				id: "6565BDFC83C8819C"
+				item: "irons_spellbooks:rare_ink"
+				type: "item"
+			}]
+			title: "A Deeper Blue"
+			x: 7.5d
+			y: 3.0d
+		}
+		{
+			dependencies: ["710C2EE3C945F360"]
+			description: [
+				"Use &6superheated&r mixing for this tier: &6750 mB Rare Ink, 250 mB Liquid Experience, and eight Pink Petals&r produce &6250 mB Epic Ink&r."
+				""
+				"Prepare the fuel before filling the basin. This is where the workshop becomes as important as the writing desk."
+			]
+			icon: "irons_spellbooks:epic_ink"
+			id: "1549066BB23B7D1B"
+			subtitle: "Pink petals, stronger ink."
+			tasks: [{
+				consume_items: false
+				id: "3B0A82E4EE628B0F"
+				item: "irons_spellbooks:epic_ink"
+				type: "item"
+			}]
+			title: "Turn Up the Heat"
+			x: 10.0d
+			y: 3.0d
+		}
+		{
+			dependencies: ["1549066BB23B7D1B"]
+			description: [
+				"Superheated mixing combines &6750 mB Epic Ink, 250 mB Liquid Experience, and four Yellow Petal Blocks&r into &6250 mB Legendary Ink&r."
+				""
+				"These are &6petal blocks&r, not loose petals. This milestone recognizes the bottle you obtain; ink found on your adventures is welcome too."
+			]
+			icon: "irons_spellbooks:legendary_ink"
+			id: "10923633A6E76014"
+			subtitle: "A whole garden in a bottle."
+			tasks: [{
+				consume_items: false
+				id: "1C58B5A6859A3397"
+				item: "irons_spellbooks:legendary_ink"
+				type: "item"
+			}]
+			title: "Written in Gold"
+			x: 12.5d
+			y: 3.0d
+		}
+		{
+			dependencies: ["489A04BC54AE9BC5"]
+			description: [
+				"The Portal Frame recipe requires &6Echo Ingots&r alongside its magical materials. Follow the Metallurgy page if your workshop is not ready to supply them."
+				""
+				"Frames are part of the Portal spell's travel setup. Crafting a frame alone does not open a route to The End."
+			]
+			icon: "irons_spellbooks:portal_frame"
+			id: "6064A6766ACB357A"
+			subtitle: "The foundry meets the spellcaster."
+			tasks: [{
+				consume_items: false
+				id: "6AD52BAD61DDFF5E"
+				item: "irons_spellbooks:portal_frame"
+				type: "item"
+			}]
+			title: "A Door Worth Building"
+			x: 5.0d
+			y: -2.0d
+		}
+		{
+			dependencies: ["489A04BC54AE9BC5"]
+			description: [
+				"The Divine Pearl requires a &dPrismatic Shard&r alongside Gold and Amethyst. Check the recipe and decide which magical project deserves that shard."
+				""
+				""
+			]
+			icon: "irons_spellbooks:divine_pearl"
+			id: "0C9E1065510CF23B"
+			subtitle: "A valuable focus deserves a valuable ingredient."
+			tasks: [{
+				consume_items: false
+				id: "26815DCFA97977F6"
+				item: "irons_spellbooks:divine_pearl"
+				type: "item"
+			}]
+			title: "A Prismatic Offering"
+			x: 5.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["489A04BC54AE9BC5"]
+			description: [
+				"The Den Dragon has a chance to drop dragon skin on every death. The spell book needs six, so be prepared to go a couple rounds."
+				""
+				"Obtain the &dDragonskin Spell Book&r. Keep the depleted egg from your fight: it can be recharged for a return visit."
+			]
+			icon: "irons_spellbooks:dragonskin_spell_book"
+			id: "194CBB9CCB73635A"
+			subtitle: "A book with a story behind it."
+			tasks: [{
+				consume_items: false
+				id: "197B58BAE23C1FEA"
+				item: "irons_spellbooks:dragonskin_spell_book"
+				type: "item"
+			}]
+			title: "Bound in Dragonskin"
+			x: 8.0d
+			y: -2.0d
+		}
+	]
+	title: "Iron's Spells"
+}

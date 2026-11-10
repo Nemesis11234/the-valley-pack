@@ -1,0 +1,974 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "sve_guild_mastery"
+	group: "0211E02D983754CA"
+	icon: {
+		Count: 1
+		id: "minecraft:golden_sword"
+		tag: {
+			Damage: 0
+		}
+	}
+	id: "0004BAE97E8C4D11"
+	order_index: 7
+	quest_links: [ ]
+	quests: [
+		{
+			description: [
+				"The Guild keeps a second board for work that takes patience. Complete these &6one-time mastery bounties&r to claim a piece of equipment chosen for the hunt."
+				""
+				"Sign on below before setting out. All mastery hunts then run together: you do not need to finish a small contract first. Progress is shared with your FTB quest team."
+				""
+				"Your existing supply contracts remain on the &6Adventurers Guild&r page. Guild enrollment for recovering belongings still happens at the Desk or Agent; signing this board does not enroll you."
+				""
+				"Relic rewards have consistent starting stats and still need to be developed through use. Each player may claim their team's completed equipment reward once."
+			]
+			icon: {
+				Count: 1
+				id: "minecraft:golden_sword"
+				tag: {
+					Damage: 0
+				}
+			}
+			id: "000B3BC4E6F67548"
+			subtitle: "Long hunts. Lasting rewards."
+			tasks: [{
+				id: "00019F2E3905757D"
+				title: "Sign on for the mastery hunts."
+				type: "checkmark"
+			}]
+			title: "A Name on the Noticeboard"
+			x: 6.0d
+			y: -3.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &6400 Zombies&r after signing on to the mastery board."
+				""
+				"Husks, ordinary listed Rotten Creatures variants, and Catacombs Zombies also count. Drowned have their own bounty. Summoned zombies do not count."
+				""
+				"Additional relic slots; earned equipment leaves the existing Rage Glove quest intact."
+				""
+				"This relic starts with fixed middle-of-range base stats, at its normal starting level. Later abilities unlock as you develop it."
+			]
+			icon: "relics:leather_belt"
+			id: "000E2645C49A8BBD"
+			rewards: [{
+				id: "000B0E41A9313697"
+				item: {
+					Count: 1
+					id: "relics:leather_belt"
+					tag: {
+						abilities: {
+							slots: {
+								points: 0
+								stats: {
+									charm: 2.0d
+								}
+							}
+						}
+					}
+				}
+				type: "item"
+			}]
+			subtitle: "The Guild salvaged a belt with room for more than a few tools."
+			tasks: [{
+				entity: "minecraft:zombie"
+				id: "000FF63BD7A58A84"
+				title: "Zombies: 400"
+				type: "kill"
+				value: 400L
+			}]
+			title: "A Little More Room"
+			x: 0.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &6150 Creepers&r after signing on to the mastery board."
+				""
+				"Hunt these creatures on your expeditions and return here to collect the reward when your count is complete."
+				""
+				"Stored-damage retaliation with stunning fragments"
+				""
+				"This relic starts with fixed middle-of-range base stats, at its normal starting level. Later abilities unlock as you develop it."
+			]
+			icon: "relics:reflection_necklace"
+			id: "0005C7198E50350B"
+			rewards: [{
+				id: "0002CC9EDD91A7FC"
+				item: {
+					Count: 1
+					id: "relics:reflection_necklace"
+					tag: {
+						abilities: {
+							explode: {
+								points: 0
+								stats: {
+									capacity: 40.0d
+									damage: 0.375d
+									stun: 0.15d
+								}
+							}
+						}
+					}
+				}
+				type: "item"
+			}]
+			subtitle: "Some adventurers learn to give as good as they get."
+			tasks: [{
+				entity: "minecraft:creeper"
+				id: "0004A409831A5242"
+				title: "Creepers: 150"
+				type: "kill"
+				value: 150L
+			}]
+			title: "Return to Sender"
+			x: 3.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &6300 Spiders&r after signing on to the mastery board."
+				""
+				"Cave Spiders and Iron's Ice Spiders also count; summoned or owned creatures are excluded from the extra variants."
+				""
+				"Poison immunity"
+			]
+			icon: "irons_spellbooks:poisonward_ring"
+			id: "000F23FEFAA027C0"
+			rewards: [{
+				id: "00003FC72AE31403"
+				item: "irons_spellbooks:poisonward_ring"
+				type: "item"
+			}]
+			subtitle: "Keep the venom on the outside."
+			tasks: [{
+				entity: "minecraft:spider"
+				id: "000B435879A41FC3"
+				title: "Spiders: 300"
+				type: "kill"
+				value: 300L
+			}]
+			title: "A Cure for the Bite"
+			x: 6.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &6400 Wild slimes&r after signing on to the mastery board."
+				""
+				"Wild Splendid Slimes also count. Tamed slimes and slimes with an owner do not. Each defeated vanilla split slime counts separately."
+				""
+				"Splitting toxic spores and retaliation"
+				""
+				"This relic starts with fixed middle-of-range base stats, at its normal starting level. Later abilities unlock as you develop it."
+			]
+			icon: "relics:spore_sack"
+			id: "000A196ED5E74B83"
+			rewards: [{
+				id: "0006AB3AC92EB5BD"
+				item: {
+					Count: 1
+					id: "relics:spore_sack"
+					tag: {
+						abilities: {
+							buffer: {
+								points: 0
+								stats: {
+									capacity: 3.5d
+									chance: 0.05d
+								}
+							}
+							explosion: {
+								points: 0
+								stats: {
+									size: 0.15d
+								}
+							}
+							multiplying: {
+								points: 0
+								stats: {
+									amount: 0.1d
+									chance: 0.1d
+									size: 0.075d
+								}
+							}
+							spore: {
+								points: 0
+								stats: {
+									cooldown: 12.5d
+									damage: 0.375d
+									duration: 3.0d
+									size: 0.3d
+								}
+							}
+						}
+					}
+				}
+				type: "item"
+			}]
+			subtitle: "A little alchemy from a great deal of goo."
+			tasks: [{
+				entity: "minecraft:slime"
+				id: "000A1B34653902CA"
+				title: "Wild slimes: 400"
+				type: "kill"
+				value: 400L
+			}]
+			title: "A Sticky Situation"
+			x: 9.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &650 Endermen&r after signing on to the mastery board."
+				""
+				"Hunt these creatures on your expeditions and return here to collect the reward when your count is complete."
+				""
+				"Enderman neutrality and position-swapping"
+				""
+				"This relic starts with fixed middle-of-range base stats, at its normal starting level. Later abilities unlock as you develop it."
+			]
+			icon: "relics:enders_hand"
+			id: "0002819DFC07D627"
+			rewards: [{
+				id: "00095705D9333790"
+				item: {
+					Count: 1
+					id: "relics:enders_hand"
+					tag: {
+						abilities: {
+							neutrality: {
+								points: 0
+								stats: { }
+							}
+							swap: {
+								points: 0
+								stats: {
+									distance: 24.0d
+								}
+							}
+						}
+					}
+				}
+				type: "item"
+			}]
+			subtitle: "Keep your footing, even when the world moves around you."
+			tasks: [{
+				entity: "minecraft:enderman"
+				id: "00076294A9602D46"
+				title: "Endermen: 50"
+				type: "kill"
+				value: 50L
+			}]
+			title: "A Change of Places"
+			x: 3.0d
+			y: 3.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &6250 Blazes&r after signing on to the mastery board."
+				""
+				"Hunt these creatures on your expeditions and return here to collect the reward when your count is complete."
+				""
+				"Fire immunity"
+			]
+			icon: "irons_spellbooks:fireward_ring"
+			id: "000C1308939DDEC4"
+			rewards: [{
+				id: "00062D6E1ED7CFBA"
+				item: "irons_spellbooks:fireward_ring"
+				type: "item"
+			}]
+			subtitle: "The next flame need not be your last."
+			tasks: [{
+				entity: "minecraft:blaze"
+				id: "000BC6F513A60F43"
+				title: "Blazes: 250"
+				type: "kill"
+				value: 250L
+			}]
+			title: "Trial by Fire"
+			x: 0.0d
+			y: 6.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &650 Ghasts&r after signing on to the mastery board."
+				""
+				"Hunt these creatures on your expeditions and return here to collect the reward when your count is complete."
+				""
+				"Creates a fire-powered local flight zone"
+				""
+				"This relic starts with fixed middle-of-range base stats, at its normal starting level. Later abilities unlock as you develop it."
+			]
+			icon: "relics:blazing_flask"
+			id: "000933E842062788"
+			rewards: [{
+				id: "000F2D1F9681C917"
+				item: {
+					Count: 1
+					id: "relics:blazing_flask"
+					tag: {
+						abilities: {
+							bonfire: {
+								points: 0
+								stats: {
+									height: 4.0d
+									speed: 0.03d
+									step: 1.75d
+								}
+							}
+						}
+					}
+				}
+				type: "item"
+			}]
+			subtitle: "Tend a fire, and give yourself room to rise."
+			tasks: [{
+				entity: "minecraft:ghast"
+				id: "0002A5E3A3241FA6"
+				title: "Ghasts: 50"
+				type: "kill"
+				value: 50L
+			}]
+			title: "A Light in the Nether"
+			x: 3.0d
+			y: 6.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &675 Phantoms&r after signing on to the mastery board."
+				""
+				"Phantoms can be hunted in the Skull Cavern; this contract does not require staying awake on the surface."
+				""
+				"Fuel-powered elytra acceleration"
+				""
+				"This relic starts with fixed middle-of-range base stats, at its normal starting level. Later abilities unlock as you develop it."
+			]
+			icon: "relics:elytra_booster"
+			id: "000B36E6EA3CC085"
+			rewards: [{
+				id: "0001369B5DD5745A"
+				item: {
+					Count: 1
+					id: "relics:elytra_booster"
+					tag: {
+						abilities: {
+							boost: {
+								points: 0
+								stats: {
+									capacity: 75.0d
+									speed: 1.3d
+								}
+							}
+						}
+					}
+				}
+				type: "item"
+			}]
+			subtitle: "Something for the journey above the clouds."
+			tasks: [{
+				entity: "minecraft:phantom"
+				id: "0005A5476B188F2A"
+				title: "Phantoms: 75"
+				type: "kill"
+				value: 75L
+			}]
+			title: "Borrowed Wings"
+			x: 6.0d
+			y: 3.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &6400 Skeletons&r after signing on to the mastery board."
+				""
+				"Strays and Bogged also count. Wither Skeletons and summoned skeletons do not."
+				""
+				"Archery abilities culminating in Arrow Rain"
+				""
+				"This relic starts with fixed middle-of-range base stats, at its normal starting level. Later abilities unlock as you develop it."
+			]
+			icon: "relics:arrow_quiver"
+			id: "000124A4D3352BE1"
+			rewards: [{
+				id: "000E79CE1ADBC2D9"
+				item: {
+					Count: 1
+					id: "relics:arrow_quiver"
+					tag: {
+						abilities: {
+							agility: {
+								points: 0
+								stats: {
+									modifier: 1.0d
+								}
+							}
+							leap: {
+								points: 0
+								stats: {
+									cooldown: 13.5d
+									duration: 5.0d
+									multiplier: 0.3d
+								}
+							}
+							rain: {
+								points: 0
+								stats: {
+									delay: 0.875d
+									duration: 12.5d
+									radius: 4.0d
+								}
+							}
+							receptacle: {
+								points: 0
+								stats: {
+									slots: 3.5d
+								}
+							}
+						}
+					}
+				}
+				type: "item"
+			}]
+			subtitle: "An archer should have something worth reaching for."
+			tasks: [{
+				entity: "minecraft:skeleton"
+				id: "0009A5E7045C5FAB"
+				title: "Skeletons: 400"
+				type: "kill"
+				value: 400L
+			}]
+			title: "The Long Shot"
+			x: 12.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &675 Shulkers&r after signing on to the mastery board."
+				""
+				"The Skull Cavern provides a hunting ground without opening The End."
+				""
+				"Controlled chorus-fruit teleportation"
+				""
+				"This relic starts with fixed middle-of-range base stats, at its normal starting level. Later abilities unlock as you develop it."
+			]
+			icon: "relics:chorus_inhibitor"
+			id: "000233E65AB1BAD6"
+			rewards: [{
+				id: "0008308B63B87624"
+				item: {
+					Count: 1
+					id: "relics:chorus_inhibitor"
+					tag: {
+						abilities: {
+							blink: {
+								points: 0
+								stats: {
+									cooldown: 7.5d
+									distance: 24.0d
+								}
+							}
+						}
+					}
+				}
+				type: "item"
+			}]
+			subtitle: "A little more say in where you arrive."
+			tasks: [{
+				entity: "minecraft:shulker"
+				id: "0003D6F5AEC3E8A9"
+				title: "Shulkers: 75"
+				type: "kill"
+				value: 75L
+			}]
+			title: "A Place to Land"
+			x: 9.0d
+			y: 3.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &6200 Illager raiders&r after signing on to the mastery board."
+				""
+				"Pillagers, Vindicators, Evokers, Igniters, Engineers, Preservers, Twittollagers, Archevokers, and Magehunter Vindicators count. Machines, clones, summoned fodder, and bosses do not."
+				""
+				"Uninterruptible long casts"
+			]
+			icon: "irons_spellbooks:concentration_amulet"
+			id: "000509E34D9EBC08"
+			rewards: [{
+				id: "0000D8FD40E3F029"
+				item: "irons_spellbooks:concentration_amulet"
+				type: "item"
+			}]
+			subtitle: "Keep your concentration when the battle turns against you."
+			tasks: [{
+				entity: "minecraft:pillager"
+				id: "000416AE6DF0585D"
+				title: "Illager raiders: 200"
+				type: "kill"
+				value: 200L
+			}]
+			title: "Hold Your Ground"
+			x: 9.0d
+			y: 6.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &6200 Zombified Piglins&r after signing on to the mastery board."
+				""
+				"Only Zombified Piglins count here. Living Piglins and Piglin Brutes are not part of this contract."
+				""
+				"Piglin neutrality and improved bartering"
+				""
+				"This relic starts with fixed middle-of-range base stats, at its normal starting level. Later abilities unlock as you develop it."
+			]
+			icon: "relics:bastion_ring"
+			id: "00008FAFB5ACF75C"
+			rewards: [{
+				id: "00084BF02373FBCF"
+				item: {
+					Count: 1
+					id: "relics:bastion_ring"
+					tag: {
+						abilities: {
+							compass: {
+								points: 0
+								stats: { }
+							}
+							trade: {
+								points: 0
+								stats: {
+									rolls: 0.5d
+								}
+							}
+						}
+					}
+				}
+				type: "item"
+			}]
+			subtitle: "A token of an older Nether bargain."
+			tasks: [{
+				entity: "minecraft:zombified_piglin"
+				id: "0004B36471684E98"
+				title: "Zombified Piglins: 200"
+				type: "kill"
+				value: 200L
+			}]
+			title: "An Old Bastion Keepsake"
+			x: 6.0d
+			y: 6.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &6125 Guardians&r after signing on to the mastery board."
+				""
+				"Hunt these creatures on your expeditions and return here to collect the reward when your count is complete."
+				""
+				"Swimming and later underwater breathing"
+				""
+				"This relic starts with fixed middle-of-range base stats, at its normal starting level. Later abilities unlock as you develop it."
+			]
+			icon: "relics:amphibian_boot"
+			id: "000D26A8BF3EE788"
+			rewards: [{
+				id: "000F9EA9F14867CC"
+				item: {
+					Count: 1
+					id: "relics:amphibian_boot"
+					tag: {
+						abilities: {
+							gills: {
+								points: 0
+								stats: {
+									chance: 0.055d
+								}
+							}
+							slipping: {
+								points: 0
+								stats: {
+									duration: 20.0d
+									speed: 0.0075d
+								}
+							}
+							swimming: {
+								points: 0
+								stats: {
+									duration: 25.0d
+									speed: 0.0075d
+								}
+							}
+						}
+					}
+				}
+				type: "item"
+			}]
+			subtitle: "Learn to move with the water."
+			tasks: [{
+				entity: "minecraft:guardian"
+				id: "000463CE2C57F22E"
+				title: "Guardians: 125"
+				type: "kill"
+				value: 125L
+			}]
+			title: "At Home Below"
+			x: 12.0d
+			y: 3.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &640 Necromancers&r after signing on to the mastery board."
+				""
+				"Hunt these creatures on your expeditions and return here to collect the reward when your count is complete."
+				""
+				"Spell cooldown support"
+			]
+			icon: "irons_spellbooks:cooldown_ring"
+			id: "0006D3E216AFD466"
+			rewards: [{
+				id: "000BBC2F8AC6433E"
+				item: "irons_spellbooks:cooldown_ring"
+				type: "item"
+			}]
+			subtitle: "A spellcaster knows the value of a second chance."
+			tasks: [{
+				entity: "irons_spellbooks:necromancer"
+				id: "000462CFB96C5CB7"
+				title: "Necromancers: 40"
+				type: "kill"
+				value: 40L
+			}]
+			title: "No Rest for the Wicked"
+			x: 12.0d
+			y: 6.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &650 Ancient Knights&r after signing on to the mastery board."
+				""
+				"Return to the Citadel or Ancient Battleground Magic Spawners after their cooldown to continue the hunt."
+				""
+				"Bouncing thrown weapon and later saw ability"
+				""
+				"This relic starts with fixed middle-of-range base stats, at its normal starting level. Later abilities unlock as you develop it."
+			]
+			icon: "relics:shadow_glaive"
+			id: "00096901A361B654"
+			rewards: [{
+				id: "0007AEFB8D92C983"
+				item: {
+					Count: 1
+					id: "relics:shadow_glaive"
+					tag: {
+						abilities: {
+							glaive: {
+								points: 0
+								stats: {
+									bounces: 4.0d
+									damage: 3.5d
+									radius: 3.75d
+									recharge: 20.0d
+								}
+							}
+							saw: {
+								points: 0
+								stats: {
+									damage: 1.125d
+									speed: 17.5d
+								}
+							}
+						}
+					}
+				}
+				type: "item"
+			}]
+			subtitle: "A weapon for those who have faced the citadel's defenders."
+			tasks: [{
+				entity: "irons_spellbooks:citadel_keeper"
+				id: "0004D645EF022687"
+				title: "Ancient Knights: 50"
+				type: "kill"
+				value: 50L
+			}]
+			title: "The Old Guard"
+			x: 0.0d
+			y: 9.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &63 Warden&r after signing on to the mastery board."
+				""
+				"Use a naturally generated, eligible Sculk Shrieker for repeat encounters. A player-placed ordinary shrieker is not a replacement."
+				""
+				"Linked local portals"
+				""
+				"This relic starts with fixed middle-of-range base stats, at its normal starting level. Later abilities unlock as you develop it."
+			]
+			icon: "relics:space_dissector"
+			id: "0003C8F23AFE4196"
+			rewards: [{
+				id: "00087DEAE1333C7C"
+				item: {
+					Count: 1
+					id: "relics:space_dissector"
+					tag: {
+						abilities: {
+							dissection: {
+								points: 0
+								stats: {
+									distance: 24.0d
+									time: 7.5d
+								}
+							}
+						}
+					}
+				}
+				type: "item"
+			}]
+			subtitle: "The Guild has kept this curious instrument for a worthy explorer."
+			tasks: [{
+				entity: "minecraft:warden"
+				id: "000235C5F43E1AB2"
+				title: "Warden: 3"
+				type: "kill"
+				value: 3L
+			}]
+			title: "A Way Through the Dark"
+			x: 3.0d
+			y: 9.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &610 Wither&r after signing on to the mastery board."
+				""
+				"Each new Wither needs its normal summoning materials. This quest does not supply them."
+				""
+				"Thundercaller: chain-lightning sword"
+			]
+			icon: {
+				Count: 1
+				id: "botania:thunder_sword"
+				tag: {
+					Damage: 0
+				}
+			}
+			id: "0007819F703A6C29"
+			rewards: [{
+				id: "0006214FC3DB1C65"
+				item: {
+					Count: 1
+					id: "botania:thunder_sword"
+					tag: {
+						Damage: 0
+					}
+				}
+				type: "item"
+			}]
+			subtitle: "A blade with a storm of its own."
+			tasks: [{
+				entity: "minecraft:wither"
+				id: "000662BD5D5037BB"
+				title: "Wither: 10"
+				type: "kill"
+				value: 10L
+			}]
+			title: "Thunder After the Storm"
+			x: 6.0d
+			y: 9.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &610 Den Dragon&r after signing on to the mastery board."
+				""
+				"Recharge your depleted egg with four End Crystals for another encounter. The Guild reward is separate from the Den chest: its carcass, Dragonskin, and template chance remain unchanged. The Tiara needs mana and has limited continuous flight."
+				""
+				"Flugel Tiara: mana-powered limited flight, dash, glide"
+			]
+			icon: "botania:flight_tiara"
+			id: "000DAC02F5279011"
+			rewards: [{
+				id: "0007593D025BC62B"
+				item: "botania:flight_tiara"
+				type: "item"
+			}]
+			subtitle: "Ten battles beneath a dragon's shadow. Now take to the sky."
+			tasks: [{
+				entity: "dragonden:den_dragon"
+				id: "00089116BCD42A72"
+				title: "Den Dragon: 10"
+				type: "kill"
+				value: 10L
+			}]
+			title: "Earn Your Wings"
+			x: 9.0d
+			y: 9.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &63 Dead King&r after signing on to the mastery board."
+				""
+				"Use a Phylactery on the Dead King Soul for a return encounter. Catacombs Magic Spawners can supply the shards. Both ordinary and ominous Dead King victories count for this Guild milestone."
+				""
+				"One extra spell projectile ricochet"
+			]
+			icon: "irons_spellbooks:wicked_bone_ring"
+			id: "00066DCFAB4FF5B9"
+			rewards: [{
+				id: "000B91F80324AE11"
+				item: "irons_spellbooks:wicked_bone_ring"
+				type: "item"
+			}]
+			subtitle: "Some echoes of a battle are worth keeping."
+			tasks: [{
+				entity: "irons_spellbooks:dead_king"
+				id: "0008FCE22DFB6383"
+				title: "Dead King: 3"
+				type: "kill"
+				value: 3L
+			}]
+			title: "An Unquiet Crown"
+			x: 12.0d
+			y: 9.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &62 Echo of Tyros&r after signing on to the mastery board."
+				""
+				"Use the reusable Cinderous Soulcaller near its Keystone to summon another encounter after the current one ends."
+				""
+				"Fire-themed staff milestone"
+			]
+			icon: "irons_spellbooks:pyrium_staff"
+			id: "00083D3AC1A46205"
+			rewards: [{
+				id: "00016BDF0C477856"
+				item: "irons_spellbooks:pyrium_staff"
+				type: "item"
+			}]
+			subtitle: "Carry a little of the Flamebearer's power home."
+			tasks: [{
+				entity: "irons_spellbooks:fire_boss"
+				id: "000304B821C08876"
+				title: "Echo of Tyros: 2"
+				type: "kill"
+				value: 2L
+			}]
+			title: "An Ember Remembered"
+			x: 3.0d
+			y: 12.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &63 Freakager/Ragno encounters&r after signing on to the mastery board."
+				""
+				"Only the final Ragno defeat counts. Defeating Freakager alone does not complete the encounter."
+				""
+				"Their existing signature equipment"
+			]
+			icon: "illageandspillage:bag_of_horrors"
+			id: "00030A04AA81D0D8"
+			rewards: [{
+				id: "000870ED7915FFC6"
+				item: "illageandspillage:bag_of_horrors"
+				type: "item"
+			}]
+			subtitle: "The Guild would rather you kept this bag closed indoors."
+			tasks: [{
+				entity: "illageandspillage:ragno"
+				id: "0009038023F32C29"
+				title: "Freakager/Ragno encounters: 3"
+				type: "kill"
+				value: 3L
+			}]
+			title: "The Last Laugh"
+			x: 9.0d
+			y: 12.0d
+		}
+		{
+			dependencies: ["000B3BC4E6F67548"]
+			description: [
+				"Defeat &6150 Drowned&r after signing on to the mastery board."
+				""
+				"Hunt these creatures on your expeditions and return here to collect the reward when your count is complete."
+				""
+				"Underwater combat, relic slots, and later dry-land Riptide"
+				""
+				"This relic starts with fixed middle-of-range base stats, at its normal starting level. Later abilities unlock as you develop it."
+			]
+			icon: "relics:drowned_belt"
+			id: "000C7D123C16F74C"
+			rewards: [{
+				id: "000AA1278FE7D379"
+				item: {
+					Count: 1
+					id: "relics:drowned_belt"
+					tag: {
+						abilities: {
+							anchor: {
+								points: 0
+								stats: {
+									sinking: 4.0d
+									slowness: 0.375d
+								}
+							}
+							pressure: {
+								points: 0
+								stats: {
+									damage: 1.625d
+								}
+							}
+							riptide: {
+								points: 0
+								stats: {
+									cooldown: 7.5d
+								}
+							}
+							slots: {
+								points: 0
+								stats: {
+									charm: 1.0d
+								}
+							}
+						}
+					}
+				}
+				type: "item"
+			}]
+			subtitle: "Recovered from the depths, ready for another voyage."
+			tasks: [{
+				entity: "minecraft:drowned"
+				id: "0004BBAFD30B0F18"
+				title: "Drowned: 150"
+				type: "kill"
+				value: 150L
+			}]
+			title: "What the Water Kept"
+			x: 0.0d
+			y: 3.0d
+		}
+	]
+	title: "Guild Mastery Bounties"
+}

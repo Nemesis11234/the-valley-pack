@@ -1,0 +1,18 @@
+{
+  "type": "create:milling",
+  "ingredients": [
+    {
+      "item": "create:crushed_raw_bismuth"
+    }
+  ],
+  "processingTime": 150,
+  "results": [
+    {
+      "item": "sve:dirty_bismuth_dust"
+    },
+    {
+      "chance": 0.25,
+      "item": "sve:dirty_bismuth_dust"
+    }
+  ]
+}

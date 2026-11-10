@@ -1,0 +1,13 @@
+name = "Death's Due"
+filename = "deaths_due-0.1.0.jar"
+side = "both"
+
+[download]
+hash-format = "sha1"
+hash = "0720b09aa1dc39c47c2d67fd32d04b95147fc8ca"
+mode = "metadata:curseforge"
+
+[update]
+[update.curseforge]
+file-id = 8861011
+project-id = 1691785

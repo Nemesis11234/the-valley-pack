@@ -1,0 +1,5 @@
+{
+  "id": "refurbished_furniture:general",
+  "enabled": false,
+  "regex": "(?!)"
+}

@@ -1,0 +1,8 @@
+{
+  "item.createmetallurgy.molten_aluminum_bucket": "Molten Bismuth Bucket",
+  "item.createmetallurgy.molten_netherite_bucket": "Molten Iridium Bucket",
+  "fluid.createmetallurgy.molten_aluminum": "Molten Bismuth",
+  "fluid.createmetallurgy.molten_netherite": "Molten Iridium",
+  "block.createmetallurgy.molten_aluminum": "Molten Bismuth",
+  "block.createmetallurgy.molten_netherite": "Molten Iridium"
+}

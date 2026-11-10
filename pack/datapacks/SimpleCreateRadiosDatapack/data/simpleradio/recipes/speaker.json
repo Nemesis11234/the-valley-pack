@@ -1,0 +1,39 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "simpleradio:items_enabled",
+          "item": "speaker"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "category": "building",
+        "key": {
+          "C": {
+            "item": "simpleradio:copper_wire"
+          },
+          "I": {
+            "item": "create:industrial_iron_block"
+          },
+          "R": {
+            "item": "minecraft:redstone"
+          },
+          "Y": {
+            "item": "simpleradio:speaker_module"
+          }
+        },
+        "pattern": [
+          " Y ",
+          "CIR"
+        ],
+        "result": {
+          "item": "simpleradio:speaker"
+        },
+        "show_notification": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+name = "Slimes and Slimebooks"
+filename = "slimes_and_slimebooks-1.0.2.jar"
+side = "both"
+
+[download]
+hash-format = "sha1"
+hash = "5c1caf0337f568db50b5e62ceca64e693b8ce1c4"
+mode = "metadata:curseforge"
+
+[update]
+[update.curseforge]
+file-id = 7513327
+project-id = 1335464

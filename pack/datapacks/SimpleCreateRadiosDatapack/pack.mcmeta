@@ -1,0 +1,7 @@
+{
+    "pack": {
+        "pack_format": 15,
+        "description": "Crafting recipes using Create's materials",
+    "supported_formats": {"min_inclusive": 10, "max_inclusive": 50}
+    }
+}

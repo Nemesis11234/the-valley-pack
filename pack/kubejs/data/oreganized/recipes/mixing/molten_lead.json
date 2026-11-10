@@ -1,0 +1,26 @@
+{
+  "type": "create:mixing",
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "heatRequirement": "heated",
+  "ingredients": [
+    [
+      {
+        "tag": "forge:storage_blocks/lead"
+      },
+      {
+        "tag": "forge:storage_blocks/raw_lead"
+      }
+    ]
+  ],
+  "results": [
+    {
+      "fluid": "createmetallurgy:molten_lead",
+      "amount": 810
+    }
+  ]
+}

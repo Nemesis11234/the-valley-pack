@@ -1,0 +1,17 @@
+{
+  "type": "create:splashing",
+  "ingredients": [
+    {
+      "item": "sve:dirty_lead_dust"
+    }
+  ],
+  "results": [
+    {
+      "item": "sve:lead_dust"
+    },
+    {
+      "item": "oreganized:silver_nugget",
+      "chance": 0.2
+    }
+  ]
+}

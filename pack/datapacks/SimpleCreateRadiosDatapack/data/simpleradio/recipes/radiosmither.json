@@ -1,0 +1,33 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "simpleradio:items_enabled",
+          "item": "radiosmither"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "category": "building",
+        "key": {
+          "P": {
+            "tag": "minecraft:planks"
+          },
+          "I": {
+            "item": "create:industrial_iron_block"
+          }
+        },
+        "pattern": [
+          "PPP",
+          "III"
+        ],
+        "result": {
+          "item": "simpleradio:radiosmither"
+        },
+        "show_notification": true
+      }
+    }
+  ]
+}

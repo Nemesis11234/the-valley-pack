@@ -1,0 +1,8 @@
+name = "Derp's Compat for Every Compat"
+filename = "DerpWood.zip"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/bht1LWst/versions/TvlqiWjt/DerpWood.zip"
+hash-format = "sha1"
+hash = "0d1afdd2cf10ee0343a183f786764c2d2485d0a7"

@@ -1,0 +1,13 @@
+name = "Dragon's Den"
+filename = "dragon-den-0.6.2-beta.jar"
+side = "both"
+
+[download]
+hash-format = "sha1"
+hash = "9bd9cca51a574246356fa588ad60ae0ffc61943f"
+mode = "metadata:curseforge"
+
+[update]
+[update.curseforge]
+file-id = 8966361
+project-id = 1707839

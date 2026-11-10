@@ -1,0 +1,8 @@
+name = "Collector's Caravan"
+filename = "collectors_caravan-8.3.0-forge-1.20.1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/AF7VX19e/versions/ITf0JfTV/collectors_caravan-8.3.0-forge-1.20.1.jar"
+hash-format = "sha1"
+hash = "6bf049bd8ece5b175a0c2784ce319f05f4f1d791"

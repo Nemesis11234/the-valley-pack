@@ -1,0 +1,213 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "sve_butchery"
+	group: "0211E02D983754CA"
+	icon: {
+		Count: 1
+		id: "butchery:iron_cleaver"
+		tag: {
+			Damage: 0
+		}
+	}
+	id: "5D513DD38C752EE6"
+	order_index: 2
+	quest_links: [ ]
+	quests: [
+		{
+			description: [
+				"Butchery turns animals and unusual creatures into materials for cooking and crafting. Begin with its tools, then build a small processing corner beside your kitchen."
+				""
+				"SVE gives the &6Mincer&r and &6Meat Grinder&r different jobs. The following branches will help you choose the right machine."
+			]
+			icon: {
+				Count: 1
+				id: "butchery:iron_cleaver"
+				tag: {
+					Damage: 0
+				}
+			}
+			id: "1DE94091C3F46316"
+			subtitle: "A useful kitchen starts before the cooking pot."
+			tasks: [{
+				id: "74218C45AABC6FA2"
+				title: "Read and understood."
+				type: "checkmark"
+			}]
+			title: "From Field to Feast"
+			x: 0.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["1DE94091C3F46316"]
+			description: [
+				"Obtain an Iron Cleaver and a Hook for your butchery workspace. Use the cleaver when hunting suitable animals for carcasses, and consult the available processing recipes for your catch."
+				""
+				"These item tasks inspect your inventory; you keep your tools."
+			]
+			icon: "butchery:hook"
+			id: "32FC6845A69FB70C"
+			subtitle: "Make room for the messy work."
+			tasks: [
+				{
+					consume_items: false
+					id: "574343D32146991A"
+					item: {
+						Count: 1
+						id: "butchery:iron_cleaver"
+						tag: {
+							Damage: 0
+						}
+					}
+					type: "item"
+				}
+				{
+					consume_items: false
+					id: "3C2D792EF3425B76"
+					item: "butchery:hook"
+					type: "item"
+				}
+			]
+			title: "Tools of the Trade"
+			x: 2.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["32FC6845A69FB70C"]
+			description: [
+				"The &6Farm and Charm Mincer &rhandles beef and lamb in SVE. Use its recipes to process meat and supported Butchery cuts into mince."
+				""
+				"The Meat Grinder is best suited for other jobs. Put your mincing station near the meals that need it."
+			]
+			icon: "farm_and_charm:mincer"
+			id: "30C4374A1487037E"
+			subtitle: "Beef and lamb have a machine of their own."
+			tasks: [{
+				consume_items: false
+				id: "50C00A058DE1B2F8"
+				item: "farm_and_charm:mincer"
+				type: "item"
+			}]
+			title: "A Fine Mince"
+			x: 5.0d
+			y: -2.0d
+		}
+		{
+			dependencies: ["32FC6845A69FB70C"]
+			description: [
+				"The &6Meat Grinder&r processes items in Butchery's scrappable category into meat scraps. Check its accepted inputs before feeding it a valuable ingredient."
+				""
+				"With the right attachment it also handles sausages. It is a companion to the Mincer, rather than a replacement for it."
+			]
+			icon: "butchery:meat_grinder"
+			id: "5A5F6E9359530A94"
+			subtitle: "A different job for the grinder."
+			tasks: [{
+				consume_items: false
+				id: "5A7EA62F28355C12"
+				item: "butchery:meat_grinder"
+				type: "item"
+			}]
+			title: "Waste Not"
+			x: 5.0d
+			y: 1.0d
+		}
+		{
+			dependencies: ["5A5F6E9359530A94"]
+			description: [
+				"Obtain a &6Sausage Attachment&r and produce Raw Sausage with the Meat Grinder. Raw Blood Sausage remains a separate product with its own requirements."
+				""
+				"Mmmm....sausage. Save some for the cooking pot instead of turning every batch into a snack."
+			]
+			icon: "butchery:sausage_attachment"
+			id: "30E233B1E6822579"
+			subtitle: "Fit the sausage attachment."
+			tasks: [
+				{
+					consume_items: false
+					id: "3D696D84E6D1991C"
+					item: "butchery:sausage_attachment"
+					type: "item"
+				}
+				{
+					consume_items: false
+					id: "7BD25A37B44412E0"
+					item: "butchery:raw_sausage"
+					type: "item"
+				}
+			]
+			title: "Links in the Chain"
+			x: 7.5d
+			y: 1.0d
+		}
+		{
+			dependencies: ["30E233B1E6822579"]
+			description: [
+				"Prepare &6Sausage with Oat Patty&r."
+				""
+				"A well-stocked kitchen supports the next expedition. Check the recipe for the remaining ingredients, then decide what you want to grow beside your livestock."
+			]
+			icon: "farm_and_charm:sausage_with_oat_patty"
+			id: "3E051C328F801D9E"
+			subtitle: "A good use for all that preparation."
+			tasks: [{
+				consume_items: false
+				id: "27B30A7979A45363"
+				item: "farm_and_charm:sausage_with_oat_patty"
+				type: "item"
+			}]
+			title: "A Proper Supper"
+			x: 10.0d
+			y: 1.0d
+		}
+		{
+			dependencies: ["32FC6845A69FB70C"]
+			description: [
+				"A successful &dDragon's Den&r encounter supplies an Ender Dragon Carcass in its reward chest. You do not need access to The End or a cleaver finishing blow on the Den Dragon."
+				""
+				"Follow the &dDragon's Den&r page when you are ready for that hunt, then bring its carcass back to your processing setup."
+			]
+			icon: "butchery:ender_dragon_carcass"
+			id: "26547339822F5E35"
+			subtitle: "The largest catch comes from the Den."
+			tasks: [{
+				consume_items: false
+				id: "432DD2FD8B0B3DB1"
+				item: "butchery:ender_dragon_carcass"
+				type: "item"
+			}]
+			title: "An Unusual Delivery"
+			x: 5.0d
+			y: 4.0d
+		}
+		{
+			dependencies: ["26547339822F5E35"]
+			description: [
+				"Obtain Dragon Bone and Dragon Scales from Butchery's dragon processing. Review their uses before deciding what to craft."
+				""
+				"The rare &dDragon Smithing Template&r has its own chance in the Den reward chest. It is not guaranteed with a carcass, and this quest does not award one."
+			]
+			icon: "butchery:dragon_scale"
+			id: "353AC2BF6BC4E94E"
+			subtitle: "Bones and scales have work to do."
+			tasks: [
+				{
+					consume_items: false
+					id: "0F9C61525E82DA68"
+					item: "butchery:dragon_bone"
+					type: "item"
+				}
+				{
+					consume_items: false
+					id: "7BD6D10B345CC1E9"
+					item: "butchery:dragon_scale"
+					type: "item"
+				}
+			]
+			title: "More Than Dinner"
+			x: 7.5d
+			y: 4.0d
+		}
+	]
+	title: "Butchery"
+}

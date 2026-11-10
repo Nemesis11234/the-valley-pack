@@ -1,0 +1,226 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "sve_metallurgy"
+	group: "0211E02D983754CA"
+	icon: "createmetallurgy:foundry_basin"
+	id: "17BDA09ED3DB68E6"
+	order_index: 3
+	quest_links: [ ]
+	quests: [
+		{
+			description: [
+				"Smelting is convenient. A processing line gives you more choices: crush, mill, wash, melt, and cast your way from ore to useful metal."
+				""
+				"Metallurgy gives advanced alloys a place in the foundry. Check JEI for the current machine layouts, heat, and recipe inputs."
+			]
+			icon: "createmetallurgy:foundry_basin"
+			id: "0EB3A2F442EEA337"
+			subtitle: "A workshop that rewards the extra step."
+			tasks: [{
+				id: "50AB027FB67197B6"
+				title: "Read and understood."
+				type: "checkmark"
+			}]
+			title: "Make Every Ore Count"
+			x: 0.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["0EB3A2F442EEA337"]
+			description: [
+				"Obtain a Foundry Basin and Foundry Lid. Use Metallurgy's Ponder scenes to assemble and heat the setup correctly."
+				""
+				"Plan space for fluid handling and casting before you begin filling tanks. Different recipes can require different heat levels."
+			]
+			icon: "createmetallurgy:foundry_basin"
+			id: "076DA55E4D6852F9"
+			subtitle: "Start with somewhere to melt."
+			tasks: [
+				{
+					consume_items: false
+					id: "523BD5A75CA19ECD"
+					item: "createmetallurgy:foundry_basin"
+					type: "item"
+				}
+				{
+					consume_items: false
+					id: "0E4B5D65942AEFE3"
+					item: "createmetallurgy:foundry_lid"
+					type: "item"
+				}
+			]
+			title: "The Heart of the Workshop"
+			x: 2.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["076DA55E4D6852F9"]
+			description: [
+				"Set up a Casting Table with a Graphite Ingot Mold. Check the casting recipe for the fluid you intend to use."
+				""
+				"Most molten metals and materials will cast &610 mB per nugget, 90 mB per ingot, and 810 mB per block&r. Keep those quantities in mind when emptying a tank."
+			]
+			icon: "createmetallurgy:casting_table"
+			id: "22F3B418D5AE10E8"
+			subtitle: "Useful metal needs a way out."
+			tasks: [
+				{
+					consume_items: false
+					id: "3905892C2F2F914E"
+					item: "createmetallurgy:casting_table"
+					type: "item"
+				}
+				{
+					consume_items: false
+					id: "6714F734FAF3F630"
+					item: "createmetallurgy:graphite_ingot_mold"
+					type: "item"
+				}
+			]
+			title: "Give It Shape"
+			x: 5.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["0EB3A2F442EEA337"]
+			description: [
+				"Like many ores, multiple processing steps improves yield. Try going from Raw to Crushed to Dirty Dust and then choose what's more important, a better yield or secondary resources. Mill crushed Bismuth into Dirty Bismuth Dust, with a chance for an extra dust."
+				""
+				"Washing can recover secondary resources such as &6Silver or Nether Quartz&r. Clean dust can then enter the melting chain; inspect the recipe before routing your fluids."
+			]
+			icon: "sve:bismuth_dust"
+			id: "167B0F71A3A3225B"
+			subtitle: "There is more in that crushed ore."
+			tasks: [
+				{
+					consume_items: false
+					id: "12EE17B1A63F212D"
+					item: "sve:dirty_bismuth_dust"
+					type: "item"
+				}
+				{
+					consume_items: false
+					id: "3D35FD4247332869"
+					item: "sve:bismuth_dust"
+					type: "item"
+				}
+			]
+			title: "Bismuth, Washed Clean"
+			x: 2.5d
+			y: -3.0d
+		}
+		{
+			dependencies: ["167B0F71A3A3225B"]
+			description: [
+				"Lead follows the same pattern: crushed Lead, Dirty Lead Dust, washing, and clean Lead Dust. Milling has a &625% chance&r for an extra dirty dust; washing has a &620% chance&r for a Silver Nugget."
+				""
+				"SVE uses Metallurgy's Molten Lead throughout the active processing chain. Dirty dust can also be melted directly if you prefer its slag output to the washing byproduct."
+			]
+			icon: "sve:lead_dust"
+			id: "5B36D7697FD1CC34"
+			subtitle: "Lead has a little extra to offer."
+			tasks: [
+				{
+					consume_items: false
+					id: "792C605979A673FD"
+					item: "sve:dirty_lead_dust"
+					type: "item"
+				}
+				{
+					consume_items: false
+					id: "25A01EBDD8F5E5DB"
+					item: "sve:lead_dust"
+					type: "item"
+				}
+			]
+			title: "A Silver Lining"
+			x: 5.0d
+			y: -3.0d
+		}
+		{
+			dependencies: ["22F3B418D5AE10E8"]
+			description: [
+				"SVE's Metallurgy alloy ratio is &6three parts Silver to one part Gold for one part Electrum&r. That improves on the base mixer's five Silver and three Gold per ingot."
+				""
+				"Use the molten recipe in JEI to plan batches. Finished ingots from any supported source can satisfy this milestone."
+			]
+			icon: "oreganized:electrum_ingot"
+			id: "1FB2A44C3D4D4660"
+			subtitle: "The foundry earns its place."
+			tasks: [{
+				consume_items: false
+				id: "2AE54095F5C97F50"
+				item: "oreganized:electrum_ingot"
+				type: "item"
+			}]
+			title: "A Better Alloy"
+			x: 7.5d
+			y: -2.0d
+		}
+		{
+			dependencies: [
+				"22F3B418D5AE10E8"
+				"167B0F71A3A3225B"
+			]
+			description: [
+				"Metallurgy makes the most of your resrouces. The superheated foundry route combines &6three scraps and three ingots worth of Bismuth&r into &6two Iridium ingots&r."
+				""
+				"The former Gold-based mixer shortcut is gone. Plan your Bismuth supply and superheated fuel before committing to a batch."
+			]
+			icon: "minecraft:netherite_ingot"
+			id: "70F267392E1642D4"
+			subtitle: "Bismuth has an end-game purpose."
+			tasks: [{
+				consume_items: false
+				id: "1AB5B3F424E6F392"
+				item: "minecraft:netherite_ingot"
+				type: "item"
+			}]
+			title: "Purple Heat"
+			x: 7.5d
+			y: 1.0d
+		}
+		{
+			dependencies: ["1FB2A44C3D4D4660"]
+			description: [
+				"Molten Void Steel can be cast into ingots and sheets. The Void Casing route combines molten metal with Obsidian in a Casting Basin."
+				""
+				"Obtain a Void Steel Ingot and inspect its casting options. Choose the form your next build actually needs."
+			]
+			icon: "createutilities:void_steel_ingot"
+			id: "6AE51637EAAE210D"
+			subtitle: "Beyond the ordinary ingot."
+			tasks: [{
+				consume_items: false
+				id: "38458D102B9FB55B"
+				item: "createutilities:void_steel_ingot"
+				type: "item"
+			}]
+			title: "Cast into the Void"
+			x: 10.0d
+			y: -2.0d
+		}
+		{
+			dependencies: ["70F267392E1642D4"]
+			description: [
+				"Superheated alloying combines an ingot worth of molten Iridium with &6three Echo Shards&r to make an ingot worth of Molten Echo."
+				""
+				"Echo Ingots are needed for some Iron's Spells recipes and top tier equipment."
+			]
+			icon: "create_deep_dark:echo_ingot"
+			id: "21406130A979FD8A"
+			subtitle: "A reason to venture deeper."
+			tasks: [{
+				consume_items: false
+				id: "718845B6C3BC95EC"
+				item: "create_deep_dark:echo_ingot"
+				type: "item"
+			}]
+			title: "An Echo in the Foundry"
+			x: 10.0d
+			y: 1.0d
+		}
+	]
+	title: "Metallurgy"
+}

@@ -1,0 +1,12 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": "society:umbra_barrens",
+  "spawners": [
+    {
+      "type": "irons_spellbooks:necromancer",
+      "weight": 20,
+      "minCount": 1,
+      "maxCount": 1
+    }
+  ]
+}

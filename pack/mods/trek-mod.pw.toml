@@ -1,0 +1,13 @@
+name = "Trek"
+filename = "trek-B0.6.2 (1).jar"
+side = "both"
+
+[download]
+hash-format = "sha1"
+hash = "42a1e4e28eb3cada71a4bc8811e50c5332799a1b"
+mode = "metadata:curseforge"
+
+[update]
+[update.curseforge]
+file-id = 8296275
+project-id = 1418999

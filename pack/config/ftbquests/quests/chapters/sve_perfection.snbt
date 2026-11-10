@@ -1,0 +1,118 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "sve_perfection"
+	group: "0211E02D983754CA"
+	icon: "dragonden:dragon_scale_chest"
+	id: "00049D02DACF80DD"
+	order_index: 9
+	quest_links: [ ]
+	quests: [
+		{
+			dependencies: ["14537C31911D63F3"]
+			description: ["Complete the linked chapter milestone. Your existing quest progress counts toward this requirement."]
+			icon: "dragonden:dragon_scale_chest"
+			id: "00025CB24B909A03"
+			tasks: [{
+				id: "00067955CD06C1CE"
+				stat: "minecraft:play_time"
+				type: "stat"
+				value: 1
+			}]
+			title: "A Dragon's Keepsake"
+			x: 0.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["353AC2BF6BC4E94E"]
+			description: ["Complete the linked chapter milestone. Your existing quest progress counts toward this requirement."]
+			icon: "butchery:dragon_scale"
+			id: "00086E7F4C126489"
+			tasks: [{
+				id: "0002524F153049F1"
+				stat: "minecraft:play_time"
+				type: "stat"
+				value: 1
+			}]
+			title: "Use Every Part"
+			x: 3.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["194CBB9CCB73635A"]
+			description: ["Complete the linked chapter milestone. Your existing quest progress counts toward this requirement."]
+			icon: "irons_spellbooks:dragonskin_spell_book"
+			id: "00023B6885DAB2A9"
+			tasks: [{
+				id: "00065C52E6C60B3C"
+				stat: "minecraft:play_time"
+				type: "stat"
+				value: 1
+			}]
+			title: "A Book Worth Binding"
+			x: 6.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["6AE51637EAAE210D"]
+			description: ["Complete the linked chapter milestone. Your existing quest progress counts toward this requirement."]
+			icon: "createutilities:void_steel_ingot"
+			id: "000164CDB6BA652E"
+			tasks: [{
+				id: "00038762E1EBD2D3"
+				stat: "minecraft:play_time"
+				type: "stat"
+				value: 1
+			}]
+			title: "Master of the Foundry"
+			x: 9.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["000B4DF31AC647E1"]
+			description: ["Complete the linked chapter milestone. Your existing quest progress counts toward this requirement."]
+			icon: "collectors_caravan:stone_ammonite"
+			id: "00021532E6E2F14A"
+			tasks: [{
+				id: "00088A9AE39707EC"
+				stat: "minecraft:play_time"
+				type: "stat"
+				value: 1
+			}]
+			title: "A Valley Worth Remembering"
+			x: 12.0d
+			y: 0.0d
+		}
+		{
+			dependencies: [
+				"00025CB24B909A03"
+				"00086E7F4C126489"
+				"00023B6885DAB2A9"
+				"000164CDB6BA652E"
+				"00021532E6E2F14A"
+				"2E7D98DEB5012260"
+				"4AA29866E19A65A8"
+				"12867D0F2D4800BE"
+			]
+			description: [
+				"Build a life that reaches beyond the farm: master the foundry, bind a dragonskin spellbook, make use of a dragon's remains, and start a collection worth sharing."
+				"Complete these five milestones alongside Society's original goals to achieve Perfection in Sunlit Valley Expanded."
+				"The original relic collection already includes several Guild rewards. This page adds the other SVE milestones without repeating those hunts."
+			]
+			icon: "dragonden:dragon_scale_chest"
+			id: "000AA4390F76CC80"
+			shape: "circle"
+			size: 2.0d
+			tasks: [{
+				id: "0005FF93782C7715"
+				stat: "minecraft:play_time"
+				type: "stat"
+				value: 1
+			}]
+			title: "An Expanded Life"
+			x: 6.0d
+			y: 5.0d
+		}
+	]
+	title: "Expanded Perfection"
+}

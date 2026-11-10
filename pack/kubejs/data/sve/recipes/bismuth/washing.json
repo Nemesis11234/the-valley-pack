@@ -1,0 +1,17 @@
+{
+  "type": "create:splashing",
+  "ingredients": [
+    {
+      "item": "sve:dirty_bismuth_dust"
+    }
+  ],
+  "results": [
+    {
+      "item": "sve:bismuth_dust"
+    },
+    {
+      "item": "oreganized:silver_nugget",
+      "chance": 0.2
+    }
+  ]
+}

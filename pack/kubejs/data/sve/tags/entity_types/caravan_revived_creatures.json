@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "collectors_caravan:great_auk",
+    "collectors_caravan:moa",
+    "collectors_caravan:mammoth"
+  ]
+}

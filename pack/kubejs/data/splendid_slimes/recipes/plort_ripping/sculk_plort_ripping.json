@@ -1,0 +1,28 @@
+{
+  "type": "splendid_slimes:plort_ripping",
+  "ingredient": {
+    "item": "splendid_slimes:plort",
+    "nbt": {
+      "plort": {
+        "id": "splendid_slimes:sculk"
+      }
+    }
+  },
+  "results": [
+    {
+      "item": "minecraft:sculk",
+      "count": 1,
+      "weight": 75
+    },
+    {
+      "item": "minecraft:echo_shard",
+      "count": 1,
+      "weight": 20
+    },
+    {
+      "item": "minecraft:sculk_sensor",
+      "count": 1,
+      "weight": 5
+    }
+  ]
+}

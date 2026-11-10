@@ -1,0 +1,162 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "sve_collectors_caravan"
+	group: "0211E02D983754CA"
+	icon: "collectors_caravan:stone_ammonite"
+	id: "0000B839A8853B25"
+	order_index: 8
+	quest_links: [ ]
+	quests: [
+		{
+			description: [
+				"There is more to bring home than ore and treasure. Keep a corner of the farm for the small discoveries that make an expedition memorable."
+				"Craft a Bug Net and begin a collection."
+				""
+			]
+			icon: "collectors_caravan:bug_net"
+			id: "000BBC7F94D90906"
+			tasks: [{
+				consume_items: false
+				id: "000AC5D93E75E1A3"
+				item: "collectors_caravan:bug_net"
+				type: "item"
+			}]
+			title: "A Place for Your Finds"
+			x: 0.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["000BBC7F94D90906"]
+			description: ["Bring home an Atlas Beetle in a Bug Net. Look in jungles, sparse jungles, mangrove swamps, swamps, or dark forests and use your net on the living beetle."]
+			icon: "collectors_caravan:net_atlas"
+			id: "000A87C205A4258C"
+			tasks: [{
+				consume_items: false
+				id: "000E4BD17444B067"
+				item: "collectors_caravan:net_atlas"
+				type: "item"
+			}]
+			title: "Small Wonders"
+			x: 3.0d
+			y: -2.0d
+		}
+		{
+			dependencies: ["000BBC7F94D90906"]
+			description: ["Buy a Fossilized Ammonite from the Wandering Trader for two Crowns. A museum starts with one good specimen and a story about how it came to the valley."]
+			icon: "collectors_caravan:stone_ammonite"
+			id: "00034BE0A7229207"
+			tasks: [{
+				consume_items: false
+				id: "00099600F88F86A6"
+				item: "collectors_caravan:stone_ammonite"
+				type: "item"
+			}]
+			title: "A Much Older Valley"
+			x: 3.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["000BBC7F94D90906"]
+			description: ["Buy an Iron Meteorite from the Wandering Trader for four Crowns. This visitor carries specimens that are otherwise difficult to obtain in the valley."]
+			icon: "collectors_caravan:iron_meteorite"
+			id: "000C19CFB7700E14"
+			tasks: [{
+				consume_items: false
+				id: "00028236CD95A4CF"
+				item: "collectors_caravan:iron_meteorite"
+				type: "item"
+			}]
+			title: "Something from Above"
+			x: 3.0d
+			y: 2.0d
+		}
+		{
+			dependencies: ["000BBC7F94D90906"]
+			description: [
+				"Build a Sample Extractor and prepare Empty Sample Tubes. The extractor accepts suitable specimens marked with a yellow sample indicator in their tooltip."
+				"Place the specimen and tube in their indicated slots. Keep the sample for the next step."
+			]
+			icon: "collectors_caravan:sample_extractor"
+			id: "000BD12C69745ED5"
+			tasks: [
+				{
+					consume_items: false
+					id: "00035AEC8D92FBFE"
+					item: "collectors_caravan:sample_extractor"
+					type: "item"
+				}
+				{
+					consume_items: false
+					id: "000B7B20AE78BEBF"
+					item: "collectors_caravan:empty_tube"
+					type: "item"
+				}
+			]
+			title: "A Closer Look"
+			x: 6.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["000BD12C69745ED5"]
+			description: [
+				"Build the Sample Infuser. It turns supported DNA or blood samples into eggs of extinct creatures."
+				"A Great Auk Feather can provide a sample for the infuser. Break Feather Bundles to find feathers; the Great Auk variety is one possible result. Bundle Monsters can drop these bundles, and the Wandering Trader sells them for five Primal Coins each. Hunt Bundle Monsters in Skull Cavern at Y 0-142, or Big Bundle Monsters in Overworld Dark Forests. Use the sample slot and Infuse button after extracting your sample."
+			]
+			icon: "collectors_caravan:sample_infuser"
+			id: "00040A712EBDF05B"
+			tasks: [{
+				consume_items: false
+				id: "000DE9A19D28CDEA"
+				item: "collectors_caravan:sample_infuser"
+				type: "item"
+			}]
+			title: "More Than a Display"
+			x: 9.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["00040A712EBDF05B"]
+			description: ["Obtain a Great Auk Egg through sample infusion. Keep it after this quest; bringing an extinct creature back to the valley is worth celebrating."]
+			icon: "collectors_caravan:great_auk_egg"
+			id: "00050076CA75C341"
+			tasks: [{
+				consume_items: false
+				id: "0009A46F9F7BDA83"
+				item: "collectors_caravan:great_auk_egg"
+				type: "item"
+			}]
+			title: "A Second Spring"
+			x: 12.0d
+			y: 0.0d
+		}
+		{
+			dependencies: [
+				"000A87C205A4258C"
+				"00034BE0A7229207"
+				"000C19CFB7700E14"
+				"00050076CA75C341"
+			]
+			description: [
+				""
+				"Observe your creation! Maybe take one of those city scooters out for a rip. "
+				""
+			]
+			icon: "collectors_caravan:great_auk_feather"
+			id: "000B4DF31AC647E1"
+			tasks: [{
+				icon: "collectors_caravan:dnas_great_auk"
+				id: "0001FFF6D36907DE"
+				observe_type: 6
+				timer: 0L
+				title: "Observe a Great Auk, Moa, or Woolly Mammoth"
+				to_observe: "sve:caravan_revived_creatures"
+				type: "observation"
+			}]
+			title: "The Living Collection"
+			x: 15.0d
+			y: 0.0d
+		}
+	]
+	title: "Collector's Caravan"
+}

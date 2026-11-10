@@ -1,0 +1,8 @@
+name = "Create Style Sophisticated Backpacks"
+filename = "CreateSophBackpacks.zip"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/srJbhHkf/versions/3WMwR0Mh/CreateSophBackpacks.zip"
+hash-format = "sha1"
+hash = "0c834a3a13d3d597b6d1273375d2bd049fc3d728"
