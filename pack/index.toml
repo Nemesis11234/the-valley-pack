@@ -26083,7 +26083,7 @@ hash = "06acac92b0033b14b3285ce5c39a650fc73729f8267992b08ff839f87fbc1b81"
 
 [[files]]
 file = "manual-mods.json"
-hash = "04953b0ec9f054377c118074f15878e630b0c98209be786bf9bf89cf64046b5b"
+hash = "53b89cbe49824e01c66a2914c305c213ee4e8c1a13005b22fbb1620ab4152d94"
 
 [[files]]
 file = "mods/additional-attributes.pw.toml"
@@ -26896,6 +26896,10 @@ hash = "39e65bf3c47517cdb2f9b4b49c6632dd56db797744faaf8b1a3726b1b95aacb4"
 metafile = true
 
 [[files]]
+file = "mods/ftbquestlocalizer-1.20.1-forge-3.2.3.jar"
+hash = "ec78d601aaf3d4fd35978b70b4a894c4a396ef5c2d11d35b4bcab05597915026"
+
+[[files]]
 file = "mods/functional-storage.pw.toml"
 hash = "ea05f8426dda347174d1690299c4517a489c6c17370a98fd812e9d06ce1dbcfd"
 metafile = true
@@ -27294,6 +27298,10 @@ metafile = true
 file = "mods/morejs.pw.toml"
 hash = "df7a58af5cb547cb765642ee4ed563fa15c59d9e6f44d99229541d4d1d32c84b"
 metafile = true
+
+[[files]]
+file = "mods/moreoverlays-1.24.1-mc1.20.1-forge.jar"
+hash = "682640707331db2fc2a43ea023896622d9179849cf74d3313e3ffea8ec3c2371"
 
 [[files]]
 file = "mods/mouse-tweaks.pw.toml"

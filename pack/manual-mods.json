@@ -1,10 +1,10 @@
 [
   {
-    "name": "More Overlays Updated",
-    "fileName": "moreoverlays-1.24.1-mc1.20.1-forge.jar",
-    "url": "https://www.curseforge.com/minecraft/mc-mods/more-overlays-updated/files/6945288",
-    "sha1": "f34bd1fde7a4b458493ddf464b4fb94c6108edf7",
-    "path": "mods"
+    "name": "Create Style for Refined Storage",
+    "fileName": "Create Style for Refined Storage.zip",
+    "url": "https://www.curseforge.com/minecraft/texture-packs/create-style-for-refined-storage/files/6168001",
+    "sha1": "31bbc546eec354201b6cc99438d1adc4621e1672",
+    "path": "resourcepacks"
   },
   {
     "name": "Balloon Box",
@@ -12,20 +12,6 @@
     "url": "https://www.curseforge.com/minecraft/mc-mods/balloon-box/files/4715994",
     "sha1": "2174f0c69ce5956dc0687ba66e811b19a8e2af95",
     "path": "mods"
-  },
-  {
-    "name": "FTB Quest Localizer",
-    "fileName": "ftbquestlocalizer-1.20.1-forge-3.2.3.jar",
-    "url": "https://www.curseforge.com/minecraft/mc-mods/ftb-quest-localizer/files/7529230",
-    "sha1": "e1063dfa696ef42410e5b52b1340745a7dd141d5",
-    "path": "mods"
-  },
-  {
-    "name": "Create Style for Refined Storage",
-    "fileName": "Create Style for Refined Storage.zip",
-    "url": "https://www.curseforge.com/minecraft/texture-packs/create-style-for-refined-storage/files/6168001",
-    "sha1": "31bbc546eec354201b6cc99438d1adc4621e1672",
-    "path": "resourcepacks"
   },
   {
     "name": "Lopy's Create Style Pipez",
