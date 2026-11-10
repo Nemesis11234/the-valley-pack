@@ -1,5 +1,5 @@
 // The Valley 강화 시스템
-// 대장장이 작업대: 무기·방어구를 들고 웅크린 채 우클릭 → 정보 표시 → 3초 안에 한 번 더 → 강화
+// 대장장이 작업대: 무기·방어구를 들고 웅크린 채 우클릭 → 강화 창 → [강화하기]
 // 무기(검·삼지창)와 방어구만. 도구(곡괭이·도끼 등)는 안 됨.
 
 console.info("[TheValley] enhance.js loaded");
@@ -13,7 +13,6 @@ const TV_ENH = {
   keepUntil: 4,
   // 강화 비용 = costPerLevelSq × 목표단계² (계좌에서)
   costPerLevelSq: 200,
-  confirmSec: 3,
   // 강화석 드롭
   drops: {
     skullMobChance: 0.08, // 해골 광산에서 적대 몹 처치 시 하급 1개
@@ -98,24 +97,56 @@ function tvEnhSound(player, sound, pitch) {
   player.server.runCommandSilent(`execute as ${player.username} at @s run playsound ${sound} player @s ~ ~ ~ 1 ${pitch}`);
 }
 
-function tvEnhInfo(player, stack, level) {
+// ───────────── 강화 창 (SVDialog) ─────────────
+// 창 글자는 점수판 값으로 채워지므로 열기 직전에 점수를 맞춘다.
+const TV_ENH_OBJECTIVES = ["tv_e_lvl", "tv_e_target", "tv_e_rate", "tv_e_break", "tv_e_have", "tv_e_cost", "tv_e_bal", "tv_e_ok"];
+
+function tvEnhDialogId(target) {
+  if (target <= TV_ENH.keepUntil) return "thevalley_enhance_low_keep";
+  if (target <= 5) return "thevalley_enhance_low_down";
+  if (TV_ENH.breakOnFail[target] <= 0) return target <= 10 ? "thevalley_enhance_mid_down" : "thevalley_enhance_high_break";
+  return target <= 10 ? "thevalley_enhance_mid_break" : "thevalley_enhance_high_break";
+}
+
+function tvEnhOpen(player, stack, level) {
+  const s = player.server;
+  const name = player.username;
+  TV_ENH_OBJECTIVES.forEach((o) => s.runCommandSilent(`scoreboard objectives add ${o} dummy`));
   const target = level + 1;
   const stone = tvEnhStone(target);
   const cost = TV_ENH.costPerLevelSq * target * target;
   const have = tvEnhCountItem(player, stone.id);
-  const failText =
-    target <= TV_ENH.keepUntil
-      ? "실패 시 유지"
-      : TV_ENH.breakOnFail[target] > 0
-      ? `실패 시 하락, 그중 ${Math.round(TV_ENH.breakOnFail[target] * 100)}%는 파괴`
-      : "실패 시 1단계 하락";
-  tvEnhSay(player, [
-    { text: "[강화] ", color: "#FFAA00" },
-    { text: `+${level} → +${target}  `, color: "#FFFFFF", bold: true },
-    { text: `성공 ${Math.round(TV_ENH.success[target] * 100)}% · ${failText}\n`, color: "#FFFFFF" },
-    { text: `       필요: ${stone.name} 1개 (보유 ${have}) · ${tvEnhFmt(cost)}원\n`, color: have > 0 ? "#AAAAAA" : "#FF5555" },
-    { text: `       ${TV_ENH.confirmSec}초 안에 한 번 더 웅크리고 우클릭하면 강화해요.`, color: "#FFD54F" },
-  ]);
+  const account = tvEnhAccount(player);
+  const balance = account ? Number(account.getBalance()) || 0 : 0;
+  const ok = have <= 0 ? 2 : balance < cost ? 3 : 1;
+  const vals = {
+    tv_e_lvl: level,
+    tv_e_target: target,
+    tv_e_rate: Math.round(TV_ENH.success[target] * 100),
+    tv_e_break: Math.round(TV_ENH.breakOnFail[target] * 100),
+    tv_e_have: have,
+    tv_e_cost: cost,
+    tv_e_bal: Math.min(2000000000, Math.floor(balance)),
+    tv_e_ok: ok,
+  };
+  Object.keys(vals).forEach((k) => s.runCommandSilent(`scoreboard players set ${name} ${k} ${vals[k]}`));
+  TV_ENH_CONFIRM[String(player.uuid)] = { at: Date.now(), key: tvEnhKey(player, stack, level) };
+  s.runCommandSilent(`dialog ${name} show ${name} ${tvEnhDialogId(target)}`);
+}
+
+function tvEnhKey(player, stack, level) {
+  return `${stack.id}|${level}|${player.inventory.selected}`;
+}
+
+function tvEnhResultTitle(player, text, color) {
+  player.server.runCommandSilent(
+    global.getEmbersTextAPICommand(
+      player.username,
+      `{anchor:"TOP_CENTER",background:1,align:"TOP_CENTER",color:"${color}",offsetY:50}`,
+      50,
+      Text.of(text).toJson()
+    )
+  );
 }
 
 function tvEnhTry(player, stack, level) {
@@ -141,6 +172,7 @@ function tvEnhTry(player, stack, level) {
     tvEnhSound(player, "minecraft:block.anvil.use", 1.4);
     tvEnhSound(player, "minecraft:entity.player.levelup", 1.2);
     tvEnhSay(player, [{ text: "[강화] ", color: "#FFAA00" }, { text: `성공! +${target} ${name}`, color: "#7EE0A1", bold: true }]);
+    tvEnhResultTitle(player, `강화 성공! +${target}`, "#7EE0A1");
     if (target >= 10) {
       player.server.runCommandSilent(
         `tellraw @a ${JSON.stringify([{ text: "[강화] ", color: "#FFAA00" }, { text: `${player.username}님이 +${target} ${name} 강화에 성공했어요!`, color: "#FFD54F" }])}`
@@ -155,6 +187,7 @@ function tvEnhTry(player, stack, level) {
     tvEnhSound(player, "minecraft:entity.item.break", 0.7);
     tvEnhSound(player, "minecraft:block.anvil.destroy", 0.8);
     tvEnhSay(player, [{ text: "[강화] ", color: "#FFAA00" }, { text: `실패... +${level} ${name}이 파괴됐어요.`, color: "#FF5555", bold: true }]);
+    tvEnhResultTitle(player, `파괴... +${level} ${name}`, "#FF5555");
     player.server.runCommandSilent(
       `tellraw @a ${JSON.stringify([{ text: "[강화] ", color: "#FFAA00" }, { text: `${player.username}님의 +${level} ${name}이 파괴됐어요...`, color: "#F28B82" }])}`
     );
@@ -165,6 +198,7 @@ function tvEnhTry(player, stack, level) {
   const down = target > TV_ENH.keepUntil ? level - 1 : level;
   tvEnhSetLevel(stack, down);
   tvEnhSound(player, "minecraft:block.anvil.land", 0.8);
+  tvEnhResultTitle(player, down < level ? `실패 +${level} → +${down}` : `실패 +${level} 유지`, "#F28B82");
   tvEnhSay(player, [
     { text: "[강화] ", color: "#FFAA00" },
     { text: down < level ? `실패... +${level} → +${down}로 떨어졌어요.` : `실패... +${level} 유지`, color: "#F28B82" },
@@ -192,17 +226,42 @@ BlockEvents.rightClicked("minecraft:smithing_table", (e) => {
     tvEnhSay(player, { text: "[강화] 이미 최대 단계(+15)예요.", color: "#FFD54F" });
     return;
   }
+  tvEnhOpen(player, stack, level);
+});
+
+// 강화 창의 [강화하기] 버튼이 부르는 명령. 창을 연 뒤 손에 든 아이템이 바뀌었으면 취소.
+function tvEnhConfirm(player) {
   const id = String(player.uuid);
-  const key = `${stack.id}|${level}|${player.inventory.selected}`;
   const pending = TV_ENH_CONFIRM[id];
-  const now = Date.now();
-  if (pending && pending.key == key && now - pending.at <= TV_ENH.confirmSec * 1000) {
-    delete TV_ENH_CONFIRM[id];
-    tvEnhTry(player, stack, level);
-  } else {
-    TV_ENH_CONFIRM[id] = { at: now, key: key };
-    tvEnhInfo(player, stack, level);
+  delete TV_ENH_CONFIRM[id];
+  const stack = player.mainHandItem;
+  if (!tvEnhKind(stack)) return 0;
+  const level = tvEnhLevel(stack);
+  if (!pending || pending.key != tvEnhKey(player, stack, level) || Date.now() - pending.at > 120000) {
+    tvEnhSay(player, { text: "[강화] 손에 든 아이템이 바뀌어서 취소했어요. 다시 열어 주세요.", color: "#FF5555" });
+    return 0;
   }
+  if (level >= 15) return 0;
+  tvEnhTry(player, stack, level);
+  // 결과를 잠깐 보여준 뒤, 아직 강화할 수 있으면 창을 다시 연다
+  player.server.scheduleInTicks(30, () => {
+    if (player.isRemoved()) return;
+    const st = player.mainHandItem;
+    if (tvEnhKind(st) && tvEnhLevel(st) < 15) tvEnhOpen(player, st, tvEnhLevel(st));
+  });
+  return 1;
+}
+
+ServerEvents.commandRegistry((event) => {
+  const { commands: Commands } = event;
+  event.register(
+    Commands.literal("tvenhance").then(
+      Commands.literal("confirm").executes((ctx) => {
+        const player = ctx.source.player;
+        return player ? tvEnhConfirm(player) : 0;
+      })
+    )
+  );
 });
 
 // ───────────── 강화석 드롭 ─────────────
