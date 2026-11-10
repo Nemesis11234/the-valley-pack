@@ -42,14 +42,14 @@ const TV_ENH_HP_UUID = {
 
 ForgeEvents.onEvent("net.minecraftforge.event.ItemAttributeModifierEvent", (e) => {
   try {
-    const stack = e.getItemStack();
-    const tag = stack.getTag();
+    let stack = e.getItemStack();
+    let tag = stack.getTag();
     if (!tag || !tag.contains("tvEnhance")) return;
-    const level = Math.max(0, Math.min(15, tag.getInt("tvEnhance")));
+    let level = Math.max(0, Math.min(15, tag.getInt("tvEnhance")));
     if (level <= 0) return;
-    const slot = String(e.getSlotType().getName());
-    const item = stack.getItem();
-    const st = global.TV_ENHANCE_STATS;
+    let slot = String(e.getSlotType().getName());
+    let item = stack.getItem();
+    let st = global.TV_ENHANCE_STATS;
 
     if (item instanceof $TvArmorItem) {
       if (String(item.getType().getSlot().getName()) != slot) return;
@@ -65,7 +65,7 @@ ForgeEvents.onEvent("net.minecraftforge.event.ItemAttributeModifierEvent", (e) =
     e.getOriginalModifiers().get($TvAttributes.ATTACK_DAMAGE).forEach((m) => {
       if (m.getOperation() == $TvOperation.ADDITION) base += m.getAmount();
     });
-    const bonus = Math.round(base * st.weaponPct[level]) / 100;
+    let bonus = Math.round(base * st.weaponPct[level]) / 100;
     if (bonus > 0) {
       e.addModifier($TvAttributes.ATTACK_DAMAGE, new $TvAttributeModifier(TV_ENH_UUID.mainhand, "tv_enhance_damage", bonus, $TvOperation.ADDITION));
     }

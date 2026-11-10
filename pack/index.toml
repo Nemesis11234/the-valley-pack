@@ -7983,7 +7983,7 @@ hash = "c8abefeb22d55fa637a8d428093646561a0d410979a78c93a20a736456d1bb5e"
 
 [[files]]
 file = "kubejs/client_scripts/thevalley/enhanceTooltip.js"
-hash = "247dae37a81205c7521a5a0f924aa965666455aba12da3b5c76cb4f9fc2b5488"
+hash = "3b09d4220f0a4376277b997a9e4c9735c133fdc5d6da6c018b4d12a5ff0378d2"
 
 [[files]]
 file = "kubejs/client_scripts/tooltips/addAdvancedTooltips.js"
@@ -25715,15 +25715,15 @@ hash = "7131d239e4d5ff79d7a84b38812621a38b7b8b106b4c97027ab616394ed0acab"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/enhance/enhance.js"
-hash = "7cb02c54bc32e20e95b89c029fdfe2be62a5022cf7d12e727e1fc9e9a6d56f1e"
+hash = "6b98b0c029c5963ec9e263bccc95b5ccc24d83983ccde01205ab1b0c0cc21e59"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/pauseWhenEmpty.js"
-hash = "d8f4c5a71bfbb550002ce28ac5a17ccf6bb676a3cc0f989241d057e9408517e5"
+hash = "ce756bcd339389cc58a49fed302602430fb84a3fac6954e45295b47bf1b351c4"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/stream.js"
-hash = "51ae0a6707e22fa7ad7028d3587c0932bac955ffd3d48a8a9986d30993e864bc"
+hash = "11db342554dc3d671e695fab1408b7a8a1530f8e1a342251b7ef3e5436fa234c"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamConfig.js"
@@ -25731,7 +25731,7 @@ hash = "d15fe521c4c503c1fb491fe203967e0b05d9b66f572f7ed1993106ef467c4f6e"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamFeeHook.js"
-hash = "78158dfde3ccbf00bf74506197e0b1d255680abb0327c7b00e93d5c0da38392d"
+hash = "a1a2a3f79ac47d92186f6bc6c86417bd7c218ab025060443d9212b26c2147882"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamTemplates.js"
@@ -26159,11 +26159,11 @@ hash = "06acac92b0033b14b3285ce5c39a650fc73729f8267992b08ff839f87fbc1b81"
 
 [[files]]
 file = "kubejs/startup_scripts/thevalley/enhance.js"
-hash = "21b935dbe89f2616345569209a558345dc0b9cd1352b25f7724baa1710e1c29a"
+hash = "b6647c1283f314a901e754dbcc858fb90a77658e53b342808f32e0ac6d19d212"
 
 [[files]]
 file = "kubejs/startup_scripts/thevalley/streamFishing.js"
-hash = "f2b16033f4977f8727134e2913e748bda498aefc8d00889040900700d016b8a7"
+hash = "a95cfe6b548a2a86201724d4b2b2f4eb72875649c35dfb59af9042379c4418ab"
 
 [[files]]
 file = "manual-mods.json"
