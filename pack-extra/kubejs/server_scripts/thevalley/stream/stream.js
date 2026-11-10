@@ -254,6 +254,28 @@ function tvSetSidebarScore(player) {
   }
 }
 
+// ───────────── 최근 행동 기록 (AI 상황 설명용, 최근 90초) ─────────────
+
+function tvNote(player, what, count) {
+  let mem = tvMem(player);
+  let now = tvNow();
+  let acts = mem.recentActs || (mem.recentActs = {});
+  let a = acts[what] || (acts[what] = { n: 0, t: now });
+  a.n += count || 1;
+  a.t = now;
+}
+
+function tvRecentSummary(player) {
+  let acts = tvMem(player).recentActs || {};
+  let now = tvNow();
+  let out = [];
+  Object.keys(acts).forEach((k) => {
+    if (now - acts[k].t > 90000) delete acts[k];
+    else out.push(`${k} ${acts[k].n}`);
+  });
+  return out.slice(0, 8).join(", ");
+}
+
 // ───────────── 시청자 변동 ─────────────
 
 // hypeDelta: 화제성 점수, subsDelta: 구독자, reason: 화면에 보일 이유
@@ -893,6 +915,7 @@ BlockEvents.broken((e) => {
   tvMarkActive(player);
   if (!tvIsOn(player)) return;
   let id = String(e.block.id);
+  tvNote(player, `캔 블록 ${id.split(":")[1] || id}`, 1);
   if (id == "minecraft:diamond_ore" || id == "minecraft:deepslate_diamond_ore") {
     if (tvFirst(player, "diamond")) tvEvent(player, 25, 5, "생애 첫 다이아몬드!", "diamond_first", {});
     else tvEvent(player, Math.round(25 * tvDaily(player, "diamond")), 0, "다이아몬드", "diamond", {});
@@ -930,6 +953,7 @@ EntityEvents.death((e) => {
     hostile = false;
   }
   if (hostile) tvMissionProgress(player, "kill", 1);
+  tvNote(player, `처치 ${mobName}`, 1);
   if (hp >= 500) {
     let first = tvFirst(player, "boss:" + typeId);
     tvEvent(player, first ? 150 : 60, first ? 30 : 3, `${mobName} 처치!`, "kill_boss", { mob: mobName });
@@ -988,7 +1012,9 @@ BlockEvents.rightClicked((e) => {
   if (e.player && !e.player.isFake()) tvMarkActive(e.player);
 });
 BlockEvents.placed((e) => {
-  if (e.player && !e.player.isFake()) tvMarkActive(e.player);
+  if (!e.player || e.player.isFake()) return;
+  tvMarkActive(e.player);
+  tvNote(e.player, `놓은 블록 ${String(e.block.id).split(":")[1]}`, 1);
 });
 
 // 업적: 선릿 밸리 주요 업적만 (streamConfig.js의 advancementRules)
@@ -1055,6 +1081,7 @@ global.tvOnFished = (player, itemIds) => {
     if (first) cat = "fish_first";
     tvEvent(player, Math.round(hype), first ? 2 : 0, first ? `처음 낚은 ${label}` : label, cat, { item: label });
     tvMissionProgress(player, "fish", 1);
+    tvNote(player, `낚음 ${label}`, 1);
   });
 };
 

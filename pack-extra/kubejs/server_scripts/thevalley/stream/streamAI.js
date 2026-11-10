@@ -42,6 +42,73 @@ function tvAiAlive() {
 }
 
 // kind: event | chat | idle
+// ───────────── 화면 상황 (AI가 "보는" 것) ─────────────
+// 화면을 직접 보진 않지만, 서버가 아는 플레이어 상태를 글로 넘겨서 상황에 맞게 반응하게 함
+
+function tvAiSafe(fn, fallback) {
+  try {
+    let v = fn();
+    return v == null ? fallback : v;
+  } catch (err) {
+    return fallback;
+  }
+}
+
+function tvAiContext(player) {
+  let lines = [];
+  let level = player.level;
+  let dim = String(level.dimension);
+  let y = Math.floor(player.y);
+  let biome = tvAiSafe(() => String(player.block.biomeId).replace("minecraft:", ""), "?");
+  let sky = tvAiSafe(() => !!player.block.canSeeSky, true);
+  let place = dim == "society:skull_cavern" ? "해골 광산 안" : !sky ? (y < 50 ? "지하 동굴" : "실내/지붕 아래") : "바깥";
+  lines.push(`장소: ${dim.replace("minecraft:", "")}, 바이옴 ${biome}, 높이 Y=${y}, ${place}`);
+
+  let t = tvAiSafe(() => Number(player.server.overworld().getDayTime()) % 24000, 6000);
+  let tod = t < 1000 ? "아침" : t < 6000 ? "오전" : t < 12000 ? "오후" : t < 13800 ? "저녁(해 질 녘)" : t < 22500 ? "밤" : "새벽";
+  let weather = tvAiSafe(() => (level.isThundering() ? "천둥번개" : level.isRaining() ? "비" : "맑음"), "맑음");
+  let season = tvAiSafe(() => String(global.getSeasonFromLevel(player.server.overworld())), "?");
+  lines.push(`시간: ${tod}, 날씨: ${weather}, 계절: ${season}`);
+
+  let hp = Math.round(Number(player.health) || 0), maxHp = Math.round(Number(player.maxHealth) || 20);
+  let food = tvAiSafe(() => Number(tvG(tvG(player, "foodData", "getFoodData"), "foodLevel", "getFoodLevel")), 20);
+  let held = tvAiSafe(() => {
+    let st = player.mainHandItem;
+    return st.isEmpty() ? "빈손" : String(st.hoverName.string).replace(/[\[\]]/g, "");
+  }, "?");
+  let vehicle = tvAiSafe(() => {
+    let v = tvG(player, "vehicle", "getVehicle");
+    return v ? String(v.displayName.string) : "";
+  }, "");
+  lines.push(`상태: 체력 ${hp}/${maxHp}, 배고픔 ${food}/20, 손에 든 것: ${held}${vehicle ? ", 타고 있는 것: " + vehicle : ""}${player.isCrouching() ? ", 웅크림" : ""}`);
+
+  let near = tvAiSafe(() => {
+    let counts = {};
+    let players = [];
+    level.getEntitiesWithin(player.boundingBox.inflate(16)).forEach((e) => {
+      if (e == player || !e.isLiving()) return;
+      if (e.isPlayer()) {
+        players.push(String(e.username));
+        return;
+      }
+      let name = String(e.displayName.string);
+      let key = (e.isMonster() ? "적:" : "") + name;
+      counts[key] = (counts[key] || 0) + 1;
+    });
+    let list = Object.keys(counts)
+      .sort((a, b) => counts[b] - counts[a])
+      .slice(0, 6)
+      .map((k) => `${k} ${counts[k]}`);
+    return { list: list, players: players };
+  }, { list: [], players: [] });
+  if (near.list.length) lines.push(`주변 16칸: ${near.list.join(", ")}`);
+  if (near.players.length) lines.push(`근처 다른 플레이어: ${near.players.join(", ")}`);
+
+  let recent = tvRecentSummary(player);
+  if (recent) lines.push(`최근 1분 동안: ${recent}`);
+  return lines.join("\n");
+}
+
 // kind: event | chat | idle | donation | recap
 // extra: 요청에 같이 보낼 값, callback(lines): 답이 오면 기본 채팅 대신 이 함수가 처리
 // 성공하면 요청 번호(seq), 못 보내면 false
@@ -75,6 +142,7 @@ global.tvAiRequest = (player, kind, text, extra, callback) => {
     names: global.TV_VIEWERS.map((v) => v.name),
     busy: busy,
     extra: extra || {},
+    context: kind == "recap" ? "" : tvAiSafe(() => tvAiContext(player), ""),
   });
   if (TV_AI_STATE.outbox.length > 30) TV_AI_STATE.outbox = TV_AI_STATE.outbox.slice(-30);
   TV_AI_STATE.dirty = true;

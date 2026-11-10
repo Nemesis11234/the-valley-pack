@@ -33,6 +33,7 @@ public class ThevalleyAI {
         "방송은 마인크래프트 농사·생활 모드팩(스타듀밸리 비슷함) 플레이 방송이다. 시청자들은 이 게임을 잘 아는 편이다.",
         "규칙:",
         "- 줄 수는 요청에 적힌 만큼. 한 줄은 25자 이내. 실제 채팅처럼 짧고 가볍게, 반말과 인터넷 말투(ㅋㅋ, ㄷㄷ, ㄹㅇ, ?, ㅠㅠ)를 섞는다.",
+        "- 화면 상황(장소·시간·날씨·체력·주변 몹·최근 행동)을 보고 있는 것처럼 구체적으로 언급한다. 예: 밤인데 크리퍼 옆, 체력 낮은데 싸움, 비 오는 날 낚시.",
         "- 방금 일어난 일에 구체적으로 반응한다. 같은 말을 반복하지 않고, 최근 채팅과 겹치지 않게 한다.",
         "- 사람마다 성격이 다르게: 감탄, 놀림, 훈수, 딴소리, 질문 등을 섞는다. 가끔 스트리머 이름을 부른다.",
         "- 스트리머가 채팅을 쳤으면 그 말에 대답하는 줄을 포함한다.",
@@ -159,7 +160,9 @@ public class ThevalleyAI {
         StringBuilder u = new StringBuilder();
         u.append("스트리머: ").append(str(req.get("streamer"))).append('\n');
         u.append("시청자 수: ").append(num(req.get("viewers")).intValue()).append(", 구독자: ").append(num(req.get("subs")).intValue()).append('\n');
-        u.append("장소: ").append(str(req.get("dimension"))).append('\n');
+        String ctx = str(req.get("context"));
+        if (!ctx.isEmpty()) u.append("지금 화면 상황 (시청자들이 화면으로 보고 있는 것):\n").append(ctx).append('\n');
+        else u.append("장소: ").append(str(req.get("dimension"))).append('\n');
         double busy = Math.max(0, Math.min(1, num(req.get("busy")).doubleValue()));
         int lineCount = 2 + (int) Math.round(busy * 4);
         if ("recap".equals(kind)) lineCount = 1;
