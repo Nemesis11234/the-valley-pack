@@ -240,7 +240,9 @@ function pingServer(host, port, timeoutMs = 4000) {
     let buf = Buffer.alloc(0);
     let done = false;
     const sock = net.createConnection({ host, port });
-    const finish = (r) => { if (!done) { done = true; sock.destroy(); resolve(r); } };
+    // 연결 단계에서 응답이 없는 주소도 확실히 끝나도록 별도 타이머
+    const timer = setTimeout(() => finish({ online: false }), timeoutMs);
+    const finish = (r) => { if (!done) { done = true; clearTimeout(timer); sock.destroy(); resolve(r); } };
     sock.setTimeout(timeoutMs, () => finish({ online: false }));
     sock.on('error', () => finish({ online: false }));
     sock.on('connect', () => {
@@ -271,6 +273,16 @@ function pingServer(host, port, timeoutMs = 4000) {
       } catch (_) { finish({ online: false }); }
     });
   });
+}
+
+// 이 PC에서 서버가 돌고 있으면 localhost로 접속 (공유기가 자기 공인 IP 접속을 막는 경우 대비)
+async function resolveTarget() {
+  const port = Number(config.server.port) || 25565;
+  if (config.preferLocalServer !== false && config.server.host !== 'localhost' && config.server.host !== '127.0.0.1') {
+    const local = await pingServer('127.0.0.1', port, 1500);
+    if (local.online) return { host: '127.0.0.1', port, local: true, status: local };
+  }
+  return { host: config.server.host, port, local: false };
 }
 
 // ───────────────────────── 설치 단계 ─────────────────────────
@@ -333,7 +345,7 @@ async function configurePrism(java) {
   });
 }
 
-async function ensureInstance(java, packInfo) {
+async function ensureInstance(java, packInfo, target) {
   await fsp.mkdir(GAME_DIR, { recursive: true });
   const mc = packInfo.versions.minecraft || '1.20.1';
   const components = [{ uid: 'net.minecraft', version: mc, important: true }];
@@ -347,7 +359,7 @@ async function ensureInstance(java, packInfo) {
     existing.components.some((e) => e.uid === c.uid && e.version === c.version));
   if (!same) await writeJson(packPath, { components, formatVersion: 1 });
 
-  const { host, port } = config.server;
+  const { host, port } = target;
   await mergeIni(path.join(INST_DIR, 'instance.cfg'), {
     InstanceType: 'OneSix',
     name: config.serverName || 'The Valley',
@@ -459,8 +471,8 @@ async function ensureManualMods() {
   });
 }
 
-function launchGame() {
-  const { host, port } = config.server;
+function launchGame(target) {
+  const { host, port } = target;
   const args = ['-l', INSTANCE_ID, '-s', `${host}:${port}`];
   log('launch', prismExe(), args.join(' '));
   const child = spawn(prismExe(), args, { cwd: PRISM_DIR, detached: true, stdio: 'ignore' });
@@ -486,7 +498,9 @@ async function play() {
     await ensurePrism();
     await configurePrism(java);
     progress('게임 준비 중', '인스턴스 설정', null);
-    await ensureInstance(java, packInfo);
+    const target = await resolveTarget();
+    log('접속 대상', `${target.host}:${target.port}`, target.local ? '(이 PC의 서버)' : '');
+    await ensureInstance(java, packInfo, target);
 
     if (remote.ok) {
       const jar = await ensureBootstrap();
@@ -498,7 +512,7 @@ async function play() {
 
     const account = await readAccount();
     progress('게임 실행 중', account ? `${account.name}(으)로 접속` : '처음이면 마이크로소프트 로그인 창이 떠요', 1);
-    launchGame();
+    launchGame(target);
     send('launched', { account });
     if (config.closeOnLaunch) setTimeout(() => app.quit(), 6000);
     return { ok: true };
@@ -550,8 +564,9 @@ ipcMain.handle('init', async () => {
 });
 
 ipcMain.handle('status', async () => {
-  const { host, port } = config.server;
-  return pingServer(host, Number(port) || 25565);
+  const target = await resolveTarget();
+  if (target.status) return target.status;
+  return pingServer(target.host, target.port);
 });
 
 ipcMain.handle('play', () => play());
