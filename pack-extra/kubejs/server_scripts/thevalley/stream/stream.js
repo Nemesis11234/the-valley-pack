@@ -247,6 +247,8 @@ function tvChange(player, hypeDelta, subsDelta, reason) {
     const subsText = subsDelta ? `  (구독자 ${subsDelta > 0 ? "+" : ""}${subsDelta})` : "";
     tvActionbar(player, `${sign}${tvFmt(diff)} 시청자 · ${reason}${subsText}`, diff >= 0 ? "#7EE0A1" : "#F28B82");
   }
+  tvSessionNote(player, diff, reason);
+  tvCheckTrophies(player);
   tvSetSidebarScore(player);
   tvRenderChat(player);
 }
@@ -304,6 +306,7 @@ function tvDonate(player, opt) {
   const troll = !(opt && opt.reason) && Math.random() < TV.trollChance;
   pd.tvPending = Number(pd.tvPending) + amount;
   pd.tvDonatedTotal = Number(pd.tvDonatedTotal) + amount;
+  tvSessionDonation(player, amount, viewer.name);
 
   let message;
   if (troll) {
@@ -517,6 +520,8 @@ function tvMissionEnd(player, success) {
     const pd = tvData(player);
     pd.tvPending = Number(pd.tvPending) + m.reward;
     pd.tvDonatedTotal = Number(pd.tvDonatedTotal) + m.reward;
+    tvSessionDonation(player, m.reward, m.from);
+    if (mem.session) mem.session.missions++;
     tvChange(player, 40, 2, "미션 성공");
     tvPushChat(player, "[후원] " + m.from, "#FFD54F", `미션 성공! ${tvFmt(m.reward)} 후원`, true);
     tvViewerChat(player, "mission_success", {}, 3, 5);
@@ -798,9 +803,15 @@ PlayerEvents.loggedIn((e) => {
   tvEnsureMenuObjectives(player.server);
   player.server.runCommandSilent(`team leave ${tvName(player)}`);
   tvSetSidebarScore(player);
+  player.server.scheduleInTicks(60, () => {
+    if (player.isRemoved()) return;
+    tvShowStoredRecap(player);
+    tvApplyRankAwards(player);
+  });
   if (tvIsOn(player)) {
     player.server.scheduleInTicks(100, () => {
       if (player.isRemoved()) return;
+      tvSessionStart(player);
       tvChange(player, 10, 0, "방송 시작");
       tvViewerChat(player, "stream_on", {}, 3, 8);
       player.tell(Text.of("[방송] 방송 중이에요. /방송 을 입력하면 메뉴가 열려요.").gray());
@@ -812,6 +823,11 @@ PlayerEvents.loggedOut((e) => {
   const player = e.player;
   const id = String(player.uuid);
   player.server.runCommandSilent(`bossbar remove ${tvBossbarId(player)}`);
+  try {
+    tvSessionEnd(player, true);
+  } catch (err) {
+    console.error("[TheValley] stream recap error: " + err);
+  }
   delete TV_ACTIVE[id];
 });
 
@@ -823,6 +839,183 @@ PlayerEvents.tick((e) => {
     tvSecond(player);
   } catch (err) {
     console.error("[TheValley] stream tick error: " + err);
+  }
+});
+
+// ───────────── 방송 결산 ─────────────
+// 레전드 장면 = 이번 방송에서 시청자가 가장 많이 늘어난 순간 3개 (같은 이유는 한 번만)
+
+function tvSessionStart(player) {
+  const mem = tvMem(player);
+  const v = tvViewers(player);
+  mem.session = { start: tvNow(), startViewers: v, peak: v, donated: 0, donations: 0, topDonation: null, missions: 0, highlights: [], subsStart: tvSubs(player) };
+}
+
+function tvSessionNote(player, diff, reason) {
+  const mem = tvMem(player);
+  if (!mem.session) return;
+  const v = tvViewers(player);
+  if (v > mem.session.peak) mem.session.peak = v;
+  tvRankNote(player, v);
+  if (diff <= 0 || reason == "방송 시작" || reason == "꾸준한 방송") return;
+  const h = mem.session.highlights;
+  const same = h.filter((x) => x.reason == reason)[0];
+  if (same) {
+    if (diff > same.diff) same.diff = diff;
+  } else {
+    h.push({ reason: reason, diff: diff });
+  }
+  h.sort((a, b) => b.diff - a.diff);
+  if (h.length > 3) h.length = 3;
+}
+
+function tvSessionDonation(player, amount, from) {
+  const mem = tvMem(player);
+  if (!mem.session) return;
+  mem.session.donated += amount;
+  mem.session.donations++;
+  if (!mem.session.topDonation || amount > mem.session.topDonation.amount) mem.session.topDonation = { amount: amount, from: from };
+}
+
+function tvRecapLines(r) {
+  const min = Math.max(1, Math.round(r.durationSec / 60));
+  const lines = [
+    "§c━━━━━━ 오늘 방송 결산 ━━━━━━",
+    `§f방송 시간 §e${min >= 60 ? Math.floor(min / 60) + "시간 " + (min % 60) + "분" : min + "분"}§f · 최고 시청자 §e${tvFmt(r.peak)}§f명`,
+    `§f구독자 §e${tvFmt(r.subsStart)} → ${tvFmt(r.subsEnd)}§f (${r.subsEnd - r.subsStart >= 0 ? "+" : ""}${tvFmt(r.subsEnd - r.subsStart)})`,
+    `§f받은 후원 §e${tvFmt(r.donated)}§f (${r.donations}회) · 미션 성공 §e${r.missions}§f번`,
+  ];
+  if (r.topDonation) lines.push(`§f최고 후원 §e${tvFmt(r.topDonation.amount)}§f · ${r.topDonation.from}`);
+  if (r.highlights.length) {
+    lines.push("§6레전드 장면");
+    r.highlights.forEach((h, i) => lines.push(`  §e${i + 1}. §f${h.reason} §a(+${tvFmt(h.diff)}명)`));
+  }
+  lines.push("§c━━━━━━━━━━━━━━━━━━━━━━");
+  return lines;
+}
+
+function tvSessionEnd(player, loggingOut) {
+  const mem = tvMem(player);
+  const sess = mem.session;
+  mem.session = null;
+  if (!sess) return;
+  const durationSec = (tvNow() - sess.start) / 1000;
+  if (durationSec < 120) return; // 2분 미만은 결산 안 함
+  const recap = {
+    durationSec: durationSec, peak: sess.peak, subsStart: sess.subsStart, subsEnd: tvSubs(player),
+    donated: sess.donated, donations: sess.donations, topDonation: sess.topDonation, missions: sess.missions, highlights: sess.highlights,
+  };
+  if (loggingOut) {
+    tvData(player).tvLastRecap = tvJson(recap); // 다음 접속 때 보여줌
+  } else {
+    tvRecapLines(recap).forEach((l) => player.tell(l));
+  }
+}
+
+function tvShowStoredRecap(player) {
+  const pd = tvData(player);
+  const raw = String(pd.tvLastRecap || "");
+  if (!raw) return;
+  pd.tvLastRecap = "";
+  try {
+    player.tell("§7지난 방송 결산이에요.");
+    tvRecapLines(JSON.parse(raw)).forEach((l) => player.tell(l));
+  } catch (err) {
+    console.error("[TheValley] recap parse error: " + err);
+  }
+}
+
+// ───────────── 구독자 달성 트로피 ─────────────
+
+function tvCheckTrophies(player) {
+  const subs = tvSubs(player);
+  TV.trophies.forEach((t) => {
+    if (subs < t.subs) return;
+    if (!tvFirst(player, "trophy:" + t.id)) return;
+    const name = tvName(player);
+    player.server.runCommandSilent(`give ${name} ${t.block}{BlockEntityTag:{Trophy:"${t.id}"}}`);
+    player.server.runCommandSilent(
+      `tellraw @a ${tvJson([{ text: "[방송] ", color: "#FF5555" }, { text: `${name}님 구독자 ${tvFmt(t.subs)}명 달성! `, color: "#FFFFFF" }, { text: t.name, color: t.color, bold: true }])}`
+    );
+    player.server.runCommandSilent(`execute as ${name} at @s run playsound minecraft:ui.toast.challenge_complete player @s ~ ~ ~ 1 1`);
+    tvViewerChat(player, "trophy", { item: t.name }, 4, 6);
+  });
+}
+
+// ───────────── 주간 순위 ─────────────
+// 게임 날짜 TV.rankWeekDays일마다 그 기간 최고 시청자 순위로 보너스 후원 (미정산금으로)
+
+function tvRankWeek(server) {
+  return Math.floor(tvDay(server) / TV.rankWeekDays);
+}
+function tvRankLoad(server) {
+  try {
+    const raw = server.persistentData.tvRankJson;
+    if (raw) return JSON.parse(String(raw));
+  } catch (err) {
+    console.error("[TheValley] rank load error: " + err);
+  }
+  return { week: tvRankWeek(server), players: {}, awards: {} };
+}
+function tvRankSave(server, data) {
+  server.persistentData.tvRankJson = tvJson(data);
+}
+
+function tvRankNote(player, viewers) {
+  const server = player.server;
+  const data = tvRankLoad(server);
+  const id = String(player.uuid);
+  const cur = data.players[id];
+  if (cur && cur.peak >= viewers) return;
+  data.players[id] = { name: tvName(player), peak: viewers };
+  tvRankSave(server, data);
+}
+
+function tvRankCheck(server) {
+  const data = tvRankLoad(server);
+  const week = tvRankWeek(server);
+  if (week == data.week) return;
+  const ranked = Object.keys(data.players)
+    .map((id) => ({ id: id, name: data.players[id].name, peak: data.players[id].peak }))
+    .sort((a, b) => b.peak - a.peak)
+    .slice(0, TV.rankRewards.length);
+  if (ranked.length) {
+    server.runCommandSilent(`tellraw @a ${tvJson({ text: "━━━━ [방송] 이번 주 시청자 순위 ━━━━", color: "#FF5555" })}`);
+    ranked.forEach((r, i) => {
+      const award = tvRoundCoins(r.peak * TV.rankRewards[i]);
+      data.awards[r.id] = (data.awards[r.id] || 0) + award;
+      server.runCommandSilent(
+        `tellraw @a ${tvJson([{ text: `${i + 1}등 `, color: "#FFD54F", bold: true }, { text: `${r.name} · 최고 ${tvFmt(r.peak)}명 · 보너스 후원 ${tvFmt(award)}`, color: "#FFFFFF" }])}`
+      );
+    });
+  }
+  data.week = week;
+  data.players = {};
+  tvRankSave(server, data);
+  server.players.forEach((p) => tvApplyRankAwards(p));
+}
+
+function tvApplyRankAwards(player) {
+  const server = player.server;
+  const data = tvRankLoad(server);
+  const id = String(player.uuid);
+  const award = data.awards[id];
+  if (!award) return;
+  delete data.awards[id];
+  tvRankSave(server, data);
+  const pd = tvData(player);
+  pd.tvPending = Number(pd.tvPending) + award;
+  pd.tvDonatedTotal = Number(pd.tvDonatedTotal) + award;
+  player.tell(Text.of(`[방송] 주간 순위 보너스 ${tvFmt(award)}이 미정산 후원금에 들어왔어요.`).gold());
+}
+
+ServerEvents.tick((e) => {
+  const server = e.server;
+  if (server.tickCount % 600 != 0) return; // 30초마다
+  try {
+    tvRankCheck(server);
+  } catch (err) {
+    console.error("[TheValley] rank tick error: " + err);
   }
 });
 
@@ -838,8 +1031,10 @@ function tvSetOn(player, on) {
       player.server.runCommandSilent(`bossbar remove ${tvBossbarId(player)}`);
     }
     player.tell(Text.of("[방송] 방송을 껐어요. 시청자가 서서히 빠져요.").gray());
+    tvSessionEnd(player, false);
   } else {
     player.tell(Text.of("[방송] 방송을 켰어요!").green());
+    tvSessionStart(player);
     tvChange(player, 10, 0, "방송 시작");
     tvViewerChat(player, "stream_on", {}, 3, 8);
   }

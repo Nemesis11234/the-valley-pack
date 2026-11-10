@@ -1,0 +1,25 @@
+{
+  "name": {
+    "text": "실버 버튼",
+    "color": "#D9D9D9"
+  },
+  "item": {
+    "item": "minecraft:iron_block"
+  },
+  "display": {
+    "scale": 0.5
+  },
+  "animation": {
+    "type": "spinning",
+    "speed": 1
+  },
+  "colors": {
+    "base": "#3A3A3A",
+    "accent": "#D9D9D9"
+  },
+  "effects": {
+    "sound": {
+      "soundEvent": "minecraft:ui.toast.challenge_complete"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": {
+    "text": "골드 버튼",
+    "color": "#FFD54F"
+  },
+  "item": {
+    "item": "minecraft:gold_block"
+  },
+  "display": {
+    "scale": 0.5
+  },
+  "animation": {
+    "type": "spinning",
+    "speed": 1
+  },
+  "colors": {
+    "base": "#3A3A3A",
+    "accent": "#FFD54F"
+  },
+  "effects": {
+    "sound": {
+      "soundEvent": "minecraft:ui.toast.challenge_complete"
+    }
+  }
+}

@@ -51,6 +51,17 @@ global.TV_CONFIG = {
   // 집(리스폰 지점)에서 이 거리 안이면 억까 금지
   homeSafeRadius: 24,
 
+  // 주간 순위: 게임 날짜 며칠마다 정산할지, 1·2·3등 보너스 = 그 기간 최고 시청자 × 배수
+  rankWeekDays: 7,
+  rankRewards: [20, 10, 5],
+
+  // 구독자 달성 트로피 (Trofers 모드 트로피 블록으로 지급)
+  trophies: [
+    { subs: 100, id: "thevalley:button_silver", name: "실버 버튼", color: "#D9D9D9", block: "trofers:medium_pillar" },
+    { subs: 1000, id: "thevalley:button_gold", name: "골드 버튼", color: "#FFD54F", block: "trofers:medium_pillar" },
+    { subs: 10000, id: "thevalley:button_diamond", name: "다이아 버튼", color: "#7FE7FF", block: "trofers:large_pillar" },
+  ],
+
   // 방송 채팅창: 보이는 줄 수, 줄이 사라지는 시간(초)
   chatLines: 6,
   chatLineLifeSec: 40,

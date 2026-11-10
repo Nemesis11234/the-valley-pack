@@ -1,0 +1,25 @@
+{
+  "name": {
+    "text": "다이아 버튼",
+    "color": "#7FE7FF"
+  },
+  "item": {
+    "item": "minecraft:diamond_block"
+  },
+  "display": {
+    "scale": 0.6
+  },
+  "animation": {
+    "type": "spinning",
+    "speed": 1
+  },
+  "colors": {
+    "base": "#3A3A3A",
+    "accent": "#7FE7FF"
+  },
+  "effects": {
+    "sound": {
+      "soundEvent": "minecraft:ui.toast.challenge_complete"
+    }
+  }
+}
