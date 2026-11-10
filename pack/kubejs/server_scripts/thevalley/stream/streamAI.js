@@ -25,7 +25,10 @@ function tvAiPath(name) {
 
 function tvAiReadJson(name) {
   try {
-    return JsonIO.read(tvAiPath(name));
+    let m = JsonIO.read(tvAiPath(name));
+    if (!m) return null;
+    // 자바 Map은 null 값을 읽으면 오류가 나서, 순수 JS 객체로 바꿔서 씀
+    return JSON.parse(String(JsonIO.toString(JsonIO.of(m))));
   } catch (err) {
     return null;
   }

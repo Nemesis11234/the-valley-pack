@@ -25703,7 +25703,7 @@ hash = "695c59ee351bc6776bf87940ecfbff5d99dfe59976d25d08fe06545d37442d5f"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamAI.js"
-hash = "7a316c4e72eff960f8a75dd9279357b3276a857ff4c4d53d5b5d8ab417dd85a0"
+hash = "02c838f9572fab1bacb249de00cc200ccb50ea0a96a6d6592ce792e5f5df4843"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamConfig.js"
