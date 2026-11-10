@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # The Valley 서버 설치 (Ubuntu, AWS EC2). 한 번만 실행:
-#   curl -fsSL https://raw.githubusercontent.com/Nemesis11234/the-valley-pack/main/server-tools/aws/setup.sh | sudo -E bash
+#   curl -sL https://raw.githubusercontent.com/Nemesis11234/the-valley-pack/main/i | sudo bash
 # 하는 일: Java 17, 서버 파일, 모드, 자동 시작(systemd), AI 채팅 도우미 설치.
 # 이후 서버가 켜질 때마다 GitHub 저장소의 최신 설정·스크립트를 자동으로 받아 온다.
 set -euo pipefail
@@ -52,8 +52,9 @@ max-tick-time=120000
 server-port=25565
 PROPS
 fi
-if [ -n "${VALLEY_WHITELIST_B64:-}" ] && [ ! -f whitelist.json ]; then echo "$VALLEY_WHITELIST_B64" | base64 -d > whitelist.json; fi
-if [ -n "${VALLEY_OPS_B64:-}" ] && [ ! -f ops.json ]; then echo "$VALLEY_OPS_B64" | base64 -d > ops.json; fi
+# 처음 설치할 때만: 화이트리스트·OP 목록 (이후에는 서버 콘솔의 whitelist add 등으로 관리)
+[ -f whitelist.json ] || cp $BASE/repo/server-tools/aws/whitelist.json whitelist.json
+[ -f ops.json ] || cp $BASE/repo/server-tools/aws/ops.json ops.json
 cat > user_jvm_args.txt <<JVM
 -Xms$HEAP_MIN
 -Xmx$HEAP_MAX
