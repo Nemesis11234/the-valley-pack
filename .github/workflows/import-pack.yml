@@ -51,6 +51,10 @@ jobs:
         working-directory: pack
         run: |
           python3 ../scripts/postprocess.py "$RUNNER_TEMP/export.log" "$GITHUB_STEP_SUMMARY"
+          # 빈(0바이트) 파일은 GitHub raw가 HTTP 501을 돌려줘서 설치기가 실패함 → 목록에서 제외
+          # (해당 모드가 처음 실행할 때 알아서 만듦)
+          find . -type f -size 0 ! -name '*.toml' ! -name '.packwizignore' -printf '/%P\n' | sed 's/[][*?!#]/\\&/g' > .packwizignore
+          echo "빈 파일 제외: $(wc -l < .packwizignore)개"; cat .packwizignore
           packwiz refresh
 
       - name: 저장소에 올리기

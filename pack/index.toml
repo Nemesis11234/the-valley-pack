@@ -10,10 +10,6 @@ file = "config/Butchery.toml"
 hash = "3fe846224282c2b2f5009e378731e20ea47f012afc3fff1fc75e2a8d7d81417b"
 
 [[files]]
-file = "config/CSC/CSC_Warn.log"
-hash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-
-[[files]]
 file = "config/CSC/Data/variables.data"
 hash = "d9d06333e660811828887858dd7863520e58115f9c827dfec5d6c694f33ab3c0"
 
@@ -344,10 +340,6 @@ hash = "d1a207b99b3b3dfb1dcefa6407f72cfc7fc8a4c74df745d8489cda5f3583ae23"
 [[files]]
 file = "config/controllable/bindings.properties"
 hash = "5eb8252947bd0a1bebdb482f729a1df47efb8e384d62a5d922feb1798abfdb20"
-
-[[files]]
-file = "config/controllable/controller.properties"
-hash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
 [[files]]
 file = "config/controllable/key_adapters.properties"
@@ -2098,10 +2090,6 @@ file = "config/jeed-client.toml"
 hash = "66d5af4c34d78b6cb153970678e3a188b96b232c5088d2b8fca6c14a59585a6f"
 
 [[files]]
-file = "config/jei/blacklist.cfg"
-hash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-
-[[files]]
 file = "config/jei/ingredient-list-mod-sort-order.ini"
 hash = "4bfc7c086572bdfde0e56813f4d5eba3c33f99c13e86ed47a10ff045448745b2"
 
@@ -3622,10 +3610,6 @@ file = "config/watermedia/assets/loading.gif"
 hash = "387f3a9aee7a1df9334ced1c5d05a5cba3915f36c556bcf14235b145f79eb60d"
 
 [[files]]
-file = "config/watermedia/custom_vlc_path.txt"
-hash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-
-[[files]]
 file = "config/watut-client.toml"
 hash = "1cc83cc8e6244e5372dd68967459e7704d6bc69db1c38f0bf3f08da659d33b94"
 
@@ -3656,10 +3640,6 @@ hash = "aa74fdd5103d5177ace919b94a87cb9b0ba499893d40a37a6ccd157bed8ded0a"
 [[files]]
 file = "config/windswept-common.toml"
 hash = "ad5c4be039b5c45d14c740d4c8e5172d883331b4ae99ec94b28fd64bfca226da"
-
-[[files]]
-file = "config/worldedit/.archive-unpack/2e1dd752/.unpack_finished"
-hash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
 [[files]]
 file = "config/worldedit/.archive-unpack/2e1dd752/af/strings.json"
@@ -4380,10 +4360,6 @@ hash = "2fba43a79b79d4f2fdacd44794f039ecc9f9d9ca6d5405a0217e37e2c71a786a"
 [[files]]
 file = "icon.png"
 hash = "efeed12cdb31fdde963db091a2d93265fac60f73c4b46bc5e14a618b22de503a"
-
-[[files]]
-file = "keybinding presets/initialized.dat"
-hash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
 [[files]]
 file = "keybinding presets/preset_to_load_on_first_startup.txt"
