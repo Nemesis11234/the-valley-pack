@@ -1,7 +1,7 @@
 {
   "serverName": "The Valley",
   "server": {
-    "host": "localhost",
+    "host": "43.202.127.139",
     "port": 25565
   },
   "packUrl": "https://raw.githubusercontent.com/Nemesis11234/the-valley-pack/main/pack/pack.toml",
