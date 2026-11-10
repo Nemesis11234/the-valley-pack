@@ -230,7 +230,9 @@ function tvViewerChat(player, category, vars, count, spreadSec) {
     used[line] = 1;
     let viewer = tvRand(global.TV_VIEWERS);
     let delay = Math.random() * (spreadSec || 6) * 1000;
-    mem.queue.push({ at: tvNow() + delay, name: viewer.name, color: viewer.color, msg: tvFill(line, vars) });
+    let fv = { p: tvName(player) };
+    Object.keys(vars || {}).forEach((k) => (fv[k] = vars[k]));
+    mem.queue.push({ at: tvNow() + delay, name: viewer.name, color: viewer.color, msg: tvFill(line, fv) });
   }
 }
 
@@ -315,24 +317,14 @@ function tvRoundCoins(n) {
   return Math.max(100, Math.round(n / 100) * 100);
 }
 
-// 후원 금액 뽑기: 금액이 클수록 드물게. 시청자가 많을수록 큰 금액 구간이 열림
-// boost: 큰 장면 보너스 (가중치를 한 단계 큰 쪽으로)
+// 후원 금액 뽑기: 100원 ~ 최대치 사이 랜덤 (파레토 분포: 작은 금액이 대부분, 큰 금액은 드묾)
+// boost: 큰 장면 보너스 배수
 function tvPickDonation(player, boost) {
-  let v = tvViewers(player);
-  let tiers = TV.donationTiers.filter((t) => v >= t.minViewers);
-  let shift = boost || 0;
-  let total = 0;
-  let weights = tiers.map((t, i) => {
-    let w = t.weight * Math.pow(2, Math.min(shift, i));
-    total += w;
-    return w;
-  });
-  let roll = Math.random() * total;
-  for (let i = 0; i < tiers.length; i++) {
-    roll -= weights[i];
-    if (roll <= 0) return tiers[i].amount;
-  }
-  return tiers[0].amount;
+  let alpha = TV.donationAlphaLow - (TV.donationAlphaLow - TV.donationAlphaHigh) * tvBusy(player);
+  let u = Math.max(1e-9, Math.random());
+  let amount = TV.donationMin / Math.pow(u, 1 / alpha);
+  amount *= boost ? 1 + boost : 1;
+  return Math.min(TV.donationMax, tvRoundCoins(amount));
 }
 
 function tvDonate(player, opt) {
@@ -349,13 +341,15 @@ function tvDonate(player, opt) {
   tvSessionDonation(player, amount, viewer.name);
 
   let message;
+  let dm = global.TV_DONATION_MESSAGES;
   if (troll) {
     let done = tvTroll(player, viewer);
     message = done ? done : tvRand(global.TV_TEMPLATES.troll_skip);
   } else if (opt && opt.reason) {
-    message = tvRand([`${opt.reason} 축하합니다!`, "이건 못참지", "보너스입니다", "레전드 기념"]);
+    message = tvFill(tvRand(dm.event), { item: opt.reason, p: tvName(player) });
   } else {
-    message = tvRand(["화이팅!", "재밌게 보고 있어요", "커피값", "오늘도 힐링", "농사 화이팅", "구독했어요", "밥 사드세요"]);
+    let pool = amount >= 10000 ? dm.huge : amount >= 2000 ? dm.big : amount >= 500 ? dm.mid : dm.small;
+    message = tvFill(tvRand(pool), { p: tvName(player) });
   }
 
   tvPushChat(player, "[후원] " + viewer.name, viewer.color, `${tvFmt(amount)} 후원 · ${message}`, true);
@@ -823,19 +817,14 @@ BlockEvents.placed((e) => {
   if (e.player && !e.player.isFake()) tvMarkActive(e.player);
 });
 
-// 업적: 레시피 해금·숨은 업적은 무시, 화면에 뜨는 업적만 등급별로
-//   일반(task): 화제성 조금, 같은 날 반복할수록 줄어듦 / 목표(goal): 중간 + 구독자 1 / 도전(challenge): 크게 + 구독자 3
-function tvAdvFrame(adv) {
-  try {
-    let display = tvG(adv.advancement, "display", "getDisplay");
-    if (!display) return null;
-    let frame = String(tvG(display, "frame", "getFrame")).toLowerCase();
-    if (frame.indexOf("challenge") >= 0) return "challenge";
-    if (frame.indexOf("goal") >= 0) return "goal";
-    return "task";
-  } catch (err) {
-    return "task";
+// 업적: 선릿 밸리 주요 업적만 (streamConfig.js의 advancementRules)
+function tvAdvRule(id) {
+  let rules = TV.advancementRules || [];
+  for (let i = 0; i < rules.length; i++) {
+    let r = rules[i];
+    if ((r.id && r.id == id) || (r.prefix && id.indexOf(r.prefix) == 0)) return r;
   }
+  return null;
 }
 
 if (PlayerEvents.advancement) {
@@ -844,20 +833,15 @@ if (PlayerEvents.advancement) {
     if (!player || player.isFake() || !tvIsOn(player)) return;
     let adv = e.advancement;
     let id = String(adv.id());
-    if (id.indexOf("recipes/") >= 0 || !adv.hasDisplay()) return;
-    let frame = tvAdvFrame(adv);
-    if (!frame) return;
+    let rule = tvAdvRule(id);
+    if (!rule) return;
     let title = "업적";
     try {
       title = String(adv.getTitle().string).replace(/[\[\]]/g, "");
     } catch (err) {
       title = "업적";
     }
-    let cfg = TV.advancement[frame];
-    let hype = Math.round(cfg.hype * (frame == "task" ? tvDaily(player, "adv_task") : 1));
-    if (hype <= 0 && !cfg.subs) return;
-    let label = frame == "challenge" ? `도전 과제: ${title}` : frame == "goal" ? `목표 달성: ${title}` : `업적: ${title}`;
-    tvEvent(player, hype, cfg.subs, label, "advancement", { item: title });
+    tvEvent(player, rule.hype, rule.subs || 0, `업적: ${title}`, "advancement", { item: title });
   });
 }
 

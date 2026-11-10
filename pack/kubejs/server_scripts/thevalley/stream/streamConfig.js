@@ -34,24 +34,19 @@ global.TV_CONFIG = {
   // 미정산 후원금 한도 없음. 병원비는 (계좌 + 미정산금) 기준으로 계산해서
   // 계좌에서 먼저 빼고, 모자란 만큼만 미정산금에서 뺌 (streamFeeHook.js)
 
-  // 랜덤 후원: 분당 기대 횟수 = min(max, base + 시청자 / perViewers)
-  //   시청자 10명 ≈ 시간당 3번, 100명 ≈ 4.5번, 1,000명 ≈ 18번, 3,000명 이상 ≈ 30번(최대)
-  donationRateBase: 0.05,
-  donationRatePerViewers: 4000,
-  donationRateMax: 0.5,
-  // 후원 금액 구간 (100원 단위). weight가 작을수록 드묾, minViewers 이상일 때만 나옴
-  //   시청자 적을 때 평균 약 240원, 많을 때 평균 약 600원
-  donationTiers: [
-    { amount: 100, weight: 100, minViewers: 0 },
-    { amount: 200, weight: 50, minViewers: 0 },
-    { amount: 500, weight: 25, minViewers: 0 },
-    { amount: 1000, weight: 12, minViewers: 0 },
-    { amount: 2000, weight: 6, minViewers: 50 },
-    { amount: 5000, weight: 3, minViewers: 100 },
-    { amount: 10000, weight: 1.2, minViewers: 300 },
-    { amount: 30000, weight: 0.4, minViewers: 1000 },
-    { amount: 50000, weight: 0.15, minViewers: 3000 },
-  ],
+  // 랜덤 후원 횟수: 1초마다 확률로 뽑아서 실제 횟수는 매번 달라짐.
+  //   분당 평균 = min(max, base + 시청자 / perViewers) → 10명 약 시간당 6번, 100명 9번, 1,000명 36번, 1,800명 이상 60번
+  donationRateBase: 0.1,
+  donationRatePerViewers: 2000,
+  donationRateMax: 1.0,
+  // 후원 금액: 100원 ~ donationMax 사이에서 랜덤 (100원 단위). 큰 금액일수록 드묾 (파레토 분포).
+  //   alpha가 클수록 큰 금액이 더 드묾. 시청자 적을 때 alphaLow ↔ 1,000명 이상 alphaHigh
+  //   alpha 1.3 기준(평균 약 390원): 500원 이상 14%, 1,000원 이상 5%, 1만 원 이상 0.24%, 5만 원 이상 0.03%
+  //   alpha 1.15 기준(평균 약 530원): 500원 이상 18%, 1,000원 이상 7.5%, 1만 원 이상 0.5%, 5만 원 이상 0.08%
+  donationMin: 100,
+  donationMax: 100000,
+  donationAlphaLow: 1.3,
+  donationAlphaHigh: 1.15,
   // 큰 장면 축하 후원: 이 화제성 이상일 때만, 확률은 최대 이 값
   eventDonationMinHype: 25,
   eventDonationMaxChance: 0.5,
@@ -91,12 +86,16 @@ global.TV_CONFIG = {
   aiIdleMaxSec: 90,
   aiIdleMinSec: 25,
 
-  // 업적: 등급별 화제성·구독자 (레시피 해금·숨은 업적은 무시)
-  advancement: {
-    task: { hype: 3, subs: 0 }, // 일반 업적 (같은 날 반복할수록 줄어듦)
-    goal: { hype: 10, subs: 1 }, // 목표 (테두리가 둥근 업적)
-    challenge: { hype: 25, subs: 3 }, // 도전 과제 (보라색)
-  },
+  // 업적: 선릿 밸리(society) 주요 업적만 반응. 위에서부터 처음 맞는 규칙 적용, 없으면 무시
+  advancementRules: [
+    { id: "society:main/money/obtain_prismatic_coin", hype: 150, subs: 20 },
+    { id: "society:main/money/obtain_ancient_coin", hype: 80, subs: 10 },
+    { id: "society:main/money/obtain_neptunium_coin", hype: 50, subs: 5 },
+    { id: "society:main/money/obtain_sun", hype: 25, subs: 3 },
+    { id: "society:main/obtain_prismatic_shard", hype: 40, subs: 5 },
+    { prefix: "society:main/machines/", hype: 10, subs: 1 },
+    { prefix: "society:main/materials/", hype: 8, subs: 1 },
+  ],
 
   // 방송 채팅창: 보이는 줄 수, 줄이 사라지는 시간(초)
   chatLines: 6,
