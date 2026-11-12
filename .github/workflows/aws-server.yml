@@ -30,6 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      - uses: actions/checkout@v4
       - name: 할 일 실행
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -68,6 +69,7 @@ jobs:
               s=$(state)
               if [ "$s" = "running" ] && mc_up; then
                 echo "RESULT: 켜져 있음, 마인크래프트 서버 응답함"
+                echo "PLAYERS: $(python3 scripts/mc_ping.py "$SERVER_IP" "$MC_PORT" 2>&1 | tail -1)"
               else
                 echo "RESULT: 인스턴스 상태 $s, 마인크래프트 서버 $(mc_up && echo 응답함 || echo 응답 없음)"
               fi
