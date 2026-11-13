@@ -51,12 +51,12 @@ let tvEnhErrLogged = false;
 
 ForgeEvents.onEvent("net.minecraftforge.event.ItemAttributeModifierEvent", (e) => {
   try {
-    let stack = e.getItemStack();
+    let stack = tvEnhG(e, "itemStack", "getItemStack");
     let tag = stack.nbt;
     if (!tag || !tag.contains("tvEnhance")) return;
     let level = Math.max(0, Math.min(15, tag.getInt("tvEnhance")));
     if (level <= 0) return;
-    let slotObj = e.getSlotType();
+    let slotObj = tvEnhG(e, "slotType", "getSlotType");
     let slot = String(slotObj).toLowerCase(); // 열거형 이름: MAINHAND, HEAD ...
     let item = stack.getItem();
     let st = global.TV_ENHANCE_STATS;
@@ -73,7 +73,7 @@ ForgeEvents.onEvent("net.minecraftforge.event.ItemAttributeModifierEvent", (e) =
     if (slotObj != $TvEquipSlot.MAINHAND) return;
     // 원래 공격력(플레이어 기본 1 + 무기 덧셈 보정) 기준으로 % 만큼 더함
     let base = 1;
-    e.getOriginalModifiers().get($TvAttributes.ATTACK_DAMAGE).forEach((m) => {
+    tvEnhG(e, "originalModifiers", "getOriginalModifiers").get($TvAttributes.ATTACK_DAMAGE).forEach((m) => {
       if (tvEnhG(m, "operation", "getOperation") == $TvOperation.ADDITION) base += Number(tvEnhG(m, "amount", "getAmount"));
     });
     let bonus = Math.round(base * st.weaponPct[level]) / 100;

@@ -498,7 +498,7 @@ function tvTrollSafe(player) {
   if (dim != "minecraft:overworld") return false; // 해골 광산·네더 등은 제외
   if (player.health < player.maxHealth * 0.6) return false;
   if (player.isSleeping()) return false;
-  let home = player.getRespawnPosition();
+  let home = tvG(player, "respawnPosition", "getRespawnPosition");
   if (home) {
     let dx = player.x - Number(tvG(home, "x", "getX")), dz = player.z - Number(tvG(home, "z", "getZ"));
     if (Math.sqrt(dx * dx + dz * dz) < TV.homeSafeRadius) return false;
