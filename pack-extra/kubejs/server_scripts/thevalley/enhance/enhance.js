@@ -63,7 +63,7 @@ function tvEnhCountItem(player, id) {
   let n = 0;
   for (let i = 0; i < inv.getContainerSize(); i++) {
     let st = inv.getItem(i);
-    if (!st.isEmpty() && String(st.id) == id) n += st.getCount();
+    if (!st.isEmpty() && String(st.id) == id) n += Number(st.count) || 0;
   }
   return n;
 }
@@ -256,7 +256,7 @@ function tvEnhTry(player, stack, level) {
 
 BlockEvents.rightClicked("minecraft:smithing_table", (e) => {
   let player = e.player;
-  if (!player || player.isFake() || e.hand == "OFF_HAND") return;
+  if (!player || player.isFake() || String(e.hand).toUpperCase().indexOf("OFF") >= 0) return;
   if (!player.isCrouching()) return;
   let stack = player.mainHandItem;
   let kind = tvEnhKind(stack);

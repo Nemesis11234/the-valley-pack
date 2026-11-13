@@ -179,6 +179,34 @@ def maybe_reset_world():
     open(done, "w").write(token)
 
 
+KEEP_WORLD_BACKUPS = 1  # 초기화 때 옮겨 둔 예전 월드: 최근 것만 이만큼 남김
+KEEP_LOG_DAYS = 14
+
+
+def cleanup():
+    """오래된 월드 백업·로그·크래시 기록 정리 (디스크 아끼기)."""
+    backups = f"{SERVER}/backups"
+    if os.path.isdir(backups):
+        worlds = sorted(d for d in os.listdir(backups) if d.startswith("world-"))
+        for d in worlds[:-KEEP_WORLD_BACKUPS] if KEEP_WORLD_BACKUPS > 0 else worlds:
+            shutil.rmtree(f"{backups}/{d}", ignore_errors=True)
+            log(f"오래된 월드 백업 삭제: {d}")
+    cutoff = time.time() - KEEP_LOG_DAYS * 86400
+    for sub in ["logs", "crash-reports"]:
+        folder = f"{SERVER}/{sub}"
+        if not os.path.isdir(folder):
+            continue
+        for name in os.listdir(folder):
+            path = f"{folder}/{name}"
+            if name == "latest.log" or not os.path.isfile(path):
+                continue
+            if os.path.getmtime(path) < cutoff:
+                os.remove(path)
+    subprocess.run(["journalctl", "--vacuum-time=14d"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    st = shutil.disk_usage(SERVER)
+    log(f"디스크: 남은 공간 {st.free // 2**30}GB / 전체 {st.total // 2**30}GB")
+
+
 def write_start_script(ver):
     path = f"{SERVER}/start-valley.sh"
     with open(path, "w") as f:
@@ -198,6 +226,10 @@ def main():
     sync_mods()
     sync_pack_files()
     maybe_reset_world()
+    try:
+        cleanup()
+    except Exception as e:  # noqa: BLE001
+        log(f"정리 실패 (계속 진행): {e}")
     apply_ai_limits()
     write_start_script(ver)
     subprocess.run(["chown", "-R", "minecraft:minecraft", SERVER], check=True)
