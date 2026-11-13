@@ -39,8 +39,8 @@ if [ ! -f server.properties ]; then
   cat > server.properties <<PROPS
 motd=The Valley - Sunlit Valley Expanded
 online-mode=true
-white-list=true
-enforce-whitelist=true
+white-list=false
+enforce-whitelist=false
 max-players=12
 view-distance=8
 simulation-distance=6
