@@ -24,6 +24,18 @@
       "find": "// priority: -20",
       "with": "// priority: -19",
       "why": "리눅스 서버에서는 같은 priority끼리 이름순으로 불러오지 않아서 sveRegistryAdditions.js(-20)가 globalRegistry.js보다 먼저 실행돼 서버가 시작되지 않음. globalRegistry를 한 단계 먼저 불러오게 함 (2026-11-10 서버 부팅 테스트에서 발견)"
+    },
+    {
+      "file": "config/incontrol/spawner.json",
+      "find": "  {\n    \"phase\": \"balloonsummon\",\n    \"mob\": \"balloonbox:balloonbox\",\n    \"amount\": {\n      \"minimum\": 1,\n      \"maximum\": 1\n    },\n    \"conditions\": {\n      \"dimension\": \"minecraft:overworld\",\n      \"mindist\": 20,\n      \"maxdist\": 40,\n      \"minheight\": 45,\n      \"maxheight\": 175,\n      \"maxthis\": 20\n    }\n  },\n  {\n    \"phase\": \"balloonsummon2\",\n    \"mob\": \"balloonbox:balloonbox\",\n    \"amount\": {\n      \"minimum\": 1,\n      \"maximum\": 1\n    },\n    \"conditions\": {\n      \"dimension\": \"minecraft:overworld\",\n      \"mindist\": 35,\n      \"minheight\": 45,\n      \"maxheight\": 175,\n      \"maxthis\": 20\n    }\n  },\n",
+      "with": "",
+      "why": "BalloonBox 모드는 재배포 금지라 팩에서 뺐는데 이 규칙이 남아 있으면 spawner.json 전체가 로드 실패 → 해골 광산 몹·스플렌디드 슬라임·털복숭이 소 등이 스폰 안 됨 (2026-11-13 서버 로그에서 발견)"
+    },
+    {
+      "file": "config/incontrol/spawn.json",
+      "find": "  {\n    \"mob\": \"balloonbox:balloonbox\",\n    \"mincount\": {\n      \"amount\": 1,\n      \"perplayer\": false,\n      \"mob\": \"balloonbox:balloonbox\"\n    },\n    \"result\": \"deny\"\n  },\n",
+      "with": "",
+      "why": "위와 같은 이유로 없는 몹(balloonbox) 규칙 제거"
     }
   ]
 }
