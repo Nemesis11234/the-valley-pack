@@ -2035,11 +2035,11 @@ hash = "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
 
 [[files]]
 file = "config/incontrol/spawn.json"
-hash = "a5b696c12d0360002d68a386b2ab865ea048c1f7391183f298aaefe9113b9740"
+hash = "7bbf951bf4cd774cc60a1e3bbbfa4cab74198433689c01aefc51fd64f54e0c8d"
 
 [[files]]
 file = "config/incontrol/spawner.json"
-hash = "ba40c983aaf305e5de54076ffb84bf4481061deb1c09c0aa9eedcd8c2f1bd95d"
+hash = "8b9366e3d7c3004edf527df53a0960243cef5e8afcf7b88185ca2bdbbfd7ce49"
 
 [[files]]
 file = "config/incontrol/summonaid.json"

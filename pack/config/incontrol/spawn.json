@@ -197,15 +197,6 @@
     "result": "deny"
   },
   {
-    "mob": "balloonbox:balloonbox",
-    "mincount": {
-      "amount": 1,
-      "perplayer": false,
-      "mob": "balloonbox:balloonbox"
-    },
-    "result": "deny"
-  },
-  {
     "dimension": "society:skull_cavern",
     "maxheight": 142,
     "healthmultiply": 3,
