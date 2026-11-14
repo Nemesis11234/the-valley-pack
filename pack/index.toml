@@ -25699,7 +25699,7 @@ hash = "ce756bcd339389cc58a49fed302602430fb84a3fac6954e45295b47bf1b351c4"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/stream.js"
-hash = "d2cfbd62a84510710f1abba657b2a285cb2829f8263f084ae573f842053df2c8"
+hash = "c949925dabc8b389e6ec7ad63850c379186a0b13aacd210e33fb9fc993de20cd"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamAI.js"
@@ -25714,8 +25714,12 @@ file = "kubejs/server_scripts/thevalley/stream/streamFeeHook.js"
 hash = "dab3da2ccbbe8efbbf44c195af88d371e41b73f8bd8f1573bacfb6ba2c82b537"
 
 [[files]]
+file = "kubejs/server_scripts/thevalley/stream/streamPhoto.js"
+hash = "ec715f7ad1fede6f64a33fc63f268e769f2bebfc309b363113327577cac4fe82"
+
+[[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamRegulars.js"
-hash = "dd758de1b5f6fe74f2193e61440fd68ce01b3196c86bf685cfdd5e5854e8d17e"
+hash = "153992b21ab6475aac894e0c730734b8ba58b8f8c8625e05fdda5f7f87771d3f"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamSituation.js"
@@ -26783,6 +26787,11 @@ hash = "3b8dacbd1cd0e3d849b080473559fd26e4268e396075ad37d0fdf7031ee9dc97"
 metafile = true
 
 [[files]]
+file = "mods/emotecraft.pw.toml"
+hash = "84e6ec23b1d9e88d4e1147d3d3c7c50b387f4b7ce06c52d3d8b6ceb6412907ee"
+metafile = true
+
+[[files]]
 file = "mods/enchantment-descriptions.pw.toml"
 hash = "2f30de9a0d70d37a56c283c98c69e0d264515d5876b7e2a9d78d1f1941692a3f"
 metafile = true
@@ -27522,7 +27531,7 @@ metafile = true
 
 [[files]]
 file = "mods/playeranimator.pw.toml"
-hash = "b52622122c19a3894e62fc5506d7c3332d202504fd406d6718be646f979feb40"
+hash = "765987a78e5d8c782d0da2de99998b43b5907d6c41347d3804045ad109e4a586"
 metafile = true
 
 [[files]]
