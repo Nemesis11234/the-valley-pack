@@ -474,7 +474,7 @@ function tvDonate(player, opt) {
   let viewer = tvPickDonor(player, amount);
   let regular = tvRegDonated(player, viewer.name, amount);
 
-  let troll = !(opt && opt.reason) && Math.random() < TV.trollChance;
+  let troll = !(opt && (opt.reason || opt.begged)) && Math.random() < TV.trollChance;
   pd.tvPending = Number(pd.tvPending) + amount;
   pd.tvDonatedTotal = Number(pd.tvDonatedTotal) + amount;
   tvSessionDonation(player, amount, viewer.name);
@@ -485,6 +485,8 @@ function tvDonate(player, opt) {
     let done = tvTroll(player, viewer);
     let why = { home: "집이라서 봐줌", boss: "보스전이라 봐줌", hp: "피 없어서 봐줌", sleep: "자는 중이라 봐줌" }[mem.trollSkip];
     message = done ? done : why && Math.random() < 0.7 ? why : tvRand(global.TV_TEMPLATES.troll_skip);
+  } else if (opt && opt.begged) {
+    message = tvRand(global.TV_ASK_LINES.beg_donate); // 스트리머가 졸라서 받은 후원
   } else if (opt && opt.reason) {
     message = tvFill(tvRand(dm.event), { item: opt.reason, p: tvName(player) });
   } else {
@@ -973,7 +975,7 @@ function tvSecond(player) {
 
   // 평소 잡담: 시청자가 많을수록 자주, 여러 명이 (10명 약 15초마다 1줄 → 1,000명 2~3초마다 여러 줄)
   let busy = tvBusy(player);
-  if (afk < TV.afkSoftSec && now - mem.lastIdleChat > mem.idleGap) {
+  if (afk < TV.afkSoftSec && now - mem.lastIdleChat > mem.idleGap && !tvIsQuiet(player)) {
     mem.lastIdleChat = now;
     mem.idleGap = (TV.idleChatMaxSec - (TV.idleChatMaxSec - TV.idleChatMinSec) * busy) * 1000 * (0.6 + Math.random() * 0.8);
     let aiIdleGap = (TV.aiIdleMaxSec - (TV.aiIdleMaxSec - TV.aiIdleMinSec) * busy) * 1000;
@@ -1174,6 +1176,7 @@ PlayerEvents.chat((e) => {
   if (!tvIsOn(player)) return;
   let msg = String(e.message);
   if (tvSwearCheck(player, msg)) return;
+  if (tvStreamerAsk(player, msg)) return; // 시청자에게 하는 부탁 (ㅋㅋ 쳐줘, 투표, 후원 구걸 등)
   if (global.tvAiRequest && global.tvAiRequest(player, "chat", msg)) return; // AI가 답함
   let matched = null;
   global.TV_CHAT_REPLIES.forEach((r) => {
