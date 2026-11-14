@@ -254,8 +254,12 @@ global.TV_REG_TEMPLATES.gift_react = ["선물 ㄷㄷ", "{d}님 착하다", "나�
 function tvGiftTick(player) {
   let mem = tvMem(player);
   let now = tvNow();
-  if (mem.lastGift && now - mem.lastGift < TV_GIFT.minGapSec * 1000) return;
-  if (Math.random() >= TV_GIFT.chancePerMin / 60) return;
+  if (mem.forceGift) {
+    mem.forceGift = false; // 스트리머가 졸라서 먹힌 선물
+  } else {
+    if (mem.lastGift && now - mem.lastGift < TV_GIFT.minGapSec * 1000) return;
+    if (Math.random() >= TV_GIFT.chancePerMin / 60) return;
+  }
   let names = Object.keys(tvRegGet(player));
   if (!names.length) return;
   mem.lastGift = now;

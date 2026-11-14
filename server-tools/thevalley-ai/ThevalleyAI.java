@@ -186,7 +186,8 @@ public class ThevalleyAI {
     static List<Object> callClaude(Map<String, Object> req) throws Exception {
         String kind = str(req.get("kind"));
         String what = switch (kind) {
-            case "chat" -> "스트리머가 채팅을 침: \"" + str(req.get("text")) + "\"";
+            case "chat" -> "스트리머가 채팅을 침: \"" + str(req.get("text")) + "\""
+                + (extra(req).get("request") != null ? " (시청자에게 하는 부탁: " + str(extra(req).get("request")) + ". 결과: " + str(extra(req).get("outcome")) + ". 결과대로 반응한다)" : "");
             case "idle" -> "평범하게 플레이 중. 진짜 방송 채팅창처럼: 지금 상황을 보고 드는 감정·훈수·드립·방장 놀리기·다른 시청자 채팅에 대꾸 위주로 쓴다. 화면을 그대로 읽는 묘사는 금지. 상황과 상관없는 밥·학교·회사 얘기는 쓰지 않는다";
             case "donation" -> "시청자 '" + str(extra(req).get("donor")) + "'가 " + num(extra(req).get("amount")).intValue()
                 + "원을 후원함. 상황: " + str(req.get("text"))
