@@ -25699,7 +25699,7 @@ hash = "ce756bcd339389cc58a49fed302602430fb84a3fac6954e45295b47bf1b351c4"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/stream.js"
-hash = "40f59f722c8ffff6fb95d4818e23be8b1fe98a6fc3d754780fefecf639b5ec0e"
+hash = "5e5cd4431c8235ccbb615c27f8997eab0b38d433c205a41b17f3d7075759773e"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamAI.js"
