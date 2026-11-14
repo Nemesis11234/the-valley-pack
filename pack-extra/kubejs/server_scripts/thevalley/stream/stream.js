@@ -995,9 +995,9 @@ function tvSecond(player) {
         // 단골이 예전 장면 얘기
       } else if (Math.random() < TV.situationChatRatio) {
         // 화면 반응. 화면이 계속 같아서 새로 할 말이 없으면 가끔만 일반 잡담 (아니면 잠깐 조용)
-        if (!tvSituationChat(player, n, 3) && Math.random() < 0.3) tvPersonaChat(player);
-      } else if (Math.random() < 0.6) {
-        tvPersonaChat(player); // 시청자 성격대로 한마디
+        if (!tvSituationChat(player, n, 3)) tvPersonaChat(player); // 화면 반응이 바닥나면 성격별 상황 대사
+      } else if (Math.random() < 0.85) {
+        tvPersonaChat(player); // 시청자 성격대로 한마디 (지금 상황에 맞게)
       } else {
         tvViewerChat(player, "idle", {}, 1, 3);
       }

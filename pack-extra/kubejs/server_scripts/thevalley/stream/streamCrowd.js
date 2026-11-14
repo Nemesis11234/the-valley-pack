@@ -9,8 +9,8 @@
 const TV_CROWD = {
   tiers: [0, 100, 500, 1000],
   newNameShare: [0, 0.3, 0.55, 0.75], // 처음 보는 닉네임(자동 생성)이 채팅하는 비율
-  crowdChance: [0, 0.25, 0.45, 0.6], // 평소 잡담 때 규모 전용 채팅이 끼어들 확률
-  replyChance: [0.03, 0.1, 0.2, 0.3], // 다른 시청자 채팅에 @답글 달 확률
+  crowdChance: [0, 0.08, 0.12, 0.18], // 평소 잡담 때 규모 전용 채팅이 끼어들 확률 (상황과 관련 없는 말이라 낮게)
+  replyChance: [0.03, 0.06, 0.1, 0.14], // 다른 시청자 채팅에 @답글 달 확률
   extraLines: [0, 1, 2, 3], // 평소 잡담 한 번에 더 올라오는 줄 수 (최대)
 };
 
@@ -73,7 +73,7 @@ function tvCrowdTick(player) {
 // 다른 시청자 채팅에 @답글
 function tvReplyChat(player) {
   let mem = tvMem(player);
-  let recent = mem.chat.slice(-6).filter((l) => l.name && l.name.indexOf("[") < 0 && l.msg.indexOf("@") < 0);
+  let recent = mem.chat.slice(-6).filter((l) => l.name && l.name.indexOf("[") < 0 && l.msg.indexOf("@") < 0 && l.msg.length >= 5);
   if (!recent.length) return;
   let target = tvRand(recent);
   let v = tvPickViewer(player);
@@ -219,3 +219,154 @@ function tvAiAudience(player, count) {
   }
   return Object.keys(out).slice(0, count).map((n) => `${n}(${TV_PERSONAS[out[n].type] ? TV_PERSONAS[out[n].type].name : "리액션러"})`);
 }
+
+// ───────────── 성격 × 상황 대사 ─────────────
+// 성격대로 말하되 "지금 화면에서 일어나는 일"에 대해 말하게 (관련 없는 잡담 줄이기)
+global.TV_PERSONA_SIT = {
+  chopping: {
+    coach: ["묘목 다시 심어요", "도끼 좋은 걸로 바꾸셈", "원목 판자로 바꿔 둬요", "나무 위쪽도 다 캐요 공중부양 남음"],
+    ask: ["그 나무로 뭐 지어요?", "몇 개 캐는 거예요?", "집 짓는 거임?"],
+    tease: ["나무가 뭔 죄임 ㅋㅋ", "숲 파괴범 등장", "환경단체 출동각"],
+    info: ["원목은 작업대에서 판자 4개 나옴", "숯 만들면 횃불 재료 됨"],
+    cheer: ["벌목 화이팅", "오늘 나무 부자 되겠다"],
+    calm: ["도끼 소리 힐링된다", "나무 베는 거 보면 마음 편함"],
+  },
+  mining: {
+    coach: ["횃불 박으면서 가요", "곡괭이 바꿀 때 됐는데", "광석 보이면 주변도 캐요", "인벤 꽉 차기 전에 올라가요"],
+    ask: ["철 나왔어요?", "몇 층까지 내려갈 거임?", "다이아 언제 나와요?"],
+    tease: ["캐도 캐도 돌 ㅋㅋ", "다이아 없는 광질 실화냐", "광부 체험 중"],
+    info: ["다이아는 더 깊게 가야 나옴", "용암 근처 조심 아이템 날아감"],
+    cheer: ["다이아 나와라 제발", "광질 가즈아"],
+    calm: ["곡괭이 소리 ASMR", "광질 보고 있으면 잠 옴"],
+  },
+  harvest: {
+    coach: ["바로 다시 심어요", "출하함에 넣는 거 잊지 마셈", "좋은 건 남겨서 요리해요"],
+    ask: ["이번 수확 얼마 나와요?", "이거 출하하면 얼마예요?"],
+    tease: ["농사 적성 찾았네 ㅋㅋ", "농부 다 됐네"],
+    info: ["품질 좋은 건 더 비싸게 팔림", "계절 지나면 작물 죽음"],
+    cheer: ["풍년이다", "부자 되자"],
+    calm: ["수확 장면 힐링", "평화롭다"],
+  },
+  planting: {
+    coach: ["물 주는 거 잊지 마요", "줄 맞춰 심으셈", "계절 맞는 씨인지 확인"],
+    ask: ["뭐 심는 거예요?", "언제 다 자라요?"],
+    tease: ["줄 삐뚤어졌는데 ㅋㅋ", "밭 모양 실화냐"],
+    info: ["계절 바뀌면 작물 다 죽음", "스프링클러 있으면 편함"],
+    cheer: ["풍년 기원", "잘 자라라"],
+    calm: ["씨 심는 거 힐링이다"],
+  },
+  fishing: {
+    coach: ["타이밍 잘 봐요", "미끼 쓰면 더 잘 잡힘", "통발도 놔 둬요"],
+    ask: ["뭐 잡았어요?", "제일 비싼 물고기 뭐임?"],
+    tease: ["멸치만 낚네 ㅋㅋ", "낚시 실력 실화냐"],
+    info: ["비 오는 날 잘 잡힘", "시간대마다 나오는 물고기 다름"],
+    cheer: ["대물 가즈아", "다음엔 큰 거"],
+    calm: ["낚시 힐링 그 자체", "물소리 좋다"],
+  },
+  night: {
+    coach: ["집에 가요 밤이에요", "침대 쓰면 밤 넘김", "횃불 들고 다녀요"],
+    ask: ["왜 밤에 나와 있어요?", "침대 있어요?"],
+    tease: ["밤에 산책 간 큼 ㅋㅋ", "생존 감각 0"],
+    info: ["밤엔 몹 스폰됨", "자면 밤 스킵 가능"],
+    cheer: ["밤 버텨라", "살아서 돌아와요"],
+    calm: ["밤하늘 이쁘다", "밤 분위기 좋다"],
+  },
+  low_hp: {
+    coach: ["먹어 먹어 빨리", "일단 도망가요", "물약 있으면 마셔요"],
+    ask: ["음식 있어요?", "괜찮아요?"],
+    tease: ["피 관리 무엇 ㅋㅋ", "죽을 각 보인다"],
+    info: ["배부르면 체력 차요"],
+    cheer: ["버텨!!", "살 수 있다"],
+  },
+  hungry: {
+    coach: ["밥부터 먹어요", "요리해서 먹으면 더 좋음"],
+    ask: ["음식 있어요?"],
+    tease: ["굶으면서 일하는 방장 ㅋㅋ"],
+    info: ["배고프면 체력 안 참"],
+  },
+  mob: {
+    coach: ["칼 들어요", "거리 두고 싸워요", "뒤로 빠지면서 쳐요"],
+    tease: ["몹한테도 지겠는데 ㅋㅋ"],
+    cheer: ["처리해!!", "이길 수 있다"],
+    info: ["방패 있으면 편함"],
+  },
+  creeper: {
+    coach: ["뒤로 빠져요!!", "치고 빠지기 해요"],
+    tease: ["펑 각 ㅋㅋㅋ", "집 날아가는 거 보고 싶다"],
+    info: ["크리퍼는 고양이 무서워함"],
+  },
+  underground: {
+    coach: ["올라갈 길 기억해요", "횃불 한쪽 벽에만 박으면 길 안 잃음", "용암 조심"],
+    ask: ["여기 어디예요?", "몇 층이에요?"],
+    tease: ["길 잃는 각 ㅋㅋ", "두더지 방장"],
+    info: ["깊을수록 좋은 광석 나옴"],
+    calm: ["동굴 분위기 좋다"],
+  },
+  skull: {
+    coach: ["체력 관리 잘해요", "폭탄 아끼지 마요", "사다리 보이면 바로 내려가요"],
+    ask: ["몇 층까지 가요?", "폭탄 있어요?"],
+    tease: ["여기서 죽으면 손해 개큼 ㅋㅋ"],
+    info: ["깊이 갈수록 비싼 광석 나옴"],
+    cheer: ["신기록 가즈아"],
+  },
+  rain: {
+    coach: ["비 오는 날은 낚시 가요", "물 안 줘도 되나 확인해 봐요"],
+    ask: ["비 오는데 뭐 해요?"],
+    tease: ["비 맞는 방장 ㅋㅋ"],
+    info: ["비 오는 날 물고기 잘 잡힘"],
+    calm: ["빗소리 좋다", "비 오는 날 감성"],
+  },
+  building: {
+    coach: ["창문 좀 내요", "지붕 모양 바꿔 봐요", "조명 달아요"],
+    ask: ["뭐 짓는 거예요?", "집 크기 얼마예요?"],
+    tease: ["두부집 ㄷㄷ", "이게 집이라고? ㅋㅋ"],
+    cheer: ["벌써 이쁘다", "건축 감 좋다"],
+    calm: ["건축 방송 힐링"],
+  },
+  still: {
+    coach: ["뭐 고민해요 퀘스트북 봐요"],
+    ask: ["뭐 고민해요?", "렉 걸림?"],
+    tease: ["방장 멍때리는 중 ㅋㅋ", "화면 멈춘 줄"],
+  },
+};
+
+// 성격대로 + 지금 상황에 맞게. 상황에 맞는 대사가 없으면 가끔만 일반 성격 대사
+const tvPersonaGeneric = tvPersonaChat;
+tvPersonaChat = function (player) {
+  let v = tvPickViewer(player);
+  let sits = tvSituations(player).filter((s) => global.TV_PERSONA_SIT[s.k] && global.TV_PERSONA_SIT[s.k][v.type]);
+  let mem = tvMem(player);
+  let used = mem.usedLines || (mem.usedLines = {});
+  if (sits.length) {
+    let total = 0;
+    sits.forEach((s) => (total += s.w));
+    let r = Math.random() * total;
+    let pick = sits[0];
+    for (let i = 0; i < sits.length; i++) {
+      r -= sits[i].w;
+      if (r <= 0) {
+        pick = sits[i];
+        break;
+      }
+    }
+    let lines = global.TV_PERSONA_SIT[pick.k][v.type];
+    let line = tvRand(lines);
+    for (let k = 0; k < 4 && used[line]; k++) line = tvRand(lines);
+    if (!used[line]) {
+      used[line] = tvNow();
+      mem.queue.push({ at: tvNow() + Math.random() * 2500, name: v.name, color: v.color, msg: tvFill(line, Object.assign({ p: tvName(player) }, pick.v || {})) });
+      return true;
+    }
+  }
+  // 상황에 맞는 대사가 없으면: 반응·응원·힐링 성격만 가끔 일반 대사 (훈수·정보·질문은 상황 없이 하면 엉뚱해서 안 함)
+  if (["react", "cheer", "calm", "lurker"].indexOf(v.type) >= 0 && Math.random() < 0.3) {
+    let gl = global.TV_PERSONA_LINES[v.type];
+    let line = tvRand(gl);
+    for (let k = 0; k < 4 && used[line]; k++) line = tvRand(gl);
+    if (used[line] && v.type != "react") return false;
+    used[line] = tvNow();
+    mem.queue.push({ at: tvNow() + Math.random() * 2500, name: v.name, color: v.color, msg: tvFill(line, { p: tvName(player) }) });
+    return true;
+  }
+  return false;
+};
