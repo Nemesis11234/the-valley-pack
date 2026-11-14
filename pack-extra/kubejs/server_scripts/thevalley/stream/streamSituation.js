@@ -17,9 +17,9 @@ global.TV_SITUATION = {
   water: ["수영 중 ㅋㅋ", "물에 빠짐?", "숨 조심", "물고기 많아 보이는데", "보트 타요 보트"],
   low_hp: ["피 없어요!!", "체력 {hp}칸 ㄷㄷ", "도망쳐요", "뭐 좀 먹어요 빨리", "죽는 각 아님?", "아 불안하다", "힐 힐"],
   hungry: ["배고파 보임", "밥 먹어요 밥", "허기 바 깜빡이는 중", "뭐라도 먹어요", "배고프면 체력 안 참"],
-  mob: ["{mob} 있다", "옆에 {mob} 조심", "{mob} 잡아요", "{mob} 뒤에 있음!!", "{mob} 보임?", "{mob} 피해요"],
+  mob: ["{mob} 있다", "옆에 {mob} 조심", "{mob} 잡아요", "{mob} 온다!!", "{mob} 보임?", "{mob} 피해요"],
   mobs_many: ["몹 너무 많은데?", "포위당함 ㄷㄷ", "도망 ㄱㄱ", "이거 위험한데", "{n}마리는 무리임", "몹 파티 ㅋㅋ"],
-  creeper: ["크리퍼!!!", "크리퍼 뒤에 있어요", "펑 하기 전에 도망", "크리퍼 조심 진짜", "쉬이이익"],
+  creeper: ["크리퍼!!!", "크리퍼 온다 크리퍼", "펑 하기 전에 도망", "크리퍼 조심 진짜", "쉬이이익"],
   animal: ["{mob} 귀엽다", "{mob} 키워요?", "{mob} 데려가요", "{mob} 이름 지어줘요", "{mob} 때리지 마요 ㅠ"],
   player: ["{o}님 옆에 있네", "{o}님이랑 같이 하는 중?", "합동 작업 ㄱㄱ", "{o}님 뭐 하는 중임?", "{o}님 안녕하세요 ㅋㅋ"],
   hold_pickaxe: ["곡괭이 들었다 광질 ㄱㄱ", "광산 가는 거임?", "곡괭이 내구도 괜찮음?"],
@@ -73,6 +73,25 @@ function tvSitSafe(fn, fallback) {
     return v == null ? fallback : v;
   } catch (err) {
     return fallback;
+  }
+}
+
+// 화면에 보이는지: 바라보는 방향 앞쪽(좌우 약 60도 안)이고, 벽에 가려지지 않았을 때만
+// (등 뒤나 벽 너머 몹을 시청자가 미리 알고 말하지 않게)
+function tvSeen(player, e) {
+  try {
+    let dx = Number(e.x) - Number(player.x);
+    let dz = Number(e.z) - Number(player.z);
+    let dist = Math.sqrt(dx * dx + dz * dz);
+    if (dist > 2) {
+      let yaw = (Number(player.yRot) * 3.141592653589793) / 180;
+      let dot = (dx * -Math.sin(yaw) + dz * Math.cos(yaw)) / dist;
+      if (dot < 0.5) return false;
+    }
+    if (typeof player.hasLineOfSight === "function" && !player.hasLineOfSight(e)) return false;
+    return true;
+  } catch (err) {
+    return false;
   }
 }
 
@@ -141,6 +160,7 @@ function tvSituations(player) {
     let r = { mobs: {}, mobCount: 0, animals: {}, players: [], creeper: false };
     level.getEntitiesWithin(player.boundingBox.inflate(16)).forEach((e) => {
       if (e == player || !e.isLiving()) return;
+      if (!tvSeen(player, e)) return;
       if (e.isPlayer()) {
         r.players.push(String(e.username));
         return;
