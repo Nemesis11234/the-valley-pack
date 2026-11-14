@@ -318,11 +318,20 @@ function tvViewerChat(player, category, vars, count, spreadSec) {
   let mem = tvMem(player);
   let n = count || 3 + Math.floor(Math.random() * 3) + Math.round(tvBusy(player) * 4);
   let used = {};
+  // 5분 안에 이 방송에서 나온 문장은 피함 (진짜 채팅처럼 같은 말 반복 X)
+  mem.usedLines = mem.usedLines || {};
+  let nowT = tvNow();
+  Object.keys(mem.usedLines).forEach((k) => {
+    if (nowT - mem.usedLines[k] > 300000) delete mem.usedLines[k];
+    else used[k] = 1;
+  });
   for (let i = 0; i < n; i++) {
     let line = tvRand(lines);
     let tries = 0;
-    while (used[line] && tries++ < 5) line = tvRand(lines);
+    while (used[line] && tries++ < 8) line = tvRand(lines);
+    if (used[line] && lines.length > 3) continue; // 할 말이 다 떨어지면 그냥 덜 침
     used[line] = 1;
+    mem.usedLines[line] = nowT;
     let viewer = tvPickViewer(player);
     let delay = Math.random() * (spreadSec || 6) * 1000;
     let fv = { p: tvName(player) };

@@ -19,7 +19,7 @@ on:
         description: 할 일
         required: true
         type: choice
-        options: [status, start, stop, reboot, logs, shell]
+        options: [status, start, stop, reboot, logs, shell, set-ai-key]
         default: status
       cmd:
         description: shell일 때 서버에서 실행할 명령
@@ -50,6 +50,7 @@ jobs:
           ACTION: ${{ inputs.action || 'start' }}
           SCHEDULED: ${{ github.event_name == 'schedule' }}
           CMD: ${{ inputs.cmd }}
+          AI_KEY: ${{ secrets.THEVALLEY_AI_KEY }}
         run: |
           set -euo pipefail
           state() {
@@ -118,5 +119,12 @@ jobs:
               ;;
             shell)
               remote "$CMD"
+              ;;
+            set-ai-key)
+              # 저장소 Secret THEVALLEY_AI_KEY의 Claude API 키를 서버 config.json에 넣고 AI 도우미 재시작 (키는 로그에 안 나옴)
+              if [ -z "$AI_KEY" ]; then echo "RESULT: THEVALLEY_AI_KEY Secret이 없음"; exit 1; fi
+              KEYB64=$(printf %s "$AI_KEY" | base64 -w0)
+              remote "python3 -c \"import json,base64;p='/opt/valley/server/thevalley_ai/config.json';c=json.load(open(p,encoding='utf-8-sig'));c['apiKey']=base64.b64decode('$KEYB64').decode();json.dump(c,open(p,'w'),ensure_ascii=False,indent=2)\" && chown minecraft:minecraft /opt/valley/server/thevalley_ai/config.json && systemctl restart valley-ai && sleep 20 && journalctl -u valley-ai --since -1min --no-pager | grep -o 'API 오류 [0-9]*' | tail -1; echo AI_RESTARTED" | grep -v "$KEYB64"
+              echo "RESULT: AI 키 반영함"
               ;;
           esac
