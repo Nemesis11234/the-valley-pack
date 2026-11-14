@@ -31,7 +31,7 @@ const TV_NICK_B = ["감자", "고구마", "치즈", "고양이", "곰", "두부"
 const TV_NICK_C = ["", "", "", "러버", "중독", "장인", "왕", "덕후", "킹", "좋아", "123", "99", "짱", "팬", "1호", "02", "7"];
 const TV_NICK_COLORS = ["#FF9AA2", "#FFB7B2", "#FFDAC1", "#E2F0CB", "#B5EAD7", "#C7CEEA", "#9AD0EC", "#F6C6EA", "#D4A5FF", "#A0E7E5", "#FBE7C6", "#B4F8C8", "#FFAEBC", "#CCCCCC"];
 
-function tvTier(player) {
+function tvCrowdTier(player) {
   let v = tvViewers(player);
   let t = 0;
   TV_CROWD.tiers.forEach((min, i) => {
@@ -51,7 +51,7 @@ function tvCrowdViewer(player) {
 
 // 평소 잡담 때 규모에 맞는 채팅 (tvSecond가 부름)
 function tvCrowdTick(player) {
-  let t = tvTier(player);
+  let t = tvCrowdTier(player);
   let mem = tvMem(player);
   let now = tvNow();
   if (t > 0 && Math.random() < TV_CROWD.crowdChance[t]) {
