@@ -328,6 +328,7 @@ function tvViewerChat(player, category, vars, count, spreadSec) {
     let fv = { p: tvName(player) };
     Object.keys(vars || {}).forEach((k) => (fv[k] = vars[k]));
     mem.queue.push({ at: tvNow() + delay, name: viewer.name, color: viewer.color, msg: tvFill(line, fv) });
+    if (i == 0 && category != "idle") tvEcho(player, tvNow() + delay, viewer.name, 0.3);
   }
 }
 
