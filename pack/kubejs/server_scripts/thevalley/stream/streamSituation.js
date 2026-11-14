@@ -7,9 +7,10 @@
 global.TV_SITUATION = {
   night: ["밤인데 밖에 있네", "밤엔 몹 나와요 조심", "어두워서 잘 안 보임", "횃불 좀 들고 다녀요", "밤샘각?", "슬슬 자러 가야 하는 거 아님?", "밤 되니까 분위기 무섭다", "이 시간에 돌아다니는 거 맞음?", "침대 어딨음"],
   dawn: ["벌써 아침이네", "해 뜬다", "새벽 감성 ㄱㅊ", "날 밝았다 이제 일하자"],
-  morning: ["아침부터 부지런하네", "오늘 할 일 정리 ㄱㄱ", "아침엔 농장 먼저 아님?", "날씨 좋을 때 많이 해놔요"],
+  morning: ["아침부터 부지런하네", "오늘 할 일 정리 ㄱㄱ", "아침엔 농장 먼저 아님?", "오늘 할 일 많다"],
   evening: ["해 진다 슬슬 들어가요", "노을 이쁘다", "곧 밤이다", "저녁 되기 전에 정리 ㄱㄱ"],
-  rain: ["비 온다", "비 오는 날은 낚시지", "비 오면 물 안 줘도 됨 개꿀", "빗소리 좋다", "우산 없음?", "비 맞으면서 일하네 ㅋㅋ"],
+  rain: ["비 온다", "비 오는 날은 낚시지", "비 오는 날 감성", "빗소리 좋다", "우산 없음?", "비 맞으면서 일하네 ㅋㅋ"],
+  snow: ["눈 온다", "눈 오는 날 감성", "춥겠다 ㅋㅋ", "눈사람 만들어요", "눈 쌓이겠다"],
   thunder: ["천둥 친다 ㄷㄷ", "번개 맞을 듯", "날씨 미쳤네", "이 날씨에 밖에 있는 거 실화?", "크리퍼 번개 맞으면 큰일남"],
   underground: ["지하 들어왔네", "동굴 탐험 ㄱㄱ", "광석 찾자", "용암 조심", "길 잃지 마요", "횃불 꼭 박아요", "다이아 나와라", "여기 어디임"],
   skull: ["해골광산이다 ㄷㄷ", "몇 층까지 감?", "폭탄 챙겼어요?", "체력 관리 잘해요", "여기서 죽으면 손해 큼", "깊이 내려가자", "보물 상자 나와라"],
@@ -22,6 +23,11 @@ global.TV_SITUATION = {
   creeper: ["크리퍼!!!", "크리퍼 온다 크리퍼", "펑 하기 전에 도망", "크리퍼 조심 진짜", "쉬이이익"],
   animal: ["{mob} 귀엽다", "{mob} 키워요?", "{mob} 데려가요", "{mob} 이름 지어줘요", "{mob} 때리지 마요 ㅠ"],
   player: ["{o}님 옆에 있네", "{o}님이랑 같이 하는 중?", "합동 작업 ㄱㄱ", "{o}님 뭐 하는 중임?", "{o}님 안녕하세요 ㅋㅋ"],
+  sleeping: ["잘 자요", "꿀잠 ㅋㅋ", "벌써 자?", "자고 일어나면 아침"],
+  chopping: ["나무 베는 중", "{n}개째 베는 중 ㅋㅋ", "벌목 장인", "나무 다시 심어요", "숲 다 밀겠다"],
+  harvest: ["수확 ㄱㄱ", "농사 잘 됐네", "{n}개 수확 ㅋㅋ", "출하하면 얼마임?", "풍년이다"],
+  digging: ["땅 파는 중", "삽질 ㅋㅋ", "흙 많이 모았네"],
+  planting: ["씨 심는 중", "농사 ㄱㄱ", "줄 맞춰 심어요", "이번엔 뭐 심음?", "물 주는 거 잊지 마요"],
   hold_pickaxe: ["곡괭이 들었다 광질 ㄱㄱ", "광산 가는 거임?", "곡괭이 내구도 괜찮음?"],
   hold_axe: ["나무 베러 감?", "도끼 들었네", "나무 다시 심어요"],
   hold_sword: ["칼 들었다 싸우러 감?", "전투 모드", "칼 좋아 보이는데"],
@@ -41,7 +47,7 @@ global.TV_SITUATION = {
   spring: ["봄이라 씨 심기 좋다", "봄 작물 뭐 심음?", "꽃 핀다"],
   summer: ["여름이다", "여름 작물 수확 ㄱ", "더워 보임 ㅋㅋ"],
   autumn: ["가을이네", "가을엔 호박이지", "수확 시즌"],
-  winter: ["겨울이라 농사 못 함?", "눈 온다", "겨울엔 광산이지", "온실 있어요?"],
+  winter: ["겨울이라 농사 못 함?", "겨울이라 추워 보임", "겨울엔 광산이지", "온실 있어요?"],
   biome_desert: ["사막이다", "선인장 조심", "물 챙겨요"],
   biome_snow: ["눈밭이다", "춥겠다", "설경 이쁘다"],
   biome_ocean: ["바다다", "바다 낚시 ㄱ", "물 많다"],
@@ -59,7 +65,7 @@ const TV_SIT_MOB_KO = {
   witch: "마녀", drowned: "드라운드", husk: "허스크", stray: "스트레이", phantom: "팬텀", pillager: "약탈자", "zombie villager": "좀비 주민",
   "magma cube": "마그마 큐브", blaze: "블레이즈", ghast: "가스트", bat: "박쥐", silverfish: "좀벌레", vindicator: "변명자", ravager: "파괴수",
   cow: "소", chicken: "닭", sheep: "양", pig: "돼지", horse: "말", donkey: "당나귀", rabbit: "토끼", cat: "고양이", wolf: "늑대", fox: "여우",
-  goat: "염소", llama: "라마", parrot: "앵무새", turtle: "거북", frog: "개구리", bee: "벌", duck: "오리", villager: "주민", boat: "보트", minecart: "광산수레",
+  goat: "염소", llama: "라마", parrot: "앵무새", turtle: "거북", frog: "개구리", bee: "벌", duck: "오리",
 };
 
 function tvSitKo(name) {
@@ -113,15 +119,27 @@ function tvSituations(player) {
   if (y > 130) add("high", 2);
   if (tvSitSafe(() => player.isInWater(), false)) add("water", 4);
 
+  if (tvSitSafe(() => player.isSleeping(), false)) {
+    add("sleeping", 10);
+    return out;
+  }
+
   // 시간·날씨
   let t = tvSitSafe(() => Number(player.server.overworld().getDayTime()) % 24000, 6000);
   if (outside) {
     if (t >= 13000 && t < 23000) add("night", 3);
     else if (t >= 23000 || t < 1000) add("dawn", 2);
     else if (t < 4000) add("morning", 1);
-    else if (t >= 11500) add("evening", 2);
-    if (tvSitSafe(() => level.isThundering(), false)) add("thunder", 4);
-    else if (tvSitSafe(() => level.isRaining(), false)) add("rain", 3);
+    let biomeId = tvSitSafe(() => String(player.block.biomeId), "");
+    let dry = /desert|badlands|savanna/.test(biomeId);
+    let snowy = /snow|frozen|ice|grove|peak/.test(biomeId) || tvSitSafe(() => String(global.getSeasonFromLevel(player.server.overworld())), "") == "winter";
+    let raining = !dry && tvSitSafe(() => level.isRaining(), false);
+    if (raining) {
+      if (snowy) add("snow", 3);
+      else if (tvSitSafe(() => level.isThundering(), false)) add("thunder", 4);
+      else add("rain", 3);
+    }
+    if (!raining && t >= 11500 && t < 13000) add("evening", 2); // 노을은 맑을 때만
   }
 
   // 계절 (바깥일 때 가끔)
@@ -201,7 +219,7 @@ function tvSituations(player) {
     else if (/_axe/.test(id)) add("hold_axe", 1.5);
     else if (/sword/.test(id)) add("hold_sword", 1.5);
     else if (/_hoe/.test(id)) add("hold_hoe", 1.5);
-    else if (/fishing_rod|_rod/.test(id)) add("hold_rod", 2);
+    else if (/fishing_rod/.test(id)) add("hold_rod", 2);
     else if (/watering_can/.test(id)) add("hold_water", 2);
     else if (/seed/.test(id)) add("hold_seed", 1.5);
     else if (held.name && held.name.length <= 14) add("hold_item", 1, { item: held.name });
@@ -213,22 +231,30 @@ function tvSituations(player) {
     tvRecentPrune(r, tvNow());
     return r;
   }, {});
-  let sum = { mine: 0, place: 0, kill: 0, fish: 0 };
+  let sum = { mine: 0, chop: 0, harvest: 0, dig: 0, place: 0, plant: 0, kill: 0, fish: 0 };
   Object.keys(acts).forEach((k) => {
     let n = Number(acts[k].n) || 0;
     if (k.indexOf("캔 블록") == 0) sum.mine += n;
+    else if (k.indexOf("벤 나무") == 0) sum.chop += n;
+    else if (k.indexOf("수확") == 0) sum.harvest += n;
+    else if (k.indexOf("판 흙") == 0) sum.dig += n;
     else if (k.indexOf("놓은 블록") == 0) sum.place += n;
+    else if (k.indexOf("심은 작물") == 0) sum.plant += n;
     else if (k.indexOf("처치") == 0) sum.kill += n;
     else if (k.indexOf("낚음") == 0) sum.fish += n;
   });
   if (sum.mine >= 8) add("mining", 3, { n: sum.mine });
+  if (sum.chop >= 6) add("chopping", 3, { n: sum.chop });
+  if (sum.harvest >= 6) add("harvest", 3, { n: sum.harvest });
+  if (sum.dig >= 10) add("digging", 2);
   if (sum.place >= 8) add("building", 3, { n: sum.place });
-  if (sum.kill >= 3) add("fighting", 3, { n: sum.kill });
+  if (sum.plant >= 6) add("planting", 3);
+  if (sum.kill >= 4) add("fighting", 3, { n: sum.kill });
   if (sum.fish >= 1) add("fishing", 3);
 
   // 가만히 있음 (1분 이상, 잠수 전)
   let idle = tvSitSafe(() => tvAfkSec(player), 0);
-  if (idle > 60) add("still", 3);
+  if (idle > 60 && sum.fish == 0 && !(held && /fishing_rod/.test(held.id))) add("still", 3);
 
   return out;
 }

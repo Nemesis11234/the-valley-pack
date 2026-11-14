@@ -121,7 +121,7 @@ function tvOnPhoto(player, info) {
     tvViewerChat(player, "photo_boss", vars, 2, 4);
   } else if (info.players.length) tvViewerChat(player, "photo_player", vars, 2, 4);
   else if (info.selfie) tvViewerChat(player, "photo_selfie", vars, 2, 4);
-  else if (info.night || info.sunset || info.rain) tvViewerChat(player, "photo_scenery", vars, 1, 4);
+  else if ((info.night || info.sunset || info.rain) && !info.cave && !info.underwater && !info.skull) tvViewerChat(player, "photo_scenery", vars, 1, 4);
   else if (Math.random() < 0.5) tvViewerChat(player, "photo_any", vars, 1, 3);
   tvNote(player, "사진 찍음", 1);
 }

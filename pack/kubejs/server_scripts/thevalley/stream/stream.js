@@ -414,7 +414,8 @@ function tvDonate(player, opt) {
   let dm = global.TV_DONATION_MESSAGES;
   if (troll) {
     let done = tvTroll(player, viewer);
-    message = done ? done : tvRand(global.TV_TEMPLATES.troll_skip);
+    let why = { home: "집이라서 봐줌", boss: "보스전이라 봐줌", hp: "피 없어서 봐줌", sleep: "자는 중이라 봐줌" }[mem.trollSkip];
+    message = done ? done : why && Math.random() < 0.7 ? why : tvRand(global.TV_TEMPLATES.troll_skip);
   } else if (opt && opt.reason) {
     message = tvFill(tvRand(dm.event), { item: opt.reason, p: tvName(player) });
   } else {
@@ -538,17 +539,31 @@ function tvBossNearby(player) {
 }
 
 function tvTrollSafe(player) {
+  let mem = tvMem(player);
+  mem.trollSkip = "";
   if (player.isCreative() || player.isSpectator()) return false;
   let dim = String(player.level.dimension);
   if (dim != "minecraft:overworld") return false; // 해골 광산·네더 등은 제외
-  if (player.health < player.maxHealth * 0.6) return false;
-  if (player.isSleeping()) return false;
+  if (player.health < player.maxHealth * 0.6) {
+    mem.trollSkip = "hp";
+    return false;
+  }
+  if (player.isSleeping()) {
+    mem.trollSkip = "sleep";
+    return false;
+  }
   let home = tvG(player, "respawnPosition", "getRespawnPosition");
   if (home) {
     let dx = player.x - Number(tvG(home, "x", "getX")), dz = player.z - Number(tvG(home, "z", "getZ"));
-    if (Math.sqrt(dx * dx + dz * dz) < TV.homeSafeRadius) return false;
+    if (Math.sqrt(dx * dx + dz * dz) < TV.homeSafeRadius) {
+      mem.trollSkip = "home";
+      return false;
+    }
   }
-  if (tvBossNearby(player)) return false;
+  if (tvBossNearby(player)) {
+    mem.trollSkip = "boss";
+    return false;
+  }
   return true;
 }
 
@@ -892,9 +907,9 @@ function tvSecond(player) {
         // 단골이 예전 장면 얘기
       } else if (Math.random() < TV.situationChatRatio) {
         // 화면 반응. 화면이 계속 같아서 새로 할 말이 없으면 가끔만 일반 잡담 (아니면 잠깐 조용)
-        if (!tvSituationChat(player, n, 3) && Math.random() < 0.3) tvViewerChat(player, Math.random() < 0.6 ? "idle" : "chat_generic", {}, 1, 3);
+        if (!tvSituationChat(player, n, 3) && Math.random() < 0.3) tvViewerChat(player, "idle", {}, 1, 3);
       } else {
-        tvViewerChat(player, Math.random() < 0.6 ? "idle" : "chat_generic", {}, 1, 3);
+        tvViewerChat(player, "idle", {}, 1, 3);
       }
     }
   }
@@ -941,6 +956,16 @@ function tvSecond(player) {
   }
 }
 
+// 강화비·병원비처럼 이유를 아는 돈 변화는 "또 지름?" 같은 반응에서 빼기
+global.tvIgnoreBalance = (player, delta) => {
+  try {
+    let mem = tvMem(player);
+    if (mem.lastBalance != null) mem.lastBalance += delta;
+  } catch (err) {
+    // 무시
+  }
+};
+
 function tvCheckBalance(player) {
   let account;
   try {
@@ -979,7 +1004,20 @@ BlockEvents.broken((e) => {
   tvMarkActive(player);
   if (!tvIsOn(player)) return;
   let id = String(e.block.id);
-  tvNote(player, `캔 블록 ${id.split(":")[1] || id}`, 1);
+  let short = id.split(":")[1] || id;
+  let isLog = false, isCrop = false;
+  try {
+    isLog = e.block.hasTag("minecraft:logs");
+    isCrop = e.block.hasTag("minecraft:crops");
+  } catch (err) {
+    // 태그 확인 실패
+  }
+  if (isLog) tvNote(player, `벤 나무 ${short}`, 1);
+  else if (isCrop || /crop|wheat|carrot|potato|beetroot|melon|pumpkin|berry|grape|tomato|rice/.test(short)) tvNote(player, `수확 ${short}`, 1);
+  else if (/dirt|grass_block|sand|gravel|clay|mud|farmland|podzol/.test(short)) tvNote(player, `판 흙 ${short}`, 1);
+  else if (/leaves|grass|fern|flower|vine|torch|snow$/.test(short)) {
+    // 잎·풀·횃불 등은 기록 안 함
+  } else tvNote(player, `캔 블록 ${short}`, 1);
   if (id == "minecraft:diamond_ore" || id == "minecraft:deepslate_diamond_ore") {
     if (tvFirst(player, "diamond")) tvEvent(player, 25, 5, "생애 첫 다이아몬드!", "diamond_first", {});
     else tvEvent(player, Math.round(25 * tvDaily(player, "diamond")), 0, "다이아몬드", "diamond", {});
@@ -1083,7 +1121,15 @@ BlockEvents.rightClicked((e) => {
 BlockEvents.placed((e) => {
   if (!e.player || e.player.isFake()) return;
   tvMarkActive(e.player);
-  tvNote(e.player, `놓은 블록 ${String(e.block.id).split(":")[1]}`, 1);
+  let pid = String(e.block.id).split(":")[1] || "";
+  let crop = false;
+  try {
+    crop = e.block.hasTag("minecraft:crops");
+  } catch (err) {
+    crop = false;
+  }
+  if (crop || /crop|sapling|seed/.test(pid)) tvNote(e.player, `심은 작물 ${pid}`, 1);
+  else tvNote(e.player, `놓은 블록 ${pid}`, 1);
 });
 
 // 업적: 선릿 밸리 주요 업적만 (streamConfig.js의 advancementRules)
