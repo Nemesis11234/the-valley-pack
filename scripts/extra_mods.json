@@ -1,6 +1,15 @@
 {
   "_comment": "원본 팩에 없는데 우리가 더 넣는 모드 (Modrinth). CI가 pack/mods에 없으면 packwiz로 추가한다.",
   "modrinth": [
-    { "slug": "emotecraft", "version": "2.2.7-b.build.50+1.20.1-forge", "why": "이모트(춤·손 흔들기 등) — 방송 콘셉트 (2026-11-14 결정)" }
+    {
+      "slug": "emotecraft",
+      "version": "2.2.7-b.build.50+1.20.1-forge",
+      "why": "이모트(춤·손 흔들기 등) — 방송 콘셉트 (2026-11-14 결정)"
+    },
+    {
+      "slug": "korean-chat-patch",
+      "version": "mc1.20.1-1.9.0-forge",
+      "why": "채팅창에서 한/영 전환 없이 한글 입력 (클라이언트 전용, 2026-11-14 결정)"
+    }
   ]
 }

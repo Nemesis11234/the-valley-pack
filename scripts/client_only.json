@@ -1,6 +1,7 @@
 {
   "_comment": "서버에 넣으면 안 되는 클라이언트 전용 모드 (재현 PC 서버 mods 폴더와 비교해서 뽑음, 2026-11-10). 파일 이름 앞부분으로 맞춤.",
   "prefixes": [
+    "koreanpatch-",
     "AmbientSounds_", "appleskin-", "BetterAdvancements-", "bobby-", "bwncr-",
     "certain_questing_additions-", "chat_heads-", "cleanview-", "colorfulhearts-",
     "colorwheel-", "colorwheel_patcher-", "controllable-", "Controlling-", "CrashAssistant-",

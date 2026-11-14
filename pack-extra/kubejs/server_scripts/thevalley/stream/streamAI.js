@@ -64,7 +64,9 @@ function tvAiContext(player) {
   let place = dim == "society:skull_cavern" ? "해골 광산 안" : !sky ? (y < 50 ? "지하 동굴" : "실내/지붕 아래") : "바깥";
   // 평원·숲처럼 흔한 바이옴은 안 넘김 (AI가 "평원이네" 같은 중계를 하지 않게)
   let biomeText = /plains|forest|river|taiga|meadow|beach/.test(biome) && !/cherry|flower/.test(biome) ? "" : `, 바이옴 ${biome}`;
-  lines.push(`장소: ${dim.replace("minecraft:", "")}${biomeText}, 높이 Y=${y}, ${place}`);
+  // 높이 숫자는 넘기지 않고 특별할 때만 말로 (AI가 "Y=93" 같은 말을 하지 않게)
+  let height = y < 0 ? ", 아주 깊은 지하" : y > 150 ? ", 아주 높은 곳" : "";
+  lines.push(`장소: ${dim.replace("minecraft:", "")}${biomeText}${height}, ${place}`);
 
   let t = tvAiSafe(() => Number(player.server.overworld().getDayTime()) % 24000, 6000);
   let tod = t < 1000 ? "아침" : t < 6000 ? "오전" : t < 12000 ? "오후" : t < 13800 ? "저녁(해 질 녘)" : t < 22500 ? "밤" : "새벽";
@@ -95,7 +97,10 @@ function tvAiContext(player) {
         return;
       }
       let name = tvEntityName(e);
-      let key = (e.isMonster() ? "적:" : "") + name;
+      // 적·NPC·동물을 구분해서 넘김 (노움=주민처럼 친근한 NPC를 적으로 착각하지 않게)
+      let tkey = String(e.type);
+      let kind = e.isMonster() ? "적" : /villager|wandering_trader|npc|golem|mannequin/.test(tkey) ? "친근한 NPC" : "동물";
+      let key = `${kind}: ${name}`;
       counts[key] = (counts[key] || 0) + 1;
     });
     let list = Object.keys(counts)
