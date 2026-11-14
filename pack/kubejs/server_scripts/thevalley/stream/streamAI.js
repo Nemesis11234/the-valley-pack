@@ -87,6 +87,7 @@ function tvAiContext(player) {
     let players = [];
     level.getEntitiesWithin(player.boundingBox.inflate(16)).forEach((e) => {
       if (e == player || !e.isLiving()) return;
+      if (!tvSeen(player, e)) return; // 화면에 보이는 것만 (등 뒤·벽 너머 제외)
       if (e.isPlayer()) {
         players.push(String(e.username));
         return;
@@ -101,8 +102,8 @@ function tvAiContext(player) {
       .map((k) => `${k} ${counts[k]}`);
     return { list: list, players: players };
   }, { list: [], players: [] });
-  if (near.list.length) lines.push(`주변 16칸: ${near.list.join(", ")}`);
-  if (near.players.length) lines.push(`근처 다른 플레이어: ${near.players.join(", ")}`);
+  if (near.list.length) lines.push(`화면에 보이는 것: ${near.list.join(", ")}`);
+  if (near.players.length) lines.push(`화면에 보이는 다른 플레이어: ${near.players.join(", ")}`);
 
   let recent = tvRecentSummary(player);
   if (recent) lines.push(`최근 1분 동안: ${recent}`);
