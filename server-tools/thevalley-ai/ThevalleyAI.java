@@ -218,6 +218,10 @@ public class ThevalleyAI {
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("model", str(config.get("model")));
+        // 생각(thinking) 끄기: 채팅 몇 줄에는 필요 없고 토큰만 씀
+        Map<String, Object> thinking = new LinkedHashMap<>();
+        thinking.put("type", "disabled");
+        body.put("thinking", thinking);
         body.put("max_tokens", Math.max(num(config.getOrDefault("maxTokens", 300)).intValue(), 120 + lineCount * 50));
         body.put("system", SYSTEM);
         body.put("messages", List.of(Map.of("role", "user", "content", u.toString())));
