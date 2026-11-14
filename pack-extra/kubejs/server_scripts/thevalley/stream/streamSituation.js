@@ -238,7 +238,7 @@ function tvSituationChat(player, count, spreadSec) {
     while (recent[msg] && tries++ < 6) msg = tvFill(tvRand(lines), fv);
     if (recent[msg]) continue;
     recent[msg] = 1;
-    let viewer = tvRand(global.TV_VIEWERS);
+    let viewer = tvPickViewer(player);
     mem.queue.push({ at: tvNow() + Math.random() * (spreadSec || 4) * 1000, name: viewer.name, color: viewer.color, msg: msg });
   }
   return true;

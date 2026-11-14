@@ -13,6 +13,10 @@ const TV_ENH = {
   keepUntil: 4,
   // 강화 비용 = costPerLevelSq × 목표단계² (계좌에서)
   costPerLevelSq: 200,
+  // 파괴 방지: 강화 비용의 이 배수를 더 내면 이번 시도에서 파괴되지 않음 (대신 1단계 하락). 파괴 확률이 있는 +10부터
+  protectCostMult: 3,
+  // 이 단계 이상 성공하면 서버 전체 알림 (파괴는 항상 알림)
+  announceFrom: 12,
   // 강화석 드롭
   drops: {
     skullMobChance: 0.08, // 해골 광산에서 적대 몹 처치 시 하급 1개
@@ -121,6 +125,7 @@ const TV_ENH_RESULT_TEXT = {
   break: ["minecraft:skeleton_skull", "파괴...", "#FF5555"],
   down: ["minecraft:redstone", "실패 · 1단계 하락", "#F28B82"],
   keep: ["minecraft:gray_dye", "실패 · 단계 유지", "#AAAAAA"],
+  saved: ["minecraft:totem_of_undying", "실패 · 파괴 방지로 1단계 하락", "#F2C14E"],
   nostone: ["minecraft:gray_dye", "강화석이 모자라요", "#AAAAAA"],
   nomoney: ["minecraft:gray_dye", "잔고가 모자라요", "#AAAAAA"],
 };
@@ -128,6 +133,7 @@ const TV_ENH_RESULT_TEXT = {
 function tvEnhOpen(player, stack, level) {
   let openKey = tvEnhKey(player, stack);
   let lastResult = null;
+  let protect = false;
   player.openChestGUI(Text.of("강화"), 3, (gui) => {
     gui.playerSlots = false;
     let draw = () => {
@@ -169,13 +175,31 @@ function tvEnhOpen(player, stack, level) {
         `성공 확률 ${Math.round(TV_ENH.success[target] * 100)}%`,
         failText,
         `필요: ${stone.name} 1개 (보유 ${have}개)`,
-        `비용: ${tvEnhFmt(cost)}원 (잔고 ${tvEnhFmt(balance)}원)`,
+        `비용: ${tvEnhFmt(cost)}원${useProtect ? ` + 파괴 방지 ${tvEnhFmt(protectCost)}원` : ""} (잔고 ${tvEnhFmt(balance)}원)`,
       ]), null);
-      let ok = have > 0 && balance >= cost;
+      let canProtect = TV_ENH.breakOnFail[target] > 0;
+      let protectCost = canProtect ? cost * TV_ENH.protectCostMult : 0;
+      let useProtect = canProtect && protect;
+      if (canProtect) {
+        tvEnhSlot(
+          gui, 4, 2,
+          useProtect
+            ? tvEnhItem("minecraft:totem_of_undying", "파괴 방지: 켜짐", "#7EE0A1", [`추가 비용 ${tvEnhFmt(protectCost)}원`, "실패해도 파괴되지 않고 1단계만 떨어져요", "누르면 꺼요"])
+            : tvEnhItem("minecraft:gray_dye", "파괴 방지: 꺼짐", "#AAAAAA", [`켜면 추가 비용 ${tvEnhFmt(protectCost)}원`, `파괴 확률 ${Math.round(TV_ENH.breakOnFail[target] * 100)}%를 막아 줘요`, "누르면 켜요"]),
+          (e) => {
+            protect = !protect;
+            draw();
+          }
+        );
+      } else {
+        tvEnhSlot(gui, 4, 2, Item.of("minecraft:air"), null);
+      }
+      let total = cost + (useProtect ? protectCost : 0);
+      let ok = have > 0 && balance >= total;
       tvEnhSlot(
         gui, 6, 1,
         ok
-          ? tvEnhItem("minecraft:anvil", "강화하기", "#FFAA00", [`성공 ${Math.round(TV_ENH.success[target] * 100)}% · 클릭!`])
+          ? tvEnhItem("minecraft:anvil", "강화하기", "#FFAA00", useProtect ? [`성공 ${Math.round(TV_ENH.success[target] * 100)}% · 클릭!`, "파괴 방지 사용"] : [`성공 ${Math.round(TV_ENH.success[target] * 100)}% · 클릭!`])
           : tvEnhItem("minecraft:gray_dye", have <= 0 ? `${stone.name}이 모자라요` : "잔고가 모자라요", "#777777", []),
         ok
           ? (e) => {
@@ -185,7 +209,7 @@ function tvEnhOpen(player, stack, level) {
                 draw();
                 return;
               }
-              lastResult = tvEnhTry(player, cur, tvEnhLevel(cur));
+              lastResult = tvEnhTry(player, cur, tvEnhLevel(cur), protect);
               draw();
             }
           : null
@@ -199,10 +223,27 @@ function tvEnhOpen(player, stack, level) {
   });
 }
 
-function tvEnhTry(player, stack, level) {
+// 서버 전체 알림: 채팅 + 화면 위 문구 + 소리 (다른 사람 방송 시청자 반응은 stream.js)
+function tvEnhAnnounce(player, text, color, sound, pitch) {
+  let server = player.server;
+  server.runCommandSilent(`tellraw @a ${JSON.stringify([{ text: "[강화] ", color: "#FFAA00" }, { text: text, color: color, bold: true }])}`);
+  server.players.forEach((p) => {
+    try {
+      server.runCommandSilent(
+        global.getEmbersTextAPICommand(String(p.username), `{anchor:"TOP_CENTER",background:1,align:"TOP_CENTER",color:"${color}",offsetY:20}`, 100, Text.of(text).toJson())
+      );
+    } catch (err) {
+      // 화면 문구가 안 돼도 채팅 알림은 나감
+    }
+    server.runCommandSilent(`execute as ${p.username} at @s run playsound ${sound} player @s ~ ~ ~ 0.5 ${pitch}`);
+  });
+}
+
+function tvEnhTry(player, stack, level, protect) {
   let target = level + 1;
   let stone = tvEnhStone(target);
-  let cost = TV_ENH.costPerLevelSq * target * target;
+  let useProtect = !!protect && TV_ENH.breakOnFail[target] > 0;
+  let cost = TV_ENH.costPerLevelSq * target * target * (useProtect ? 1 + TV_ENH.protectCostMult : 1);
   if (tvEnhCountItem(player, stone.id) <= 0) {
     tvEnhSay(player, { text: `[강화] ${stone.name}이 없어요.`, color: "#FF5555" });
     return "nostone";
@@ -222,23 +263,28 @@ function tvEnhTry(player, stack, level) {
     tvEnhSound(player, "minecraft:block.anvil.use", 1.4);
     tvEnhSound(player, "minecraft:entity.player.levelup", 1.2);
     tvEnhSay(player, [{ text: "[강화] ", color: "#FFAA00" }, { text: `성공! +${target} ${name}`, color: "#7EE0A1", bold: true }]);
-    if (target >= 10) {
-      player.server.runCommandSilent(
-        `tellraw @a ${JSON.stringify([{ text: "[강화] ", color: "#FFAA00" }, { text: `${player.username}님이 +${target} ${name} 강화에 성공했어요!`, color: "#FFD54F" }])}`
-      );
+    if (target >= TV_ENH.announceFrom) {
+      tvEnhAnnounce(player, `${player.username}님이 +${target} ${name} 강화에 성공했어요!`, "#FFD54F", "minecraft:ui.toast.challenge_complete", 1.2);
+      if (global.tvOnEnhanceOthers) global.tvOnEnhanceOthers(player, "success", target, name);
     }
     if (global.tvOnEnhance) global.tvOnEnhance(player, "success", target, name);
     return "success";
   }
 
   if (Math.random() < TV_ENH.breakOnFail[target]) {
+    if (useProtect) {
+      tvEnhSetLevel(stack, level - 1);
+      tvEnhSound(player, "minecraft:item.totem.use", 1.2);
+      tvEnhSay(player, [{ text: "[강화] ", color: "#FFAA00" }, { text: `파괴될 뻔했지만 방지 성공! +${level} → +${level - 1}`, color: "#F2C14E", bold: true }]);
+      if (global.tvOnEnhance) global.tvOnEnhance(player, "saved", level, name);
+      return "saved";
+    }
     stack.shrink(1);
     tvEnhSound(player, "minecraft:entity.item.break", 0.7);
     tvEnhSound(player, "minecraft:block.anvil.destroy", 0.8);
     tvEnhSay(player, [{ text: "[강화] ", color: "#FFAA00" }, { text: `실패... +${level} ${name}이 파괴됐어요.`, color: "#FF5555", bold: true }]);
-    player.server.runCommandSilent(
-      `tellraw @a ${JSON.stringify([{ text: "[강화] ", color: "#FFAA00" }, { text: `${player.username}님의 +${level} ${name}이 파괴됐어요...`, color: "#F28B82" }])}`
-    );
+    tvEnhAnnounce(player, `${player.username}님의 +${level} ${name}이 파괴됐어요...`, "#F28B82", "minecraft:entity.wither.death", 1.6);
+    if (global.tvOnEnhanceOthers) global.tvOnEnhanceOthers(player, "break", level, name);
     if (global.tvOnEnhance) global.tvOnEnhance(player, "break", level, name);
     return "break";
   }

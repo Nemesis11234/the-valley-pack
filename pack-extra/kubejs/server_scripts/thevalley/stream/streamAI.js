@@ -106,6 +106,8 @@ function tvAiContext(player) {
 
   let recent = tvRecentSummary(player);
   if (recent) lines.push(`최근 1분 동안: ${recent}`);
+  let reg = tvAiSafe(() => tvRegAiContext(player), "");
+  if (reg) lines.push(reg);
   return lines.join("\n");
 }
 

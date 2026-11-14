@@ -94,6 +94,8 @@ function tvData(player) {
     pd.tvFirsts = "{}";
     pd.tvDaily = "{}";
     pd.tvDailyDay = -1;
+    pd.tvRegulars = "";
+    pd.tvMemories = "[]";
   }
   // 숫자가 깨졌으면(NaN) 복구
   ["tvPending", "tvDonatedTotal", "tvHype", "tvSkullBest"].forEach((k) => {
@@ -189,28 +191,57 @@ function tvActionbar(player, text, color) {
   );
 }
 
+// 채팅창 설정 (각자): 위치 · 줄 수 · 글자 크기
+const TV_OVERLAY_POS = [
+  { key: "left", name: "왼쪽 가운데" },
+  { key: "left_top", name: "왼쪽 위" },
+  { key: "right_bottom", name: "오른쪽 아래" },
+];
+const TV_OVERLAY_LINES = [4, 6, 8, 10];
+const TV_OVERLAY_SCALES = [0.75, 1, 1.25];
+const TV_OVERLAY_MAX_LINES = 10;
+
+function tvOverlay(player) {
+  let pd = tvData(player);
+  let pos = String(pd.tvOvPos || "left");
+  if (!TV_OVERLAY_POS.some((p) => p.key == pos)) pos = "left";
+  let lines = Number(pd.tvOvLines) || TV.chatLines;
+  if (TV_OVERLAY_LINES.indexOf(lines) < 0) lines = TV.chatLines;
+  let scale = Number(pd.tvOvScale) || 1;
+  if (TV_OVERLAY_SCALES.indexOf(scale) < 0) scale = 1;
+  return { pos: pos, lines: lines, scale: scale };
+}
+
 function tvRenderChat(player) {
   let mem = tvMem(player);
   let now = tvNow();
-  mem.chat = mem.chat.filter((l) => now - l.t < TV.chatLineLifeSec * 1000).slice(-TV.chatLines);
+  let ov = tvOverlay(player);
+  mem.chat = mem.chat.filter((l) => now - l.t < TV.chatLineLifeSec * 1000).slice(-TV_OVERLAY_MAX_LINES);
   let show = Number(tvData(player).tvChatOn) == 1 && tvIsOn(player);
+  let step = Math.round(11 * ov.scale);
+  let right = ov.pos == "right_bottom";
+  let alignX = right ? "right" : "left";
+  let alignY = ov.pos == "left" ? "center" : ov.pos == "left_top" ? "top" : "bottom";
+  let x = right ? -5 : 5;
+  // 제목 줄의 y와 첫 줄의 y
+  let titleY = ov.pos == "left" ? -14 - ov.lines * step / 2 : ov.pos == "left_top" ? 48 : -70 - ov.lines * step;
   let paint = {};
-  for (let i = 0; i < TV.chatLines; i++) {
-    let line = show ? mem.chat[mem.chat.length - TV.chatLines + i] : null;
-    let y = -36 + i * 11;
+  for (let i = 0; i < TV_OVERLAY_MAX_LINES; i++) {
+    let line = show && i < ov.lines ? mem.chat[mem.chat.length - ov.lines + i] : null;
+    let y = titleY + step + 3 + i * step;
     let id = `tvChat${i}`;
     if (line) {
       let body = `${tvMcCode(line.color)}${line.name}§f: ${line.gold ? "§e" : ""}${line.msg}`;
-      paint[id + "Shadow"] = { type: "text", x: 6, z: -1, y: y + 1, text: line.name + ": " + line.msg, color: "#000000", alignX: "left", alignY: "center" };
-      paint[id] = { type: "text", x: 5, y: y, text: body, color: "#FFFFFF", alignX: "left", alignY: "center" };
+      paint[id + "Shadow"] = { type: "text", x: x + 1, z: -1, y: y + 1, text: line.name + ": " + line.msg, color: "#000000", alignX: alignX, alignY: alignY, scale: ov.scale };
+      paint[id] = { type: "text", x: x, y: y, text: body, color: "#FFFFFF", alignX: alignX, alignY: alignY, scale: ov.scale };
     } else {
-      paint[id + "Shadow"] = { type: "text", x: 6, z: -1, y: y + 1, text: "", alignX: "left", alignY: "center" };
-      paint[id] = { type: "text", x: 5, y: y, text: "", alignX: "left", alignY: "center" };
+      paint[id + "Shadow"] = { type: "text", x: x + 1, z: -1, y: y + 1, text: "", alignX: alignX, alignY: alignY, scale: ov.scale };
+      paint[id] = { type: "text", x: x, y: y, text: "", alignX: alignX, alignY: alignY, scale: ov.scale };
     }
   }
   let title = show ? `● LIVE  시청자 ${tvFmt(tvViewers(player))}` : "";
-  paint.tvChatTitleShadow = { type: "text", x: 6, z: -1, y: -49, text: title, color: "#000000", alignX: "left", alignY: "center" };
-  paint.tvChatTitle = { type: "text", x: 5, y: -50, text: title, color: "#FF5555", alignX: "left", alignY: "center" };
+  paint.tvChatTitleShadow = { type: "text", x: x + 1, z: -1, y: titleY + 1, text: title, color: "#000000", alignX: alignX, alignY: alignY, scale: ov.scale };
+  paint.tvChatTitle = { type: "text", x: x, y: titleY, text: title, color: "#FF5555", alignX: alignX, alignY: alignY, scale: ov.scale };
   player.paint(paint);
 }
 
@@ -233,7 +264,7 @@ function tvViewerChat(player, category, vars, count, spreadSec) {
     let tries = 0;
     while (used[line] && tries++ < 5) line = tvRand(lines);
     used[line] = 1;
-    let viewer = tvRand(global.TV_VIEWERS);
+    let viewer = tvPickViewer(player);
     let delay = Math.random() * (spreadSec || 6) * 1000;
     let fv = { p: tvName(player) };
     Object.keys(vars || {}).forEach((k) => (fv[k] = vars[k]));
@@ -359,8 +390,9 @@ function tvDonate(player, opt) {
   if (tvAfkSec(player) > TV.afkHardSec) return;
   let pd = tvData(player);
   let mem = tvMem(player);
-  let viewer = tvRand(global.TV_VIEWERS);
   let amount = tvPickDonation(player, (opt && opt.boost) || 0);
+  let viewer = tvPickDonor(player, amount);
+  let regular = tvRegDonated(player, viewer.name, amount);
 
   let troll = !(opt && opt.reason) && Math.random() < TV.trollChance;
   pd.tvPending = Number(pd.tvPending) + amount;
@@ -376,6 +408,7 @@ function tvDonate(player, opt) {
     message = tvFill(tvRand(dm.event), { item: opt.reason, p: tvName(player) });
   } else {
     let pool = amount >= 10000 ? dm.huge : amount >= 2000 ? dm.big : amount >= 500 ? dm.mid : dm.small;
+    if (regular && Math.random() < 0.3) pool = global.TV_REG_TEMPLATES.donate_regular;
     message = tvFill(tvRand(pool), { p: tvName(player) });
   }
 
@@ -400,6 +433,7 @@ function tvDonate(player, opt) {
 }
 
 function tvShowDonation(player, viewer, amount, message, troll, extraLines) {
+  if (amount >= 30000) tvRemember(player, `${viewer.name}님이 ${tvFmt(amount)}원 후원한 거`);
   tvPushChat(player, "[후원] " + viewer.name, viewer.color, `${tvFmt(amount)} 후원 · ${message}`, true);
   let mem = tvMem(player);
   let delay = 0;
@@ -841,7 +875,9 @@ function tvSecond(player) {
     } else {
       // 90%는 화면 상황 반응, 10%만 일반 잡담
       let n = 1 + Math.floor(Math.random() * (1.5 + busy * 3));
-      if (Math.random() < TV.situationChatRatio && tvSituationChat(player, n, 3)) {
+      if (Math.random() < TV_REG.memoryChatChance && tvRegMemoryChat(player)) {
+        // 단골이 예전 장면 얘기
+      } else if (Math.random() < TV.situationChatRatio && tvSituationChat(player, n, 3)) {
         // 화면 반응
       } else {
         tvViewerChat(player, Math.random() < 0.6 ? "idle" : "chat_generic", {}, 1, 3);
@@ -856,6 +892,7 @@ function tvSecond(player) {
       let gained = depth - Number(pd.tvSkullBest);
       pd.tvSkullBest = depth;
       tvEvent(player, 4 * gained, gained, `해골 광산 ${depth}구간 신기록`, "skull_depth", { depth: depth });
+      if (depth >= 10 && depth % 5 == 0) tvRemember(player, `해골 광산 ${depth}구간까지 내려간 거`);
     }
   }
 
@@ -943,7 +980,10 @@ EntityEvents.death((e) => {
   if (entity.isPlayer()) {
     if (entity.isFake && entity.isFake()) return;
     let boss = tvBossNearby(entity);
-    if (boss) tvEvent(entity, 10, 0, "보스전 사망 (레전드 장면)", "death_boss", {});
+    if (boss) {
+      tvEvent(entity, 10, 0, "보스전 사망 (레전드 장면)", "death_boss", {});
+      tvRemember(entity, "보스전에서 죽은 거");
+    }
     else tvEvent(entity, -30, 0, "사망", "death", {});
     let m = tvMem(entity).mission;
     if (m && m.type != "request") tvMissionEnd(entity, false); // 사연은 죽어도 유지
@@ -967,8 +1007,10 @@ EntityEvents.death((e) => {
   if (hp >= 500) {
     let first = tvFirst(player, "boss:" + typeId);
     tvEvent(player, first ? 150 : 60, first ? 30 : 3, `${mobName} 처치!`, "kill_boss", { mob: mobName });
+    tvRemember(player, first ? `${mobName} 처음 잡은 거` : `${mobName} 또 잡은 거`);
   } else if (hp >= 100) {
     let first = tvFirst(player, "mini:" + typeId);
+    if (first) tvRemember(player, `${mobName} 처음 잡은 거`);
     tvEvent(player, first ? 40 : Math.round(15 * tvDaily(player, "mini")), first ? 5 : 0, `${mobName} 처치`, "kill_mini", { mob: mobName });
   } else if (hostile && tvFirst(player, "kill:" + typeId)) {
     tvChange(player, 3, 1, `처음 잡은 몹: ${mobName}`);
@@ -1052,6 +1094,7 @@ if (PlayerEvents.advancement) {
       title = "업적";
     }
     tvEvent(player, rule.hype, rule.subs || 0, `업적: ${title}`, "advancement", { item: title });
+    if (rule.hype >= 40) tvRemember(player, `'${title}' 업적 딴 거`);
   });
 }
 
@@ -1059,6 +1102,12 @@ if (PlayerEvents.advancement) {
 global.tvOnEnhance = (player, result, level, name) => {
   if (!player || !tvIsOn(player)) return;
   let vars = { item: name, n: level };
+  if (result == "success" && level >= 10) tvRemember(player, `+${level} 강화 성공한 거`);
+  if (result == "break") tvRemember(player, `+${level} ${name} 터진 거`);
+  if (result == "saved") {
+    tvEvent(player, Math.round(level * 2), 0, `+${level} 파괴 방지 성공`, "enhance_saved", vars);
+    return;
+  }
   if (result == "success") {
     if (level >= 7) tvEvent(player, Math.round(level * level * 0.8), level >= 10 ? level : 0, `+${level} 강화 성공`, "enhance_success", vars);
     else tvViewerChat(player, "enhance_success", vars, 1, 3);
@@ -1070,6 +1119,16 @@ global.tvOnEnhance = (player, result, level, name) => {
   } else {
     tvViewerChat(player, "enhance_fail", vars, 1, 3);
   }
+};
+
+// 다른 사람의 고강화 성공·파괴 소식 → 방송 중인 다른 스트리머 시청자들이 반응
+global.tvOnEnhanceOthers = (who, result, level, name) => {
+  who.server.players.forEach((p) => {
+    if (p == who || String(p.uuid) == String(who.uuid) || p.isFake() || !tvIsOn(p)) return;
+    let vars = { o: tvName(who), n: level, item: name };
+    tvViewerChat(p, result == "break" ? "other_enhance_break" : "other_enhance_success", vars, 2 + Math.round(tvBusy(p) * 2), 6);
+    tvChange(p, 3, 0, `${tvName(who)}님 +${level} ${result == "break" ? "파괴" : "강화"} 소식`);
+  });
 };
 
 // 낚시: 시작 스크립트(streamFishing.js)의 Forge 이벤트가 이 함수를 부름
@@ -1114,7 +1173,8 @@ PlayerEvents.loggedIn((e) => {
       if (player.isRemoved()) return;
       tvSessionStart(player);
       tvChange(player, 10, 0, "방송 시작");
-      tvViewerChat(player, "stream_on", {}, 3, 8);
+      tvViewerChat(player, "stream_on", {}, 2, 8);
+      tvRegGreet(player);
       player.tell(Text.of("[방송] 방송 중이에요. /방송 을 입력하면 메뉴가 열려요.").gray());
     });
   }
@@ -1359,7 +1419,8 @@ function tvSetOn(player, on) {
     player.tell(Text.of("[방송] 방송을 켰어요!").green());
     tvSessionStart(player);
     tvChange(player, 10, 0, "방송 시작");
-    tvViewerChat(player, "stream_on", {}, 3, 8);
+    tvViewerChat(player, "stream_on", {}, 2, 8);
+    tvRegGreet(player);
   }
   tvSetSidebarScore(player);
   tvRenderChat(player);
@@ -1453,6 +1514,57 @@ function tvOpenMenu(player) {
         tvToggleChat(player, Number(tvData(player).tvChatOn) != 1);
         draw();
       });
+      let ov = tvOverlay(player);
+      tvBtn(gui, 6, 2, tvMenuItem("minecraft:painting", "채팅창 설정", "#9AD0EC", [
+        `위치: ${TV_OVERLAY_POS.filter((p) => p.key == ov.pos)[0].name}`,
+        `줄 수: ${ov.lines}줄 · 글자 크기: ${Math.round(ov.scale * 100)}%`,
+        "누르면 설정 창이 열려요",
+      ]), (e) => tvOpenOverlayMenu(player));
+      tvBtn(gui, 8, 2, tvMenuItem("minecraft:barrier", "닫기", "#AAAAAA", []), (e) => tvCloseGui(player));
+      gui.sync();
+    };
+    draw();
+  });
+  return 1;
+}
+
+function tvNextOf(list, cur) {
+  let i = list.indexOf(cur);
+  return list[(i + 1) % list.length];
+}
+
+function tvOpenOverlayMenu(player) {
+  player.openChestGUI(Text.of("채팅창 설정"), 3, (gui) => {
+    gui.playerSlots = false;
+    let draw = () => {
+      let pd = tvData(player);
+      let ov = tvOverlay(player);
+      let posName = TV_OVERLAY_POS.filter((p) => p.key == ov.pos)[0].name;
+      tvBtn(gui, 2, 1, tvMenuItem("minecraft:compass", `위치: ${posName}`, "#9AD0EC", TV_OVERLAY_POS.map((p) => (p.key == ov.pos ? "▶ " : "   ") + p.name).concat(["누르면 다음 위치로"])), (e) => {
+        let keys = TV_OVERLAY_POS.map((p) => p.key);
+        tvData(player).tvOvPos = tvNextOf(keys, tvOverlay(player).pos);
+        tvRenderChat(player);
+        draw();
+      });
+      tvBtn(gui, 4, 1, tvMenuItem("minecraft:paper", `줄 수: ${ov.lines}줄`, "#FFFFFF", [TV_OVERLAY_LINES.map((n) => (n == ov.lines ? `[${n}]` : `${n}`)).join(" "), "누르면 바뀌어요"]), (e) => {
+        tvData(player).tvOvLines = tvNextOf(TV_OVERLAY_LINES, tvOverlay(player).lines);
+        tvRenderChat(player);
+        draw();
+      });
+      tvBtn(gui, 6, 1, tvMenuItem("minecraft:spyglass", `글자 크기: ${Math.round(ov.scale * 100)}%`, "#FFFFFF", [TV_OVERLAY_SCALES.map((n) => (n == ov.scale ? `[${Math.round(n * 100)}%]` : `${Math.round(n * 100)}%`)).join(" "), "누르면 바뀌어요"]), (e) => {
+        tvData(player).tvOvScale = tvNextOf(TV_OVERLAY_SCALES, tvOverlay(player).scale);
+        tvRenderChat(player);
+        draw();
+      });
+      tvBtn(gui, 4, 2, tvMenuItem("minecraft:gray_dye", "기본값으로", "#AAAAAA", ["왼쪽 가운데 · 8줄 · 100%"]), (e) => {
+        let d = tvData(player);
+        d.tvOvPos = "left";
+        d.tvOvLines = TV.chatLines;
+        d.tvOvScale = 1;
+        tvRenderChat(player);
+        draw();
+      });
+      tvBtn(gui, 0, 2, tvMenuItem("minecraft:arrow", "뒤로", "#AAAAAA", []), (e) => tvOpenMenu(player));
       tvBtn(gui, 8, 2, tvMenuItem("minecraft:barrier", "닫기", "#AAAAAA", []), (e) => tvCloseGui(player));
       gui.sync();
     };
