@@ -302,14 +302,15 @@ function tvSituationChat(player, count, spreadSec) {
 
 // 채팅 따라 치기: chance 확률로 다른 시청자 1~2명이 "ㅋㅋㅋ", "ㄹㅇ" 같은 걸 이어서 침
 function tvEcho(player, at, fromName, chance) {
-  if (Math.random() >= chance) return;
+  let t = typeof tvTier === "function" ? tvTier(player) : 0;
+  if (Math.random() >= Math.min(0.9, chance * (1 + 0.8 * t))) return;
   let mem = tvMem(player);
-  let n = Math.random() < 0.3 ? 2 : 1;
+  let n = (Math.random() < 0.3 ? 2 : 1) + Math.floor(Math.random() * (t * 2 + 1)); // 1천 명 이상이면 최대 8줄 물결
   for (let i = 0; i < n; i++) {
     let v = tvPickViewer(player);
     if (v.name == fromName) continue;
     // 바로 전에 쓴 따라치기 말은 피함
-    let msg = tvRand(global.TV_ECHO);
+    let msg = tvRand(t >= 2 && Math.random() < 0.5 ? global.TV_WAVE : global.TV_ECHO);
     for (let t = 0; t < 4 && (mem.lastEchos || []).indexOf(msg) >= 0; t++) msg = tvRand(global.TV_ECHO);
     mem.lastEchos = (mem.lastEchos || []).concat([msg]).slice(-4);
     mem.queue.push({ at: at + 700 + Math.random() * 1500 + i * 600, name: v.name, color: v.color, msg: msg });

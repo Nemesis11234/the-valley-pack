@@ -968,7 +968,7 @@ function tvSecond(player) {
   if (mem.queue.length) {
     let ready = mem.queue.filter((q) => q.at <= now);
     mem.queue = mem.queue.filter((q) => q.at > now);
-    ready.forEach((q) => tvPushChat(player, q.name, q.color, q.msg));
+    ready.forEach((q) => tvPushChat(player, q.name, q.color, String(q.name).indexOf("[") == 0 ? q.msg : tvQuirk(q.name, q.msg)));
   }
 
   // 평소 잡담: 시청자가 많을수록 자주, 여러 명이 (10명 약 15초마다 1줄 → 1,000명 2~3초마다 여러 줄)
@@ -981,12 +981,16 @@ function tvSecond(player) {
       mem.aiIdleAt = now;
     } else {
       // 90%는 화면 상황 반응, 10%만 일반 잡담
-      let n = 1 + Math.floor(Math.random() * (1.5 + busy * 3));
+      let tier = tvTier(player);
+      let n = 1 + Math.floor(Math.random() * (1.5 + busy * 3 + TV_CROWD.extraLines[tier]));
+      tvCrowdTick(player);
       if (Math.random() < TV_REG.memoryChatChance && tvRegMemoryChat(player)) {
         // 단골이 예전 장면 얘기
       } else if (Math.random() < TV.situationChatRatio) {
         // 화면 반응. 화면이 계속 같아서 새로 할 말이 없으면 가끔만 일반 잡담 (아니면 잠깐 조용)
-        if (!tvSituationChat(player, n, 3) && Math.random() < 0.3) tvViewerChat(player, "idle", {}, 1, 3);
+        if (!tvSituationChat(player, n, 3) && Math.random() < 0.3) tvPersonaChat(player);
+      } else if (Math.random() < 0.6) {
+        tvPersonaChat(player); // 시청자 성격대로 한마디
       } else {
         tvViewerChat(player, "idle", {}, 1, 3);
       }

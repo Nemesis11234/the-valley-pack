@@ -61,11 +61,7 @@ function tvRegSave(player, regs) {
 }
 
 function tvRegViewer(name) {
-  let found = null;
-  global.TV_VIEWERS.forEach((v) => {
-    if (v.name == name) found = v;
-  });
-  return found || { name: name, color: "#CCCCCC" };
+  return typeof tvViewerByName === "function" ? tvViewerByName(name) : { name: name, color: "#CCCCCC" };
 }
 
 // 큰손: 단골 중 후원 많이 한 순서 (후원한 적 있는 사람만)
@@ -79,11 +75,13 @@ function tvRegBigDonors(player, n) {
 
 // 채팅할 시청자 뽑기 (단골 우선)
 function tvPickViewer(player) {
-  if (Math.random() < TV_REG.chatShare) {
+  // 단골 비율은 방송이 커질수록 줄어듦 (사람이 많아지면 단골 채팅이 묻힘)
+  let t = typeof tvTier === "function" ? tvTier(player) : 0;
+  if (Math.random() < TV_REG.chatShare * [1, 0.7, 0.45, 0.3][t]) {
     let names = Object.keys(tvRegGet(player));
     if (names.length) return tvRegViewer(tvRand(names));
   }
-  return tvRand(global.TV_VIEWERS);
+  return typeof tvPresentViewer === "function" ? tvPresentViewer(player) : tvRand(global.TV_VIEWERS);
 }
 
 // 후원할 시청자 뽑기
@@ -94,7 +92,12 @@ function tvPickDonor(player, amount) {
   }
   let names = Object.keys(tvRegGet(player));
   if (names.length && Math.random() < TV_REG.donateShare) return tvRegViewer(tvRand(names));
-  return tvRand(global.TV_VIEWERS);
+  // 후원 성향이 높은 시청자일수록 후원을 잘 함
+  for (let i = 0; i < 10; i++) {
+    let v = tvPickViewer(player);
+    if (Math.random() < 0.15 + (v.donor || 0) * 1.5) return v;
+  }
+  return tvPickViewer(player);
 }
 
 // 후원 기록. 단골이면 누적, 아니면 큰 후원일 때 새 단골. 단골이면 true
