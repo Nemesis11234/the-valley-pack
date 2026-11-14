@@ -47,7 +47,7 @@ function tvAskPush(player, lines, n, spread, delay) {
 
 // 시청자 규모에 따른 물결 줄 수 (최대 8줄)
 function tvAskWave(player, base) {
-  return Math.min(8, base + tvTier(player) * 2 + Math.floor(Math.random() * 2));
+  return Math.min(8, base + tvCrowdTier(player) * 2 + Math.floor(Math.random() * 2));
 }
 
 // 스트리머 채팅이 부탁이면 처리하고 true

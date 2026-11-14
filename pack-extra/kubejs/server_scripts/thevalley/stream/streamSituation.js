@@ -302,7 +302,7 @@ function tvSituationChat(player, count, spreadSec) {
 
 // 채팅 따라 치기: chance 확률로 다른 시청자 1~2명이 "ㅋㅋㅋ", "ㄹㅇ" 같은 걸 이어서 침
 function tvEcho(player, at, fromName, chance) {
-  let t = typeof tvTier === "function" ? tvTier(player) : 0;
+  let t = typeof tvCrowdTier === "function" ? tvCrowdTier(player) : 0;
   if (Math.random() >= Math.min(0.9, chance * (1 + 0.8 * t))) return;
   let mem = tvMem(player);
   let n = (Math.random() < 0.3 ? 2 : 1) + Math.floor(Math.random() * (t * 2 + 1)); // 1천 명 이상이면 최대 8줄 물결

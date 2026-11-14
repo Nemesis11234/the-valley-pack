@@ -76,7 +76,7 @@ function tvRegBigDonors(player, n) {
 // 채팅할 시청자 뽑기 (단골 우선)
 function tvPickViewer(player) {
   // 단골 비율은 방송이 커질수록 줄어듦 (사람이 많아지면 단골 채팅이 묻힘)
-  let t = typeof tvTier === "function" ? tvTier(player) : 0;
+  let t = typeof tvCrowdTier === "function" ? tvCrowdTier(player) : 0;
   if (Math.random() < TV_REG.chatShare * [1, 0.7, 0.45, 0.3][t]) {
     let names = Object.keys(tvRegGet(player));
     if (names.length) return tvRegViewer(tvRand(names));

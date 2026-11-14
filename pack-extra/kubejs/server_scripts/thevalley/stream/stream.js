@@ -569,6 +569,11 @@ function tvSettle(player) {
   let tier = tvTier(player);
   let fee = Math.min(pending, Math.ceil((pending * tier.fee) / 100) * 100); // 수수료도 100원 단위
   let net = pending - fee;
+  if (!isFinite(fee) || !isFinite(net) || net < 0) {
+    player.tell(Text.of("[방송] 정산 계산에 문제가 있어서 멈췄어요. 운영자에게 알려 주세요.").red());
+    console.error(`[TheValley] 정산 중단: pending=${pending} fee=${fee} tier=${JSON.stringify(tier)}`);
+    return 0;
+  }
   let account;
   try {
     account = global.getPersonalOrCurioAccount(player.level, player);
@@ -983,7 +988,7 @@ function tvSecond(player) {
       mem.aiIdleAt = now;
     } else {
       // 90%는 화면 상황 반응, 10%만 일반 잡담
-      let tier = tvTier(player);
+      let tier = tvCrowdTier(player);
       let n = 1 + Math.floor(Math.random() * (1.5 + busy * 3 + TV_CROWD.extraLines[tier]));
       tvCrowdTick(player);
       if (Math.random() < TV_REG.memoryChatChance && tvRegMemoryChat(player)) {
