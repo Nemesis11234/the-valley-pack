@@ -142,7 +142,7 @@ global.tvAiRequest = (player, kind, text, extra, callback) => {
     subs: tvSubs(player),
     dimension: String(player.level.dimension),
     recent: recent,
-    names: global.TV_VIEWERS.map((v) => v.name),
+    names: tvAiSafe(() => tvAiAudience(player, 16), global.TV_VIEWERS.map((v) => v.name)),
     busy: busy,
     extra: extra || {},
     context: kind == "recap" ? "" : tvAiSafe(() => tvAiContext(player), ""),
@@ -189,9 +189,10 @@ function tvAiApply(server) {
     let mem = tvMem(player);
     let colors = {};
     global.TV_VIEWERS.forEach((v) => (colors[v.name] = v.color));
+    Object.keys(global.TV_ROSTER_MAP || {}).forEach((k) => (colors[k] = global.TV_ROSTER_MAP[k].color));
     let delay = 0;
     (r.lines || []).forEach((l) => {
-      let name = String(l.n || "").slice(0, 12) || tvRand(global.TV_VIEWERS).name;
+      let name = String(l.n || "").replace(/\(.*\)$/, "").slice(0, 12) || tvRand(global.TV_VIEWERS).name;
       let msg = String(l.m || "").replace(/[§\n\r]/g, "").slice(0, 40);
       if (!msg) return;
       delay += 600 + Math.random() * 2200;
