@@ -9,7 +9,7 @@
 if (global.handleFee && !global.handleFee.tvWrapped) {
   let tvOriginalHandleFee = global.handleFee;
   let tvFeeFmt = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  let tvWrappedHandleFee = (server, player, reason) => {
+  let tvFeeInner = (server, player, reason) => {
     let account = null;
     let pending = 0;
     try {
@@ -42,6 +42,22 @@ if (global.handleFee && !global.handleFee.tvWrapped) {
           Text.of(`[방송] 병원비 ${tvFeeFmt(balance + fromPending)}: 계좌 ${tvFeeFmt(balance)} + 미정산 후원금 ${tvFeeFmt(fromPending)} (남은 미정산금 ${tvFeeFmt(left)})`).red()
         );
       }
+    }
+  };
+  // 병원비로 빠진 돈은 방송 "지출" 반응에서 제외
+  let tvWrappedHandleFee = (server, player, reason) => {
+    let account = null, before = 0;
+    try {
+      account = global.getPersonalOrCurioAccount(player.level, player);
+      before = account ? Number(account.getBalance()) || 0 : 0;
+    } catch (err) {
+      account = null;
+    }
+    tvFeeInner(server, player, reason);
+    try {
+      if (account && global.tvIgnoreBalance) global.tvIgnoreBalance(player, (Number(account.getBalance()) || 0) - before);
+    } catch (err) {
+      // 무시
     }
   };
   tvWrappedHandleFee.tvWrapped = true;

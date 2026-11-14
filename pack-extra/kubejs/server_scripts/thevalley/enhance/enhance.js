@@ -256,6 +256,7 @@ function tvEnhTry(player, stack, level, protect) {
   }
   tvEnhTakeItem(player, stone.id);
   account.setBalance(balance - cost);
+  if (global.tvIgnoreBalance) global.tvIgnoreBalance(player, -cost);
 
   let name = String(stack.hoverName.string);
   if (Math.random() < TV_ENH.success[target]) {
