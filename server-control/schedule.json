@@ -1,0 +1,7 @@
+{
+  "_comment": "서버 자동 켜기·끄기 (일본 시간). 켜기는 GitHub 예약(.github/workflows/aws-server.yml)이 17:30·17:45에 켜서 18시 전에 준비, 끄기는 서버가 스스로 stop 시각 10분 전부터 알림 후 정각에 끔. enabled를 false로 하면 둘 다 멈춤.",
+  "enabled": true,
+  "start": "18:00",
+  "stop": "24:00",
+  "warnSeconds": [600, 300, 180, 60, 30, 10]
+}

@@ -228,6 +228,37 @@ def cleanup():
     log(f"디스크: 남은 공간 {st.free // 2**30}GB / 전체 {st.total // 2**30}GB")
 
 
+def install_countdown():
+    """매일 자동 끄기 타이머 설치 (server-control/schedule.json). 끄는 시각 11분 전에 valley_countdown.py 실행."""
+    cfg_path = f"{REPO}/server-control/schedule.json"
+    timer = "/etc/systemd/system/valley-countdown.timer"
+    service = "/etc/systemd/system/valley-countdown.service"
+    cfg = json.load(open(cfg_path, encoding="utf-8")) if os.path.exists(cfg_path) else {"enabled": False}
+    if not cfg.get("enabled"):
+        if os.path.exists(timer):
+            subprocess.run(["systemctl", "disable", "--now", "valley-countdown.timer"], check=False, timeout=30)
+            log("자동 끄기 꺼짐")
+        return
+    h, m = (int(x) for x in cfg.get("stop", "24:00").split(":"))
+    lead = max(cfg.get("warnSeconds", [600])) + 60
+    t = (h * 3600 + m * 60 - lead) % 86400
+    when = f"*-*-* {t // 3600:02d}:{t % 3600 // 60:02d}:{t % 60:02d} Asia/Tokyo"
+    want_service = (
+        "[Unit]\nDescription=The Valley daily shutdown countdown\n\n[Service]\nType=oneshot\n"
+        f"ExecStart=/usr/bin/python3 {REPO}/server-tools/aws/valley_countdown.py\nTimeoutStartSec=1200\n"
+    )
+    want_timer = f"[Unit]\nDescription=The Valley daily shutdown\n\n[Timer]\nOnCalendar={when}\nAccuracySec=1s\n\n[Install]\nWantedBy=timers.target\n"
+    changed = False
+    for path, text in [(service, want_service), (timer, want_timer)]:
+        if not os.path.exists(path) or open(path).read() != text:
+            open(path, "w").write(text)
+            changed = True
+    if changed:
+        subprocess.run(["systemctl", "daemon-reload"], check=False, timeout=60)
+    subprocess.run(["systemctl", "enable", "--now", "valley-countdown.timer"], check=False, timeout=60)
+    log(f"자동 끄기: 매일 {cfg.get('stop')} (알림 시작 {when})")
+
+
 def write_start_script(ver):
     path = f"{SERVER}/start-valley.sh"
     with open(path, "w") as f:
@@ -256,6 +287,10 @@ def main():
     except Exception as e:  # noqa: BLE001
         log(f"정리 실패 (계속 진행): {e}")
     apply_ai_limits()
+    try:
+        install_countdown()
+    except Exception as e:  # noqa: BLE001
+        log(f"자동 끄기 설치 실패: {e}")
     write_start_script(ver)
     subprocess.run(["chown", "-R", "minecraft:minecraft", SERVER], check=True)
     log("준비 끝, 서버 시작")
