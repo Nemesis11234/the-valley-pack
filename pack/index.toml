@@ -25723,11 +25723,11 @@ hash = "1e1508846c6a5dea7f5bce5e2bdebeaa1c5b50acaa6b250d7f9174398999fcd4"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamSituation.js"
-hash = "bb9a6731f3f1e7a3d9cc5514bc813b7afd4f397396d8f76037ca637934b56194"
+hash = "39c20716347e321149c6d48a793115ad456ea971e63155a19426647b26e954e5"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamTemplates.js"
-hash = "b5d7024d2b5828095c3e41b604d318f271213699c033e33237ac05d56913334b"
+hash = "ac60c769607ae1915f704ef74f9589e2f018de61acec07851d324d007763e2a4"
 
 [[files]]
 file = "kubejs/startup_scripts/_config.js"
