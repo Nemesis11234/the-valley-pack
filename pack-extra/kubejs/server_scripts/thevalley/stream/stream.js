@@ -292,24 +292,35 @@ function tvSetSidebarScore(player) {
 
 // ───────────── 최근 행동 기록 (AI 상황 설명용, 최근 90초) ─────────────
 
+// 최근 90초 동안 한 일 (몇 개 캤는지 등). 90초 지난 기록은 빠짐
+const TV_RECENT_MS = 90000;
+
+function tvRecentPrune(acts, now) {
+  Object.keys(acts).forEach((k) => {
+    let a = acts[k];
+    a.hits = (a.hits || []).filter((h) => now - h[0] <= TV_RECENT_MS);
+    a.n = a.hits.reduce((sum, h) => sum + h[1], 0);
+    if (!a.hits.length) delete acts[k];
+  });
+}
+
 function tvNote(player, what, count) {
   let mem = tvMem(player);
   let now = tvNow();
   let acts = mem.recentActs || (mem.recentActs = {});
-  let a = acts[what] || (acts[what] = { n: 0, t: now });
-  a.n += count || 1;
+  let a = acts[what] || (acts[what] = { n: 0, t: now, hits: [] });
+  a.hits.push([now, count || 1]);
   a.t = now;
+  tvRecentPrune(acts, now);
 }
 
 function tvRecentSummary(player) {
   let acts = tvMem(player).recentActs || {};
-  let now = tvNow();
-  let out = [];
-  Object.keys(acts).forEach((k) => {
-    if (now - acts[k].t > 90000) delete acts[k];
-    else out.push(`${k} ${acts[k].n}`);
-  });
-  return out.slice(0, 8).join(", ");
+  tvRecentPrune(acts, tvNow());
+  return Object.keys(acts)
+    .slice(0, 8)
+    .map((k) => `${k} ${acts[k].n}`)
+    .join(", ");
 }
 
 // ───────────── 시청자 변동 ─────────────
@@ -879,8 +890,9 @@ function tvSecond(player) {
       let n = 1 + Math.floor(Math.random() * (1.5 + busy * 3));
       if (Math.random() < TV_REG.memoryChatChance && tvRegMemoryChat(player)) {
         // 단골이 예전 장면 얘기
-      } else if (Math.random() < TV.situationChatRatio && tvSituationChat(player, n, 3)) {
-        // 화면 반응
+      } else if (Math.random() < TV.situationChatRatio) {
+        // 화면 반응. 화면이 계속 같아서 새로 할 말이 없으면 가끔만 일반 잡담 (아니면 잠깐 조용)
+        if (!tvSituationChat(player, n, 3) && Math.random() < 0.3) tvViewerChat(player, Math.random() < 0.6 ? "idle" : "chat_generic", {}, 1, 3);
       } else {
         tvViewerChat(player, Math.random() < 0.6 ? "idle" : "chat_generic", {}, 1, 3);
       }
