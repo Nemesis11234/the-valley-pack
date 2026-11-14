@@ -188,7 +188,11 @@ function tvSituations(player) {
   }
 
   // 최근 1분 반 동안 한 일
-  let acts = tvSitSafe(() => tvMem(player).recentActs || {}, {});
+  let acts = tvSitSafe(() => {
+    let r = tvMem(player).recentActs || {};
+    tvRecentPrune(r, tvNow());
+    return r;
+  }, {});
   let sum = { mine: 0, place: 0, kill: 0, fish: 0 };
   Object.keys(acts).forEach((k) => {
     let n = Number(acts[k].n) || 0;
@@ -218,8 +222,21 @@ function tvSituationChat(player, count, spreadSec) {
   let recent = {};
   mem.chat.slice(-15).forEach((l) => (recent[String(l.msg)] = 1));
   mem.queue.forEach((q) => (recent[String(q.msg)] = 1));
+  // 5분 안에 쓴 문장은 다시 안 씀 (화면이 계속 같을 때 같은 말 반복 방지)
+  mem.sitUsed = mem.sitUsed || {};
+  Object.keys(mem.sitUsed).forEach((k) => {
+    if (tvNow() - mem.sitUsed[k] > 300000) delete mem.sitUsed[k];
+    else recent[k] = 1;
+  });
+  // 방금(1분 안) 쓴 상황은 덜 나오게
+  mem.sitLast = mem.sitLast || {};
+  let nowMs = tvNow();
+  sits.forEach((s) => {
+    if (mem.sitLast[s.k] && nowMs - mem.sitLast[s.k] < 60000) s.w *= 0.25;
+  });
   let total = 0;
   sits.forEach((s) => (total += s.w));
+  let pushed = 0;
   for (let i = 0; i < count; i++) {
     let r = Math.random() * total;
     let pick = sits[sits.length - 1];
@@ -230,6 +247,7 @@ function tvSituationChat(player, count, spreadSec) {
         break;
       }
     }
+    mem.sitLast[pick.k] = nowMs;
     let lines = global.TV_SITUATION[pick.k];
     let fv = { p: tvName(player) };
     Object.keys(pick.v).forEach((k) => (fv[k] = pick.v[k]));
@@ -237,9 +255,11 @@ function tvSituationChat(player, count, spreadSec) {
     let tries = 0;
     while (recent[msg] && tries++ < 6) msg = tvFill(tvRand(lines), fv);
     if (recent[msg]) continue;
+    pushed++;
     recent[msg] = 1;
+    mem.sitUsed[msg] = tvNow();
     let viewer = tvPickViewer(player);
     mem.queue.push({ at: tvNow() + Math.random() * (spreadSec || 4) * 1000, name: viewer.name, color: viewer.color, msg: msg });
   }
-  return true;
+  return pushed > 0; // 새로 할 말이 없으면 false → 일반 잡담으로
 }

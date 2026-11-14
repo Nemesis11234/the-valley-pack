@@ -16,6 +16,7 @@ const TV_REG = {
   greetCount: [2, 4], // 방송 켤 때 인사하는 단골 수
   memoryMax: 15, // 기억해 두는 장면 수
   memoryChatChance: 0.08, // 평소 잡담 중 기억 꺼내는 비율
+  memoryChatGapSec: 600, // 기억 꺼내기 최소 간격 (10분)
   memoryMinAgeMin: 20, // 이 시간(분)이 지난 장면만 꺼냄 (방금 일은 다른 채팅이 반응함)
 };
 
@@ -184,13 +185,23 @@ function tvAgo(at) {
 
 // 단골이 예전 장면을 꺼냄. 꺼낼 게 없으면 false
 function tvRegMemoryChat(player) {
-  let old = tvMemories(player).filter((m) => Date.now() - Number(m.at) > TV_REG.memoryMinAgeMin * 60000);
+  let mem = tvMem(player);
+  let now = Date.now();
+  if (mem.lastMemoryChat && now - mem.lastMemoryChat < TV_REG.memoryChatGapSec * 1000) return false;
+  mem.usedMemories = mem.usedMemories || {};
+  // 오래된 장면 중 이번 접속에서 아직 안 꺼낸 것
+  let old = tvMemories(player).filter((m) => now - Number(m.at) > TV_REG.memoryMinAgeMin * 60000 && !mem.usedMemories[m.t]);
   let names = Object.keys(tvRegGet(player));
   if (!old.length || !names.length) return false;
   let m = tvRand(old);
-  let v = tvRegViewer(tvRand(names));
+  // 장면 속 주인공(예: 선물한 사람)이 자기 얘기를 남 얘기처럼 하지 않게
+  let speakers = names.filter((n) => m.t.indexOf(n + "님") < 0);
+  if (!speakers.length) return false;
+  mem.usedMemories[m.t] = 1;
+  mem.lastMemoryChat = now;
+  let v = tvRegViewer(tvRand(speakers));
   let msg = tvFill(tvRand(global.TV_REG_TEMPLATES.memory), { ago: tvAgo(m.at), mem: m.t }).replace(/^\s+/, "");
-  tvMem(player).queue.push({ at: tvNow() + Math.random() * 2000, name: v.name, color: v.color, msg: msg.slice(0, 40) });
+  mem.queue.push({ at: tvNow() + Math.random() * 2000, name: v.name, color: v.color, msg: msg.slice(0, 40) });
   return true;
 }
 
