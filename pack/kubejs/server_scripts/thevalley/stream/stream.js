@@ -20,6 +20,65 @@ function tvG(obj, field, method) {
   return obj[field];
 }
 
+// ───────────── 한국어 이름 ─────────────
+// 서버는 영어 이름만 알아서, 서버를 켤 때 만든 표(thevalley_ai/ko_names.json, 모드들의 ko_kr.json을 모은 것)로 바꿈
+const TV_KO = { map: null, tried: false };
+
+function tvKo(key) {
+  if (!key) return null;
+  if (!TV_KO.tried) {
+    TV_KO.tried = true;
+    try {
+      TV_KO.map = JsonIO.read("thevalley_ai/ko_names.json");
+    } catch (err) {
+      TV_KO.map = null;
+    }
+    console.info("[TheValley] 한국어 이름표 " + (TV_KO.map ? "불러옴" : "없음 (영어 이름 사용)"));
+  }
+  if (!TV_KO.map) return null;
+  try {
+    let v = typeof TV_KO.map.get === "function" ? TV_KO.map.get(String(key)) : TV_KO.map[String(key)];
+    return v == null ? null : String(v);
+  } catch (err) {
+    return null;
+  }
+}
+
+// 아이템 이름 (이름표로 바꾼 아이템은 그 이름 그대로)
+function tvStackName(st) {
+  try {
+    let custom = typeof st.hasCustomHoverName === "function" && st.hasCustomHoverName();
+    if (!custom) {
+      let key = tvG(st, "descriptionId", "getDescriptionId");
+      let ko = tvKo(key);
+      if (ko) return ko;
+    }
+    return String(st.hoverName.string).replace(/[\[\]]/g, "");
+  } catch (err) {
+    return String(st.id || "?");
+  }
+}
+
+// 몹 이름 (이름표 붙인 몹은 그 이름)
+function tvEntityName(e) {
+  try {
+    if (typeof e.hasCustomName === "function" && e.hasCustomName()) return String(e.displayName.string);
+    let t = e.type;
+    let s = String(t);
+    let key = s.indexOf("entity.") == 0 ? s : s.indexOf(":") > 0 ? "entity." + s.replace(":", ".") : tvG(t, "descriptionId", "getDescriptionId");
+    let ko = tvKo(key);
+    if (ko) return ko;
+  } catch (err) {
+    // 아래 영어 이름
+  }
+  return String(e.displayName.string);
+}
+
+function tvBlockName(id) {
+  let s = String(id);
+  return tvKo("block." + s.replace(":", ".")) || s.split(":")[1] || s;
+}
+
 function tvNow() {
   return Date.now();
 }
@@ -713,7 +772,7 @@ function tvTakeItem(player, id, count) {
 
 function tvItemLabel(id) {
   try {
-    return String(Item.of(id).displayName.string).replace(/[\[\]]/g, "");
+    return tvStackName(Item.of(id));
   } catch (err) {
     return id;
   }
@@ -754,7 +813,7 @@ function tvRequestStart(player) {
   let value = tvTradeValue(id);
   let target = Math.min(TV.requestTargetMax, TV.requestTargetBase + tvViewers(player) * 3);
   let goal = Math.max(1, Math.min(64, Math.round(target / value)));
-  let viewer = tvRand(global.TV_VIEWERS);
+  let viewer = tvPickViewer(player);
   let label = tvItemLabel(id);
   let m = {
     type: "request",
@@ -777,7 +836,17 @@ function tvRequestStart(player) {
   s.runCommandSilent(`bossbar set ${bid} max ${m.sec}`);
   s.runCommandSilent(`bossbar set ${bid} value ${m.sec}`);
   s.runCommandSilent(`bossbar set ${bid} players ${tvName(player)}`);
-  let story = tvFill(tvRand(global.TV_REQUEST_STORIES), { item: label, n: goal, p: tvName(player) });
+  let edible = false;
+  try {
+    let st = Item.of(id);
+    edible = typeof st.isEdible === "function" ? !!st.isEdible() : false;
+  } catch (err) {
+    edible = false;
+  }
+  let stories = global.TV_REQUEST_STORIES.filter((x) => !x.food || edible);
+  let picked = tvRand(stories);
+  m.thanks = picked.thanks || null;
+  let story = tvFill(picked.t, { item: label, n: goal, p: tvName(player) });
   tvPushChat(player, "[사연] " + viewer.name, viewer.color, `${story} (보상 ${tvFmt(m.reward)})`, true);
   s.runCommandSilent(
     `tellraw ${tvName(player)} ${tvJson([
@@ -813,7 +882,7 @@ function tvRequestSend(player) {
     return 0;
   }
   tvTakeItem(player, m.item, m.goal);
-  tvPushChat(player, m.from, "#FFB3E6", tvFill(tvRand(global.TV_REQUEST_THANKS), { item: m.label, p: tvName(player) }));
+  tvPushChat(player, m.from, "#FFB3E6", tvFill(m.thanks && Math.random() < 0.7 ? m.thanks : tvRand(global.TV_REQUEST_THANKS), { item: m.label, p: tvName(player) }));
   tvMissionEnd(player, true);
   return 1;
 }
@@ -1005,6 +1074,7 @@ BlockEvents.broken((e) => {
   if (!tvIsOn(player)) return;
   let id = String(e.block.id);
   let short = id.split(":")[1] || id;
+  let koBlock = tvBlockName(id);
   let isLog = false, isCrop = false;
   try {
     isLog = e.block.hasTag("minecraft:logs");
@@ -1012,12 +1082,12 @@ BlockEvents.broken((e) => {
   } catch (err) {
     // 태그 확인 실패
   }
-  if (isLog) tvNote(player, `벤 나무 ${short}`, 1);
-  else if (isCrop || /crop|wheat|carrot|potato|beetroot|melon|pumpkin|berry|grape|tomato|rice/.test(short)) tvNote(player, `수확 ${short}`, 1);
-  else if (/dirt|grass_block|sand|gravel|clay|mud|farmland|podzol/.test(short)) tvNote(player, `판 흙 ${short}`, 1);
+  if (isLog) tvNote(player, `벤 나무 ${koBlock}`, 1);
+  else if (isCrop || /crop|wheat|carrot|potato|beetroot|melon|pumpkin|berry|grape|tomato|rice/.test(short)) tvNote(player, `수확 ${koBlock}`, 1);
+  else if (/dirt|grass_block|sand|gravel|clay|mud|farmland|podzol/.test(short)) tvNote(player, `판 흙 ${koBlock}`, 1);
   else if (/leaves|grass|fern|flower|vine|torch|snow$/.test(short)) {
     // 잎·풀·횃불 등은 기록 안 함
-  } else tvNote(player, `캔 블록 ${short}`, 1);
+  } else tvNote(player, `캔 블록 ${koBlock}`, 1);
   if (id == "minecraft:diamond_ore" || id == "minecraft:deepslate_diamond_ore") {
     if (tvFirst(player, "diamond")) tvEvent(player, 25, 5, "생애 첫 다이아몬드!", "diamond_first", {});
     else tvEvent(player, Math.round(25 * tvDaily(player, "diamond")), 0, "다이아몬드", "diamond", {});
@@ -1049,7 +1119,7 @@ EntityEvents.death((e) => {
   tvMarkActive(player);
   if (!entity.isLiving()) return;
   let hp = Number(entity.maxHealth) || 0;
-  let mobName = String(entity.displayName.string);
+  let mobName = tvEntityName(entity);
   let typeId = String(entity.type);
   let hostile = false;
   try {
@@ -1098,16 +1168,18 @@ PlayerEvents.chat((e) => {
   let mem = tvMem(player);
   if (matched) {
     let n = 2 + Math.floor(Math.random() * 2);
-    for (let i = 0; i < n; i++) {
-      let v = tvRand(global.TV_VIEWERS);
-      mem.queue.push({ at: tvNow() + 1000 + Math.random() * 4000, name: v.name, color: v.color, msg: tvRand(matched.lines) });
+    let lines = matched.lines.slice().sort(() => Math.random() - 0.5);
+    for (let i = 0; i < n && i < lines.length; i++) {
+      let v = tvPickViewer(player);
+      mem.queue.push({ at: tvNow() + 1000 + Math.random() * 4000, name: v.name, color: v.color, msg: lines[i] });
     }
   } else {
     // 키워드가 없어도 스트리머가 말하면 항상 1~2명은 반응
     let n = 2 + Math.floor(Math.random() * 2);
+    let lines = global.TV_TEMPLATES.chat_generic.slice().sort(() => Math.random() - 0.5);
     for (let i = 0; i < n; i++) {
-      let v = tvRand(global.TV_VIEWERS);
-      mem.queue.push({ at: tvNow() + 1200 + Math.random() * 3500, name: v.name, color: v.color, msg: tvRand(global.TV_TEMPLATES.chat_generic) });
+      let v = tvPickViewer(player);
+      mem.queue.push({ at: tvNow() + 1200 + Math.random() * 3500, name: v.name, color: v.color, msg: lines[i] });
     }
   }
 });
@@ -1128,8 +1200,9 @@ BlockEvents.placed((e) => {
   } catch (err) {
     crop = false;
   }
-  if (crop || /crop|sapling|seed/.test(pid)) tvNote(e.player, `심은 작물 ${pid}`, 1);
-  else tvNote(e.player, `놓은 블록 ${pid}`, 1);
+  let koPlaced = tvBlockName(e.block.id);
+  if (crop || /crop|sapling|seed/.test(pid)) tvNote(e.player, `심은 작물 ${koPlaced}`, 1);
+  else tvNote(e.player, `놓은 블록 ${koPlaced}`, 1);
 });
 
 // 업적: 선릿 밸리 주요 업적만 (streamConfig.js의 advancementRules)
@@ -1152,7 +1225,9 @@ if (PlayerEvents.advancement) {
     if (!rule) return;
     let title = "업적";
     try {
-      title = String(adv.getTitle().string).replace(/[\[\]]/g, "");
+      let t = adv.getTitle();
+      let c = typeof t.getContents === "function" ? t.getContents() : t.contents;
+      title = tvKo(tvG(c, "key", "getKey")) || String(t.string).replace(/[\[\]]/g, "");
     } catch (err) {
       title = "업적";
     }
@@ -1203,7 +1278,7 @@ global.tvOnFished = (player, itemIds) => {
     let value = trade ? Number(trade.value) : 0;
     let label = id;
     try {
-      label = String(Item.of(id).displayName.string).replace(/[\[\]]/g, "");
+      label = tvStackName(Item.of(id));
     } catch (err) {
       label = id;
     }

@@ -74,11 +74,11 @@ function tvAiContext(player) {
   let food = tvAiSafe(() => Number(tvG(tvG(player, "foodData", "getFoodData"), "foodLevel", "getFoodLevel")), 20);
   let held = tvAiSafe(() => {
     let st = player.mainHandItem;
-    return st.isEmpty() ? "빈손" : String(st.hoverName.string).replace(/[\[\]]/g, "");
+    return st.isEmpty() ? "빈손" : tvStackName(st);
   }, "?");
   let vehicle = tvAiSafe(() => {
     let v = tvG(player, "vehicle", "getVehicle");
-    return v ? String(v.displayName.string) : "";
+    return v ? tvEntityName(v) : "";
   }, "");
   lines.push(`상태: 체력 ${hp}/${maxHp}, 배고픔 ${food}/20, 손에 든 것: ${held}${vehicle ? ", 타고 있는 것: " + vehicle : ""}${player.isCrouching() ? ", 웅크림" : ""}`);
 
@@ -92,7 +92,7 @@ function tvAiContext(player) {
         players.push(String(e.username));
         return;
       }
-      let name = String(e.displayName.string);
+      let name = tvEntityName(e);
       let key = (e.isMonster() ? "적:" : "") + name;
       counts[key] = (counts[key] || 0) + 1;
     });
