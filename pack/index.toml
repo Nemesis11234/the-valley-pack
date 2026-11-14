@@ -25703,7 +25703,7 @@ hash = "5b54334cfde5e45af3811788456dbe702774519a767233e6da409d56c6c407c9"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamAI.js"
-hash = "24abdf6ffd8640806781c058803357c96f3d8191905fbe0f59e300ad57f03932"
+hash = "2ec0108928efdf63e8e1474fc66a7545ed3eca67bf31327bc3f0a35174c2184c"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamConfig.js"
@@ -27181,6 +27181,11 @@ metafile = true
 [[files]]
 file = "mods/konkrete.pw.toml"
 hash = "143102be700d30cf68d0988bc9f1b523545e37b7074ee786faac56a388e6f0e9"
+metafile = true
+
+[[files]]
+file = "mods/korean-chat-patch.pw.toml"
+hash = "b92cf4a397ebe0bb7baef89cbbb2e27c9344a0ca044ab0f443d81e0ed4142d47"
 metafile = true
 
 [[files]]
