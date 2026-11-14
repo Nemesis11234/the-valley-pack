@@ -159,6 +159,27 @@ def apply_ai_limits():
         log(f"AI 한도: 하루 ${cfg.get('dailyLimitUsd')}, 한 달 ${cfg.get('monthlyLimitUsd')}")
 
 
+def build_ko_names():
+    """방송 채팅용 한국어 이름표 (모드가 바뀌었을 때만 다시 만듦)."""
+    out = f"{SERVER}/thevalley_ai/ko_names.json"
+    sig_file = f"{SERVER}/thevalley_ai/ko_names.sig"
+    mods = sorted(os.listdir(f"{SERVER}/mods"))
+    langs = []
+    for root, _, files in os.walk(f"{SERVER}/kubejs/assets"):
+        for f in files:
+            if f == "ko_kr.json":
+                p = os.path.join(root, f)
+                langs.append(f"{p}:{os.path.getsize(p)}")
+    sig = json.dumps([mods, sorted(langs)])
+    if os.path.exists(out) and os.path.exists(sig_file) and open(sig_file).read() == sig:
+        return
+    r = subprocess.run([sys.executable, f"{REPO}/scripts/build_ko_names.py", SERVER, out], capture_output=True, text=True, timeout=600)
+    for line in (r.stdout + r.stderr).strip().splitlines()[-3:]:
+        log(line)
+    if r.returncode == 0:
+        open(sig_file, "w").write(sig)
+
+
 def maybe_reset_world():
     flag = f"{REPO}/server-control/reset-world.txt"
     done = f"{SERVER}/.reset-done"
@@ -225,6 +246,10 @@ def main():
     ver = install_forge()
     sync_mods()
     sync_pack_files()
+    try:
+        build_ko_names()
+    except Exception as e:  # noqa: BLE001
+        log(f"한국어 이름표 실패 (영어 이름으로 계속): {e}")
     maybe_reset_world()
     try:
         cleanup()

@@ -171,7 +171,7 @@ function tvSituations(player) {
   if (food <= 6) add("hungry", 4);
   if (tvSitSafe(() => player.isCrouching(), false)) add("crouch", 1);
   let vehicle = tvSitSafe(() => tvG(player, "vehicle", "getVehicle"), null);
-  if (vehicle) add("riding", 3, { mob: tvSitSafe(() => tvSitKo(vehicle.displayName.string), null) || "탈 것" });
+  if (vehicle) add("riding", 3, { mob: tvSitSafe(() => tvEntityName(vehicle), null) || "탈 것" });
 
   // 주변 (16칸)
   let near = tvSitSafe(() => {
@@ -184,7 +184,10 @@ function tvSituations(player) {
         return;
       }
       let en = String(e.displayName.string);
-      let ko = tvSitKo(en);
+      let ko = tvSitKo(en) || tvEntityName(e);
+      if (!/[가-힣]/.test(ko)) ko = null; // 한국어 이름을 모르면 그냥 "몹"
+      let tkey = String(e.type);
+      if (/armor_stand|villager|wandering_trader|golem|npc|mannequin|statue/.test(tkey)) return; // 갑옷 거치대·주민·NPC는 반응 안 함
       if (e.isMonster()) {
         r.mobCount++;
         if (/creeper/i.test(en)) r.creeper = true;
@@ -210,7 +213,7 @@ function tvSituations(player) {
   let held = tvSitSafe(() => {
     let st = player.mainHandItem;
     if (st.isEmpty()) return { id: "", name: "" };
-    return { id: String(st.id), name: String(st.hoverName.string).replace(/[\[\]]/g, "") };
+    return { id: String(st.id), name: tvStackName(st) };
   }, null);
   if (held) {
     let id = held.id;

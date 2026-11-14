@@ -10,6 +10,7 @@ on:
       - "scripts/client_only.json"
       - "scripts/extra_mods.json"
       - "scripts/add_extra_mods.py"
+      - "scripts/build_ko_names.py"
       - ".github/workflows/server-test.yml"
   workflow_dispatch:
 
@@ -64,3 +65,7 @@ jobs:
 
       - name: 서버 부팅 테스트
         run: python -u scripts/boot_test.py "$RUNNER_TEMP/server"
+
+      - name: 한국어 이름표 확인 (방송 채팅용)
+        if: always()
+        run: python -u scripts/build_ko_names.py "$RUNNER_TEMP/server" "$RUNNER_TEMP/ko_names.json"
