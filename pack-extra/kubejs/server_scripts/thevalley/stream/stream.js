@@ -588,12 +588,14 @@ function tvMissionStart(player) {
   let mem = tvMem(player);
   if (mem.mission || !tvIsOn(player)) return;
   if (String(player.level.dimension) != "minecraft:overworld" && Math.random() < 0.7) return;
-  let viewer = tvRand(global.TV_VIEWERS);
+  let viewer = tvPickViewer(player);
   let types = ["kill", "mine", "fish"];
   if (String(player.level.dimension) == "minecraft:overworld") types.push("goto");
   let type = tvRand(types);
-  let m;
-  if (type == "goto") {
+  let m = tvPhotoMission(player);
+  if (m) {
+    // 사진 미션 (카메라가 있을 때만)
+  } else if (type == "goto") {
     let a = Math.random() * 6.283185307179586;
     let r = 80 + Math.random() * 100;
     let tx = Math.round(player.x + Math.cos(a) * r), tz = Math.round(player.z + Math.sin(a) * r);
@@ -611,7 +613,7 @@ function tvMissionStart(player) {
   m.progress = 0;
   m.from = viewer.name;
   m.ends = tvNow() + m.sec * 1000;
-  m.reward = tvRoundCoins(Math.min(TV.missionRewardMax, Math.max(TV.missionRewardMin, tvViewers(player) * 2)));
+  m.reward = tvRoundCoins(Math.min(TV.missionRewardMax, Math.max(TV.missionRewardMin, tvViewers(player) * 2)) * (m.rewardMult || 1));
   mem.mission = m;
 
   let id = tvBossbarId(player);
@@ -898,6 +900,9 @@ function tvSecond(player) {
 
   // 미션
   tvMissionTick(player);
+
+  // 단골 선물 (잠수 중엔 안 옴)
+  if (tvIsOn(player) && afk < TV.afkSoftSec) tvGiftTick(player);
 
   // 수입·지출 감지 (10초마다)
   if (player.age % (TV_TICKS_PER_SEC * 10) < TV_TICKS_PER_SEC) tvCheckBalance(player);

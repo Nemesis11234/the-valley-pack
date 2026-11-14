@@ -205,3 +205,64 @@ function tvRegAiContext(player) {
   if (mems.length) lines.push(`지난 방송 명장면: ${mems.map((m) => `${tvAgo(m.at)} ${m.t}`).join(" / ")}`);
   return lines.join("\n");
 }
+
+// ───────────── 시청자 선물 ─────────────
+// 가끔 단골이 작은 선물을 택배로 보내 줌 (가방이 꽉 차면 발밑에 떨어짐). 큰손은 가끔 귀한 걸 보냄
+
+const TV_GIFT = {
+  chancePerMin: 0.03, // 1분마다 선물이 올 확률 (평균 30분에 한 번쯤)
+  minGapSec: 900, // 선물 사이 최소 간격
+  rareChance: 0.15, // 큰손이 있을 때 귀한 선물 확률
+  small: [
+    { id: "minecraft:bread", n: [3, 6], name: "빵" },
+    { id: "minecraft:cooked_beef", n: [2, 4], name: "스테이크" },
+    { id: "minecraft:baked_potato", n: [3, 6], name: "구운 감자" },
+    { id: "minecraft:golden_carrot", n: [2, 3], name: "황금 당근" },
+    { id: "minecraft:torch", n: [16, 32], name: "횃불" },
+    { id: "minecraft:honey_bottle", n: [1, 3], name: "꿀병" },
+    { id: "minecraft:cookie", n: [6, 12], name: "쿠키" },
+    { id: "minecraft:pumpkin_pie", n: [1, 3], name: "호박 파이" },
+    { id: "minecraft:bone_meal", n: [8, 16], name: "뼛가루" },
+    { id: "thevalley:enhance_stone_low", n: [1, 1], name: "하급 강화석" },
+  ],
+  rare: [
+    { id: "thevalley:enhance_stone_low", n: [2, 3], name: "하급 강화석" },
+    { id: "thevalley:enhance_stone_mid", n: [1, 1], name: "중급 강화석" },
+    { id: "minecraft:golden_apple", n: [1, 1], name: "황금 사과" },
+    { id: "minecraft:diamond", n: [1, 2], name: "다이아몬드" },
+  ],
+};
+
+global.TV_REG_TEMPLATES.gift = ["밥은 먹고 해요", "이거 쓰세요", "택배 왔어요", "응원 선물", "필요할 것 같아서", "맨날 보는 보답", "아껴 쓰세요 ㅋㅋ", "선물 받아요"];
+global.TV_REG_TEMPLATES.gift_rare = ["큰맘 먹고 보냄", "이걸로 강화 가즈아", "통 크게 쏜다", "아끼지 말고 써요"];
+global.TV_REG_TEMPLATES.gift_react = ["선물 ㄷㄷ", "{d}님 착하다", "나도 보내고 싶다", "택배 왔다 ㅋㅋ", "역시 단골"];
+
+function tvGiftTick(player) {
+  let mem = tvMem(player);
+  let now = tvNow();
+  if (mem.lastGift && now - mem.lastGift < TV_GIFT.minGapSec * 1000) return;
+  if (Math.random() >= TV_GIFT.chancePerMin / 60) return;
+  let names = Object.keys(tvRegGet(player));
+  if (!names.length) return;
+  mem.lastGift = now;
+  let big = tvRegBigDonors(player, 2);
+  let rare = big.length && Math.random() < TV_GIFT.rareChance;
+  let g = tvRand(rare ? TV_GIFT.rare : TV_GIFT.small);
+  let n = g.n[0] + Math.floor(Math.random() * (g.n[1] - g.n[0] + 1));
+  let from = tvRegViewer(rare ? tvRand(big) : tvRand(names));
+  try {
+    player.give(Item.of(g.id, n));
+  } catch (err) {
+    console.error("[TheValley] gift error: " + err);
+    return;
+  }
+  let msg = tvRand(rare ? global.TV_REG_TEMPLATES.gift_rare : global.TV_REG_TEMPLATES.gift);
+  tvPushChat(player, "[선물] " + from.name, from.color, `${g.name} ${n}개 보냄 · ${msg}`, true);
+  player.server.runCommandSilent(`execute as ${tvName(player)} at @s run playsound minecraft:entity.item.pickup player @s ~ ~ ~ 0.8 0.8`);
+  player.server.runCommandSilent(
+    `title ${tvName(player)} actionbar ${tvJson({ text: `${from.name}님이 ${g.name} ${n}개를 보냈어요!`, color: "#FFB3E6" })}`
+  );
+  let other = tvPickViewer(player);
+  if (other.name != from.name) mem.queue.push({ at: now + 2000, name: other.name, color: other.color, msg: tvFill(tvRand(global.TV_REG_TEMPLATES.gift_react), { d: from.name }) });
+  if (rare) tvRemember(player, `${from.name}님이 ${g.name} 선물한 거`);
+}

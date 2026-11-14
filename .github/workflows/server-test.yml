@@ -8,6 +8,8 @@ on:
       - "scripts/tweaks.json"
       - "scripts/boot_test.py"
       - "scripts/client_only.json"
+      - "scripts/extra_mods.json"
+      - "scripts/add_extra_mods.py"
       - ".github/workflows/server-test.yml"
   workflow_dispatch:
 
@@ -44,6 +46,8 @@ jobs:
       - name: pack-extra와 설정 변경을 팩에 반영
         run: |
           python scripts/apply_tweaks.py pack
+          export PATH="$PATH:$(go env GOPATH)/bin"
+          python scripts/add_extra_mods.py pack
           cd pack && packwiz refresh
 
       - name: 바뀐 팩 커밋
