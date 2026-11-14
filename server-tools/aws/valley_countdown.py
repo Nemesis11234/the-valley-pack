@@ -41,7 +41,6 @@ def warn(sec, stop_text):
         console("title @a title " + json.dumps({"text": f"{label(sec)} 뒤 서버 종료", "color": "#FF5555"}, ensure_ascii=False))
     else:
         console("title @a actionbar " + json.dumps({"text": text, "color": "#FFD54F"}, ensure_ascii=False))
-    console("execute as @a at @s run playsound minecraft:block.note_block.pling master @s ~ ~ ~ 1 " + ("2" if sec <= 10 else "1"))
 
 
 def target_time(now, stop):
@@ -81,8 +80,6 @@ def main():
     wait = left / SPEED - (time.time() - start_real)
     if wait > 0:
         time.sleep(wait)
-    reopen = f" 내일 {cfg.get('start')}에 다시 열려요!" if cfg.get("start") else ""
-    console("tellraw @a " + json.dumps({"text": "[서버] 서버를 끕니다." + reopen, "color": "#FF5555"}, ensure_ascii=False))
     log("서버 끄기")
     if DRY:
         return
