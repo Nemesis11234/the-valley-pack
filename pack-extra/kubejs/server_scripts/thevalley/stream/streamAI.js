@@ -62,7 +62,9 @@ function tvAiContext(player) {
   let biome = tvAiSafe(() => String(player.block.biomeId).replace("minecraft:", ""), "?");
   let sky = tvAiSafe(() => !!player.block.canSeeSky, true);
   let place = dim == "society:skull_cavern" ? "해골 광산 안" : !sky ? (y < 50 ? "지하 동굴" : "실내/지붕 아래") : "바깥";
-  lines.push(`장소: ${dim.replace("minecraft:", "")}, 바이옴 ${biome}, 높이 Y=${y}, ${place}`);
+  // 평원·숲처럼 흔한 바이옴은 안 넘김 (AI가 "평원이네" 같은 중계를 하지 않게)
+  let biomeText = /plains|forest|river|taiga|meadow|beach/.test(biome) && !/cherry|flower/.test(biome) ? "" : `, 바이옴 ${biome}`;
+  lines.push(`장소: ${dim.replace("minecraft:", "")}${biomeText}, 높이 Y=${y}, ${place}`);
 
   let t = tvAiSafe(() => Number(player.server.overworld().getDayTime()) % 24000, 6000);
   let tod = t < 1000 ? "아침" : t < 6000 ? "오전" : t < 12000 ? "오후" : t < 13800 ? "저녁(해 질 녘)" : t < 22500 ? "밤" : "새벽";
