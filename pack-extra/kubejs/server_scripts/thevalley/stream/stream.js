@@ -1785,4 +1785,6 @@ ServerEvents.commandRegistry((event) => {
 
 ServerEvents.loaded((e) => {
   tvUpdateSidebar(e.server);
+  // 한국어 이름표를 미리 불러와서 확인 (예: 대구 / 좀비)
+  console.info(`[TheValley] 이름표 확인: ${tvKo("item.minecraft.cod")} / ${tvKo("entity.minecraft.zombie")}`);
 });
