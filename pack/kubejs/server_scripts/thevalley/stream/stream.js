@@ -308,6 +308,8 @@ function tvPushChat(player, name, color, msg, gold) {
   let mem = tvMem(player);
   mem.chat.push({ t: tvNow(), name: name, color: color, msg: msg, gold: !!gold });
   tvRenderChat(player);
+  // 실제 방송 채팅 기록 (나중에 어색한 채팅 찾아 고치는 용도, logs/kubejs/server.log)
+  if (TV.chatLog) console.info(`[TVCHAT] ${tvName(player)} ${tvViewers(player)} | ${name}: ${msg}`);
 }
 
 // 시청자 채팅 n줄을 0~spread초에 걸쳐 흘려보냄
@@ -337,7 +339,8 @@ function tvViewerChat(player, category, vars, count, spreadSec) {
     let fv = { p: tvName(player) };
     Object.keys(vars || {}).forEach((k) => (fv[k] = vars[k]));
     mem.queue.push({ at: tvNow() + delay, name: viewer.name, color: viewer.color, msg: tvFill(line, fv) });
-    if (i == 0 && category != "idle") tvEcho(player, tvNow() + delay, viewer.name, 0.3);
+    // 큰 장면은 아무 말에나 물결, 작은 일은 웃기거나 놀란 말에만
+    if (i == 0 && category != "idle" && category != "donation_small") tvEcho(player, tvNow() + delay, viewer.name, 0.3, tvNow() - (mem.bigEventAt || 0) < 3000 ? null : line);
   }
 }
 
@@ -362,7 +365,7 @@ function tvSetSidebarScore(player) {
 // ───────────── 최근 행동 기록 (AI 상황 설명용, 최근 90초) ─────────────
 
 // 최근 90초 동안 한 일 (몇 개 캤는지 등). 90초 지난 기록은 빠짐
-const TV_RECENT_MS = 90000;
+const TV_RECENT_MS = 60000;
 
 function tvRecentPrune(acts, now) {
   Object.keys(acts).forEach((k) => {
@@ -437,6 +440,7 @@ function tvEvent(player, hype, subs, reason, category, vars) {
   if (!tvIsOn(player)) return;
   tvMarkActive(player);
   tvChange(player, hype, subs, reason);
+  if (Math.abs(hype) >= 15) tvMem(player).bigEventAt = tvNow(); // 큰 장면 직후엔 딴소리(평화롭다 등) 안 함
   // 큰 장면은 AI가 이어서 반응 (템플릿은 1줄만 먼저)
   let aiUsed = Math.abs(hype) >= 15 && global.tvAiRequest && global.tvAiRequest(player, "event", reason);
   if (category) tvViewerChat(player, category, vars || {}, aiUsed ? 1 : null, hype >= 50 ? 10 : 6);
@@ -539,7 +543,9 @@ function tvShowDonation(player, viewer, amount, message, troll, extraLines) {
       )
     );
   }
-  if (Math.random() < 0.4) tvViewerChat(player, troll ? "troll" : "donation_thanks", {}, 1, 4);
+  // 후원 금액에 맞는 반응 (100원에 "큰손 등장"은 어색)
+  let thanks = amount < 1000 ? "donation_small" : amount >= 10000 ? "donation_big" : "donation_thanks";
+  if (Math.random() < (amount < 1000 ? 0.25 : 0.5)) tvViewerChat(player, troll ? "troll" : thanks, {}, 1, 4);
 }
 
 function tvSettleHint(player, full) {
@@ -975,7 +981,22 @@ function tvSecond(player) {
   if (mem.queue.length) {
     let ready = mem.queue.filter((q) => q.at <= now);
     mem.queue = mem.queue.filter((q) => q.at > now);
-    ready.forEach((q) => tvPushChat(player, q.name, q.color, String(q.name).indexOf("[") == 0 ? q.msg : tvQuirk(q.name, q.msg)));
+    let spoke = mem.spokeAt || (mem.spokeAt = {});
+    ready.forEach((q) => {
+      // 한 사람이 몇 초 안에 연달아 치지 않게 (진짜 채팅은 사람마다 텀이 있음)
+      if (String(q.name).indexOf("[") != 0 && spoke[q.name] && now - spoke[q.name] < 7000) {
+        for (let k = 0; k < 3; k++) {
+          let v = tvPickViewer(player);
+          if (!spoke[v.name] || now - spoke[v.name] >= 7000) {
+            q.name = v.name;
+            q.color = v.color;
+            break;
+          }
+        }
+      }
+      spoke[q.name] = now;
+      tvPushChat(player, q.name, q.color, String(q.name).indexOf("[") == 0 ? q.msg : tvQuirk(q.name, q.msg));
+    });
   }
 
   // 평소 잡담: 시청자가 많을수록 자주, 여러 명이 (10명 약 15초마다 1줄 → 1,000명 2~3초마다 여러 줄)
@@ -1180,6 +1201,7 @@ PlayerEvents.chat((e) => {
   tvMarkActive(player);
   if (!tvIsOn(player)) return;
   let msg = String(e.message);
+  if (TV.chatLog) console.info(`[TVCHAT] ${tvName(player)} ${tvViewers(player)} | >> 스트리머: ${msg}`);
   if (tvSwearCheck(player, msg)) return;
   if (tvStreamerAsk(player, msg)) return; // 시청자에게 하는 부탁 (ㅋㅋ 쳐줘, 투표, 후원 구걸 등)
   if (global.tvAiRequest && global.tvAiRequest(player, "chat", msg)) return; // AI가 답함
@@ -1307,7 +1329,7 @@ global.tvOnFished = (player, itemIds) => {
     let first = tvFirst(player, "fish:" + id);
     let hype = Math.max(1, Math.min(40, Math.round(value / 16))) * (first ? 2 : 1) * tvDaily(player, "fish:" + id);
     let cat = value >= 160 ? "fish_big" : "fish_small";
-    if (first) cat = "fish_first";
+    if (first) cat = value >= 160 ? "fish_first" : "fish_first_small";
     tvEvent(player, Math.round(hype), first ? 2 : 0, first ? `처음 낚은 ${label}` : label, cat, { item: label });
     tvMissionProgress(player, "fish", 1);
     tvNote(player, `낚음 ${label}`, 1);

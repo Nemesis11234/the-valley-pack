@@ -97,6 +97,7 @@ global.TV_CONFIG = {
   idleChatMinSec: 3,
   // 평소 잡담 중 화면 상황(밤·비·몹·체력·손에 든 것·하는 일 등)에 반응하는 비율
   situationChatRatio: 0.9,
+  chatLog: true, // 방송 채팅을 서버 로그에 남김 ([TVCHAT])
   // AI 잡담 간격(초)
   aiIdleMaxSec: 40,
   aiIdleMinSec: 15,
