@@ -21,7 +21,10 @@ global.TV_CROWD_LINES = [
   ["천 명 넘었다 ㄷㄷ", "역대급 방송", "오늘 레전드 찍네", "방장 출세했다 ㅋㅋ", "초창기부터 보던 사람 손", "나 시청자 10명일 때부터 봄", "숏츠에서 보고 옴", "채팅 따라가기 힘들다", "이 많은 사람 앞에서 이러기 있냐 ㅋㅋ", "오늘 무슨 날임?"],
 ];
 
-global.TV_REPLY_LINES = ["ㄹㅇ", "ㅇㅈ", "그건 아니지 ㅋㅋ", "ㅋㅋㅋㅋ 공감", "님 뭔데 ㅋㅋ", "훈수 ㄴㄴ", "나도 그 생각함", "ㄴㄴ 아님", "ㅋㅋㅋ 정답", "말 되네", "이분 뭐야 ㅋㅋ"];
+// 대부분 맞장구, 가끔 반박 (진짜 채팅도 @답글은 맞장구가 많음)
+global.TV_REPLY_LINES = ["ㄹㅇ", "ㅇㅈ", "ㅋㅋㅋㅋ 공감", "나도 그 생각함", "ㅋㅋㅋ 정답", "말 되네", "ㄹㅇㅋㅋ", "ㅇㅈ ㅋㅋ"];
+global.TV_REPLY_NO = ["그건 아니지 ㅋㅋ", "님 뭔데 ㅋㅋ", "ㄴㄴ 아님", "이분 뭐야 ㅋㅋ"];
+global.TV_REPLY_COACH = ["훈수 ㄴㄴ", "훈수충 등장 ㅋㅋ", "ㅇㅈ 그게 맞음", "ㄹㅇ 그거 해야 됨"];
 
 // 반응 물결 (큰 방송일수록 여러 명이 같은 반응을 도배)
 global.TV_WAVE = ["ㅋㅋㅋㅋㅋㅋ", "ㅋㅋㅋㅋㅋㅋㅋㅋㅋ", "ㅋㅋㅋ", "ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ", "ㄷㄷㄷ", "ㄷㄷㄷㄷㄷ", "와", "와아아", "?????", "??", "ㅋㅋㅋㅋㅋㅋㅋ 아"];
@@ -58,9 +61,13 @@ function tvCrowdTick(player) {
     // 규모 전용 채팅: 이번 단계와 아래 단계 문구 섞어서
     let pool = [];
     for (let i = 1; i <= t; i++) pool = pool.concat(global.TV_CROWD_LINES[i]);
-    let used = mem.usedLines || (mem.usedLines = {});
+    // 규모 잡담은 20분 안에 같은 말 안 함 ("채팅 빨라졌네"가 계속 나오면 티 남)
+    let used = mem.crowdUsed || (mem.crowdUsed = {});
+    Object.keys(used).forEach((k) => {
+      if (now - used[k] > 1200000) delete used[k];
+    });
     let line = tvRand(pool);
-    for (let k = 0; k < 6 && used[line]; k++) line = tvRand(pool);
+    for (let k = 0; k < 8 && used[line]; k++) line = tvRand(pool);
     if (!used[line]) {
       used[line] = now;
       let v = tvCrowdViewer(player);
@@ -73,12 +80,19 @@ function tvCrowdTick(player) {
 // 다른 시청자 채팅에 @답글
 function tvReplyChat(player) {
   let mem = tvMem(player);
-  let recent = mem.chat.slice(-6).filter((l) => l.name && l.name.indexOf("[") < 0 && l.msg.indexOf("@") < 0 && l.msg.length >= 5);
+  // 의견·주장에만 답글 (인사·근황·질문에 "그건 아니지"는 어색)
+  let recent = mem.chat.slice(-6).filter((l) => l.name && l.name.indexOf("[") < 0 && l.msg.indexOf("@") < 0 && (l.msg.match(/[가-힣]/g) || []).length >= 3 && !/[?？]|ㅎㅇ|안녕|하이|잘 보고|퇴근|밥 먹|과제|보는 중|왔어요|ㅂㅂ/.test(l.msg));
   if (!recent.length) return;
   let target = tvRand(recent);
   let v = tvPickViewer(player);
   if (v.name == target.name) return;
-  mem.queue.push({ at: tvNow() + 800 + Math.random() * 2500, name: v.name, color: v.color, msg: `@${target.name} ${tvRand(global.TV_REPLY_LINES)}` });
+  // 훈수에는 훈수 답글, 놀림·의견엔 대부분 맞장구 가끔 반박. 응원·짧은 감탄엔 답글 안 함
+  let m = target.msg;
+  let pool;
+  if (/요$|셈$|해요|하세요|주셈|가요|박아|바꿔|심어|조심/.test(m)) pool = global.TV_REPLY_COACH;
+  else if (/ㅋ|실화|무엇|각$|듯|네$|임$|냐/.test(m)) pool = Math.random() < 0.8 ? global.TV_REPLY_LINES : global.TV_REPLY_NO;
+  else return;
+  mem.queue.push({ at: tvNow() + 800 + Math.random() * 2500, name: v.name, color: v.color, msg: `@${target.name} ${tvRand(pool)}` });
 }
 
 // ───────────── 시청자 1,500명 명단 (각자 성격·말버릇) ─────────────
@@ -99,9 +113,9 @@ const TV_PERSONA_ORDER = ["react", "react", "tease", "tease", "coach", "coach", 
 
 // 성격별로 자기가 자주 하는 말 (평소 잡담 때)
 global.TV_PERSONA_LINES = {
-  react: ["ㅋㅋㅋㅋㅋ", "와", "ㄷㄷ", "미쳤다", "아 ㅋㅋㅋ", "오", "헐", "ㅋㅋㅋ", "이거지", "ㅇㅈ"],
+  react: ["ㅋㅋㅋㅋㅋ", "아 ㅋㅋㅋ", "ㅋㅋㅋ", "이거지", "ㅇㅈ", "ㄹㅇㅋㅋ"],
   tease: ["방장 오늘도 노잼 ㅋㅋ", "실력 이슈 ㅋㅋ", "방장 길치임?", "오늘도 노숙각", "훈수 들어도 못함 ㅋㅋ", "방장 원래 이럼?", "이게 플레이냐 ㅋㅋ", "어제도 이러지 않았나 ㅋㅋ"],
-  coach: ["물부터 주셈", "그거 팔면 손해임", "곡괭이 먼저 바꿔요", "퀘스트북 확인 좀", "인벤 정리 좀 ㅋㅋ", "상자 좀 만들어요 인벤 터지겠다"],
+  coach: ["그거 팔면 손해임", "퀘스트북 확인 좀", "인벤 정리 좀 ㅋㅋ", "상자 좀 만들어요 인벤 터지겠다"],
   ask: ["몇 일차예요?", "이거 무슨 모드팩임?", "다음엔 뭐 해요?", "오늘 몇 시까지 함?", "이거 혼자 하는 거예요?", "브금 뭐예요?", "방송 매일 함?"],
   cheer: ["방장 화이팅", "가보자고", "오늘 폼 좋다", "오늘 뭔가 될 것 같음", "오늘 방송 일찍 켰네"],
   info: ["비 오는 날 메기 나옴", "해골광산 깊이 가면 이리듐 나옴", "무지갯빛 파편 진짜 비쌈", "계절 지나면 작물 다 죽음", "출하는 아침에 정산됨", "슬라임 키우면 돈 됨", "낚시는 아침이 잘 됨"],
@@ -334,7 +348,13 @@ global.TV_PERSONA_SIT = {
 const tvPersonaGeneric = tvPersonaChat;
 tvPersonaChat = function (player) {
   let v = tvPickViewer(player);
-  let sits = tvSituations(player).filter((s) => global.TV_PERSONA_SIT[s.k] && global.TV_PERSONA_SIT[s.k][v.type]);
+  let all = tvSituations(player);
+  // 위험할 땐 위험 얘기만 (크리퍼 앞에서 "밤하늘 이쁘다"는 어색)
+  let danger = all.some((s) => ["low_hp", "creeper", "mob"].indexOf(s.k) >= 0);
+  let sits = all.filter((s) => global.TV_PERSONA_SIT[s.k] && global.TV_PERSONA_SIT[s.k][v.type] && (!danger || ["low_hp", "creeper", "mob", "hungry"].indexOf(s.k) >= 0));
+  if (danger && !sits.length) return false;
+  let fresh = tvNow() - (tvMem(player).bigEventAt || 0) < 30000;
+  if (fresh && v.type == "calm") return false; // 방금 죽거나 큰일 났는데 힐링 멘트는 어색
   let mem = tvMem(player);
   let used = mem.usedLines || (mem.usedLines = {});
   if (sits.length && Math.random() < 0.75) {
@@ -350,19 +370,28 @@ tvPersonaChat = function (player) {
       }
     }
     let lines = global.TV_PERSONA_SIT[pick.k][v.type];
+    // 화면 반응과 같은 문장이 있어서 둘 다 5분 안에 쓴 말은 피함
+    let su = mem.sitUsed || (mem.sitUsed = {});
+    let seen = (l) => used[l] || (su[l] && tvNow() - su[l] < 300000);
     let line = tvRand(lines);
-    for (let k = 0; k < 4 && used[line]; k++) line = tvRand(lines);
-    if (!used[line]) {
+    for (let k = 0; k < 4 && seen(line); k++) line = tvRand(lines);
+    if (!seen(line)) {
       used[line] = tvNow();
+      su[line] = tvNow();
       mem.queue.push({ at: tvNow() + Math.random() * 2500, name: v.name, color: v.color, msg: tvFill(line, Object.assign({ p: tvName(player) }, pick.v || {})) });
       return true;
     }
   }
   // 그 외엔 평소 잡담 (모든 대사를 화면에 맞추면 오히려 인위적. 단 고인물 정보는 상황 없이 하면 엉뚱해서 뺌)
-  if (v.type != "info" && Math.random() < 0.6) {
+  if (v.type != "info" && !danger && !fresh && Math.random() < 0.6) {
     let gl = global.TV_PERSONA_LINES[v.type];
+    // 인사는 한 사람이 한 번만
+    let greeted = mem.greeted || (mem.greeted = {});
+    if (greeted[v.name]) gl = gl.filter((l) => !/ㅎㅇ/.test(l));
+    if (!gl.length) return false;
     let line = tvRand(gl);
     for (let k = 0; k < 4 && used[line]; k++) line = tvRand(gl);
+    if (/ㅎㅇ/.test(line)) greeted[v.name] = 1;
     if (used[line] && v.type != "react") return false;
     used[line] = tvNow();
     mem.queue.push({ at: tvNow() + Math.random() * 2500, name: v.name, color: v.color, msg: tvFill(line, { p: tvName(player) }) });

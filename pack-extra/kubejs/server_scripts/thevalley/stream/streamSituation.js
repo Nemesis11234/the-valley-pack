@@ -9,7 +9,7 @@
 global.TV_SITUATION = {
   night: ["밤에 밖에 나가는 거 맞음?", "이 시간에 산책 ㅋㅋ 간 크네", "방장 침대 어디다 뒀어요", "밤엔 집에 있으라고요 ㅋㅋ", "아 불안해", "몹 스폰 시간인데", "이러다 크리퍼 만나지", "횃불 하나 없이 다니네 ㄷㄷ", "밤에 왜 나감 ㅋㅋ 미쳤나", "생존 감각 0 ㅋㅋ", "죽으러 나가는 중"],
   dawn: ["밤샘 성공 ㅋㅋ", "해 떴다 살았다", "드디어 아침", "밤 버텼네"],
-  morning: ["오늘은 뭐 하나", "아침 루틴 ㄱㄱ", "물부터 주셈", "오늘 할 거 많다며"],
+  morning: ["아침부터 열일하네", "해 떴다", "아침 공기 좋아 보임", "오늘은 뭐 하나"],
   evening: ["해 지는데 아직 밖이네 ㅋㅋ", "노을 미쳤다", "곧 밤인데 괜찮음?", "슬슬 집 가야 할 듯"],
   rain: ["비 오는 날은 낚시지 ㄹㅇ", "비 오면 물 안 줘도 되나?", "빗소리 ASMR", "감성 미쳤다", "비 맞으면서 일하는 방장 ㅠ"],
   snow: ["눈 온다 ㄷㄷ", "감성 미쳤다", "눈 오는 날 광산 ㄱ?", "추워 보여 ㅋㅋ"],
@@ -18,7 +18,7 @@ global.TV_SITUATION = {
   skull: ["해골광산 ㄷㄷ", "몇 층까지 가나 보자", "여기서 죽으면 손해 개큼", "폭탄 있음?", "오늘 신기록 각", "체력 관리 잘하셈", "여기서 뒤지면 ㄹㅇ 손해"],
   high: ["떨어지면 끝 ㅋㅋ", "고소공포증 옴", "뷰 맛집 ㄹㅇ", "아 손에 땀 남", "떨어지면 웃길 듯 ㅋㅋ"],
   water: ["수영 ㅋㅋ", "숨 조심요", "물속 무섭다", "보트 타요 보트", "물에 빠진 생쥐 ㅋㅋ"],
-  low_hp: ["피 없어요!!", "피 {hp}칸 ㄷㄷㄷ", "도망쳐요 빨리", "먹어 먹어 뭐라도", "이러다 죽어", "아 심장 떨려", "힐 힐 힐", "이건 진짜 위험한데", "ㅈ된 거 아님?", "피 관리 무엇 ㅋㅋ", "이 정도면 일부러 죽으려는 듯"],
+  low_hp: ["피 없어요!!", "피 {hp}칸 ㄷㄷㄷ", "도망쳐요 빨리", "먹어 먹어 뭐라도", "이러다 죽어", "아 심장 떨려", "힐 힐 힐", "이건 진짜 위험한데", "아 이거 끝난 듯", "피 관리 무엇 ㅋㅋ", "이 정도면 일부러 죽으려는 듯"],
   hungry: ["배고프다는데요 ㅋㅋ", "밥부터 먹어요", "허기 바 실화냐", "먹으면서 해요"],
   mob: ["{mob}!!", "{mob} 온다", "{mob} 잡아요", "앞에 {mob}", "{mob} ㅋㅋ 덤벼", "{mob} 처리 ㄱ"],
   mobs_many: ["몹 왜 이렇게 많음", "포위당했는데요?", "도망 ㄱㄱ", "이거 죽는 각", "몹 파티 ㅋㅋㅋ", "아 이건 무리", "몹들한테 인기 많네 ㅋㅋ"],
@@ -120,7 +120,7 @@ function tvSituations(player) {
   if (outside) {
     if (t >= 13000 && t < 23000) add("night", 3);
     else if (t >= 23000 || t < 1000) add("dawn", 2);
-    else if (t < 4000) add("morning", 1);
+    else if (t < 4000 && !tvSitSafe(() => level.isRaining(), false)) add("morning", 1);
     let biomeId = tvSitSafe(() => String(player.block.biomeId), "");
     let dry = /desert|badlands|savanna/.test(biomeId);
     let snowy = /snow|frozen|ice|grove|peak/.test(biomeId) || tvSitSafe(() => String(global.getSeasonFromLevel(player.server.overworld())), "") == "winter";
@@ -262,7 +262,7 @@ function tvSituationChat(player, count, spreadSec) {
   let nowMs = tvNow();
   sits.forEach((s) => {
     // 계절·바이옴 얘기는 20분에 한 번만, 나머지는 1분 안에 쓴 상황이면 덜 나오게
-    let slow = /^(spring|summer|autumn|winter|biome_)/.test(s.k);
+    let slow = /^(spring|summer|autumn|winter|biome_|morning|dawn)$|^biome_/.test(s.k);
     if (slow && mem.sitLast[s.k] && nowMs - mem.sitLast[s.k] < 1200000) s.w = 0;
     else if (mem.sitLast[s.k] && nowMs - mem.sitLast[s.k] < 60000) s.w *= 0.25;
   });
@@ -295,23 +295,39 @@ function tvSituationChat(player, count, spreadSec) {
     let viewer = tvPickViewer(player);
     let at = tvNow() + Math.random() * (spreadSec || 4) * 1000;
     mem.queue.push({ at: at, name: viewer.name, color: viewer.color, msg: msg });
-    tvEcho(player, at, viewer.name, 0.2);
+    tvEcho(player, at, viewer.name, 0.2, msg);
   }
   return pushed > 0; // 새로 할 말이 없으면 false → 일반 잡담으로
 }
 
 // 채팅 따라 치기: chance 확률로 다른 시청자 1~2명이 "ㅋㅋㅋ", "ㄹㅇ" 같은 걸 이어서 침
-function tvEcho(player, at, fromName, chance) {
+function tvEcho(player, at, fromName, chance, srcMsg) {
   let t = typeof tvCrowdTier === "function" ? tvCrowdTier(player) : 0;
+  // 화면 반응은 웃기거나 놀란 말에만 따라치기 ("아침 공기 좋아 보임"에 ㅋㅋㅋ 물결은 어색)
+  let laughOnly = false;
+  if (srcMsg != null) {
+    if (/ㅋ|실화|무엇|각$|ㄷㄷ|!!/.test(srcMsg) == false) return;
+    laughOnly = /ㅋ|실화|무엇|각$/.test(srcMsg);
+  }
   if (Math.random() >= Math.min(0.9, chance * (1 + 0.8 * t))) return;
+  let mem0 = tvMem(player);
+  if (srcMsg != null) {
+    // 시청자 말 하나에 큰 물결은 가끔만 (20초에 한 번, 최대 3줄). 큰 물결은 큰 장면용
+    if (tvNow() - (mem0.lastSitEcho || 0) < 20000) return;
+    mem0.lastSitEcho = tvNow();
+  }
   let mem = tvMem(player);
   let n = (Math.random() < 0.3 ? 2 : 1) + Math.floor(Math.random() * (t * 2 + 1)); // 1천 명 이상이면 최대 8줄 물결
+  if (srcMsg != null) n = Math.min(n, 3);
   for (let i = 0; i < n; i++) {
     let v = tvPickViewer(player);
     if (v.name == fromName) continue;
     // 바로 전에 쓴 따라치기 말은 피함
-    let msg = tvRand(t >= 2 && Math.random() < 0.5 ? global.TV_WAVE : global.TV_ECHO);
-    for (let t = 0; t < 4 && (mem.lastEchos || []).indexOf(msg) >= 0; t++) msg = tvRand(global.TV_ECHO);
+    let pool = t >= 2 && Math.random() < 0.5 ? global.TV_WAVE : global.TV_ECHO;
+    if (srcMsg != null) pool = pool.filter((l) => (laughOnly ? /ㅋ|ㅇㅈ|ㄹㅇ/.test(l) : /ㄷ|와/.test(l)));
+    if (!pool.length) pool = laughOnly ? ["ㅋㅋㅋ", "ㄹㅇㅋㅋ"] : ["ㄷㄷ"];
+    let msg = tvRand(pool);
+    for (let t = 0; t < 4 && (mem.lastEchos || []).indexOf(msg) >= 0; t++) msg = tvRand(pool);
     mem.lastEchos = (mem.lastEchos || []).concat([msg]).slice(-4);
     mem.queue.push({ at: at + 700 + Math.random() * 1500 + i * 600, name: v.name, color: v.color, msg: msg });
   }
