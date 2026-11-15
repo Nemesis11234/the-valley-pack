@@ -1012,7 +1012,9 @@ function tvSecond(player) {
       let tier = tvCrowdTier(player);
       let n = 1 + Math.floor(Math.random() * (1.5 + busy * 3 + TV_CROWD.extraLines[tier]));
       tvCrowdTick(player);
-      if (Math.random() < TV_REG.memoryChatChance && tvRegMemoryChat(player)) {
+      if (typeof tvCollabChat == "function" && tvCollabChat(player)) {
+        // 합방 중: 같이 하는 사람과 오늘 기록 비교·놀림 (streamCollab.js)
+      } else if (Math.random() < TV_REG.memoryChatChance && tvRegMemoryChat(player)) {
         // 단골이 예전 장면 얘기
       } else if (Math.random() < TV.situationChatRatio) {
         // 화면 반응. 화면이 계속 같아서 새로 할 말이 없으면 가끔만 일반 잡담 (아니면 잠깐 조용)

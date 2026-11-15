@@ -116,6 +116,8 @@ function tvAiContext(player) {
   if (recent) lines.push(`최근 1분 동안: ${recent}`);
   let reg = tvAiSafe(() => tvRegAiContext(player), "");
   if (reg) lines.push(reg);
+  let co = typeof tvCollabAiContext == "function" ? tvAiSafe(() => tvCollabAiContext(player), "") : "";
+  if (co) lines.push(co);
   return lines.join("\n");
 }
 
