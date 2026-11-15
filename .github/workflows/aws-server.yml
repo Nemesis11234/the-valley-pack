@@ -9,7 +9,6 @@ on:
   # GitHub 예약은 정각·30분에 몰려서 늦거나 빠지는 일이 있어 어중간한 분으로 여러 번.
   # server-control/schedule.json의 enabled가 false면 건너뜀. 끄기는 서버가 스스로 함 (valley_countdown.py)
   schedule:
-    - cron: "30 10 * * *" # 테스트: 오늘 19:30 일본 시간
     - cron: "51 7 * * *"
     - cron: "13 8 * * *"
     - cron: "29 8 * * *"
