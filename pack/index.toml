@@ -25711,7 +25711,7 @@ hash = "774b8694a7988b0315bc29d8378aeb3025b0ba9506a7b50228050c79ec00e6b3"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamCrowd.js"
-hash = "089dda94abd99a68eecfb801196709c4e5160bba16938385aa07945559fcb107"
+hash = "e0ea7e30697595fd3778691ef265787408b9a95d83e8d6d936454c8aca9807b4"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/streamFeeHook.js"
