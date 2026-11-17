@@ -59,11 +59,14 @@ function tvAiContext(player) {
   let level = player.level;
   let dim = String(level.dimension);
   let y = Math.floor(player.y);
-  let biome = tvAiSafe(() => String(player.block.biomeId).replace("minecraft:", ""), "?");
+  let biomeId = tvAiSafe(() => String(player.block.biomeId), "?");
+  let biome = biomeId.replace("minecraft:", "");
+  // 한국어 이름으로 (없으면 안 넘김: "pine barrens" 같은 영어가 채팅에 나오지 않게)
+  let biomeKo = tvAiSafe(() => tvKo("biome." + biomeId.replace(":", ".")), null);
   let sky = tvAiSafe(() => !!player.block.canSeeSky, true);
   let place = dim == "society:skull_cavern" ? "해골 광산 안" : !sky ? (y < 50 ? "지하 동굴" : "실내/지붕 아래") : "바깥";
   // 평원·숲처럼 흔한 바이옴은 안 넘김 (AI가 "평원이네" 같은 중계를 하지 않게)
-  let biomeText = /plains|forest|river|taiga|meadow|beach/.test(biome) && !/cherry|flower/.test(biome) ? "" : `, 바이옴 ${biome}`;
+  let biomeText = (/plains|forest|river|taiga|meadow|beach/.test(biome) && !/cherry|flower/.test(biome)) || !biomeKo ? "" : `, 바이옴 ${biomeKo}`;
   // 높이 숫자는 넘기지 않고 특별할 때만 말로 (AI가 "Y=93" 같은 말을 하지 않게)
   let height = y < 0 ? ", 아주 깊은 지하" : y > 150 ? ", 아주 높은 곳" : "";
   lines.push(`장소: ${dim.replace("minecraft:", "")}${biomeText}${height}, ${place}`);
@@ -84,7 +87,12 @@ function tvAiContext(player) {
     let v = tvG(player, "vehicle", "getVehicle");
     return v ? tvEntityName(v) : "";
   }, "");
-  lines.push(`상태: 체력 ${hp}/${maxHp}, 배고픔 ${food}/20, 손에 든 것: ${held}${vehicle ? ", 타고 있는 것: " + vehicle : ""}${player.isCrouching() ? ", 웅크림" : ""}`);
+  // 숫자는 안 넘김 ("배고픔 14인데" 같은 숫자 중계·과한 걱정 방지). 정말 낮을 때만 말로
+  let st = [];
+  if (hp <= maxHp * 0.3) st.push("체력 아주 낮음");
+  else if (hp <= maxHp * 0.5) st.push("체력 절반 이하");
+  if (food <= 6) st.push("배고픔 심함(곧 체력 깎임)");
+  lines.push(`상태: ${st.length ? st.join(", ") : "괜찮음"}${held == "빈손" || held == "?" ? "" : ", 손에 든 것: " + held}${vehicle ? ", 타고 있는 것: " + vehicle : ""}${player.isCrouching() ? ", 웅크림" : ""}`);
 
   let near = tvAiSafe(() => {
     let counts = {};
@@ -112,8 +120,16 @@ function tvAiContext(player) {
   if (near.list.length) lines.push(`화면에 보이는 것: ${near.list.join(", ")}`);
   if (near.players.length) lines.push(`화면에 보이는 다른 플레이어: ${near.players.join(", ")}`);
 
-  let recent = tvRecentSummary(player);
-  if (recent) lines.push(`최근 1분 동안: ${recent}`);
+  // 개수는 안 넘김 (AI가 "돌 5개 캔 것도" 같은 개수 중계를 하지 않게)
+  let recent = tvAiSafe(() => {
+    let acts = tvMem(player).recentActs || {};
+    tvRecentPrune(acts, tvNow());
+    return Object.keys(acts)
+      .slice(0, 6)
+      .map((k) => (acts[k].n >= 5 ? `${k}(여러 번)` : k))
+      .join(", ");
+  }, "");
+  if (recent) lines.push(`최근 1분 동안 한 일: ${recent}`);
   let reg = tvAiSafe(() => tvRegAiContext(player), "");
   if (reg) lines.push(reg);
   let co = typeof tvCollabAiContext == "function" ? tvAiSafe(() => tvCollabAiContext(player), "") : "";
@@ -139,7 +155,8 @@ global.tvAiRequest = (player, kind, text, extra, callback) => {
   if (!special) mem.aiLastAt = now;
   TV_AI_STATE.seq++;
   if (callback) TV_AI_STATE.callbacks[TV_AI_STATE.seq] = callback;
-  let recent = mem.chat.slice(-8).map((l) => `${l.name}: ${l.msg}`);
+  // 최근 채팅을 넉넉히 넘겨서 이미 나온 화제를 반복하지 않게 (8줄일 땐 "밥 안 먹음?"이 계속 나왔음)
+  let recent = mem.chat.slice(-20).map((l) => `${l.name}: ${l.msg}`);
   TV_AI_STATE.outbox.push({
     seq: TV_AI_STATE.seq,
     at: now,
