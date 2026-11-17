@@ -87,7 +87,12 @@ function tvAiContext(player) {
     let v = tvG(player, "vehicle", "getVehicle");
     return v ? tvEntityName(v) : "";
   }, "");
-  lines.push(`상태: 체력 ${hp}/${maxHp}, 배고픔 ${food}/20${held == "빈손" || held == "?" ? "" : ", 손에 든 것: " + held}${vehicle ? ", 타고 있는 것: " + vehicle : ""}${player.isCrouching() ? ", 웅크림" : ""}`);
+  // 숫자는 안 넘김 ("배고픔 14인데" 같은 숫자 중계·과한 걱정 방지). 정말 낮을 때만 말로
+  let st = [];
+  if (hp <= maxHp * 0.3) st.push("체력 아주 낮음");
+  else if (hp <= maxHp * 0.5) st.push("체력 절반 이하");
+  if (food <= 6) st.push("배고픔 심함(곧 체력 깎임)");
+  lines.push(`상태: ${st.length ? st.join(", ") : "괜찮음"}${held == "빈손" || held == "?" ? "" : ", 손에 든 것: " + held}${vehicle ? ", 타고 있는 것: " + vehicle : ""}${player.isCrouching() ? ", 웅크림" : ""}`);
 
   let near = tvAiSafe(() => {
     let counts = {};
@@ -150,7 +155,8 @@ global.tvAiRequest = (player, kind, text, extra, callback) => {
   if (!special) mem.aiLastAt = now;
   TV_AI_STATE.seq++;
   if (callback) TV_AI_STATE.callbacks[TV_AI_STATE.seq] = callback;
-  let recent = mem.chat.slice(-8).map((l) => `${l.name}: ${l.msg}`);
+  // 최근 채팅을 넉넉히 넘겨서 이미 나온 화제를 반복하지 않게 (8줄일 땐 "밥 안 먹음?"이 계속 나왔음)
+  let recent = mem.chat.slice(-20).map((l) => `${l.name}: ${l.msg}`);
   TV_AI_STATE.outbox.push({
     seq: TV_AI_STATE.seq,
     at: now,

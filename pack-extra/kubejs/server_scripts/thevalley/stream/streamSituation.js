@@ -242,7 +242,8 @@ function tvSituations(player) {
 
   // 가만히 있음 (1분 이상, 잠수 전)
   let idle = tvSitSafe(() => tvAfkSec(player), 0);
-  if (idle > 60 && sum.fish == 0 && !(held && /fishing_rod/.test(held.id))) add("still", 3);
+  // 멍때리기 반응은 가만히 있기 시작하고 잠깐만 (3분 내내 "렉 걸림?" 반복 방지, 2026-11-17 실제 방송)
+  if (idle > 60 && idle < 100 && sum.fish == 0 && !(held && /fishing_rod/.test(held.id))) add("still", 3);
 
   return out;
 }
