@@ -118,8 +118,13 @@ function tvSituations(player) {
   // 시간·날씨
   let t = tvSitSafe(() => Number(player.server.overworld().getDayTime()) % 24000, 6000);
   if (outside) {
-    if (t >= 13000 && t < 23000) add("night", 3);
-    else if (t >= 23000 || t < 1000) add("dawn", 2);
+    let smem = tvMem(player);
+    if (t >= 13000 && t < 23000) {
+      add("night", 3);
+      smem.nightSeenAt = tvNow();
+    }
+    // "밤샘 성공"은 실제로 밤을 보낸 뒤에만 (접속하자마자 아침이면 안 함)
+    else if ((t >= 23000 || t < 1000) && smem.nightSeenAt && tvNow() - smem.nightSeenAt < 900000) add("dawn", 2);
     else if (t < 4000 && !tvSitSafe(() => level.isRaining(), false)) add("morning", 1);
     let biomeId = tvSitSafe(() => String(player.block.biomeId), "");
     let dry = /desert|badlands|savanna/.test(biomeId);
