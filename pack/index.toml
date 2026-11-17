@@ -291,7 +291,7 @@ hash = "8bf5950da5681b2ec910b0d425507011b57f84e5f8c1a31e79e38da362d457b7"
 
 [[files]]
 file = "config/chunky/config.json"
-hash = "ad1b78ddb1d209a2edcac7177b9a17e7c2af78bccb28920acbc6bb16b1872b56"
+hash = "45eba04252347d97e9649b9a71a17a7427ba74c04dec249645c072859063aef9"
 
 [[files]]
 file = "config/citadel-common.toml"
@@ -25698,6 +25698,10 @@ file = "kubejs/server_scripts/thevalley/pauseWhenEmpty.js"
 hash = "ce756bcd339389cc58a49fed302602430fb84a3fac6954e45295b47bf1b351c4"
 
 [[files]]
+file = "kubejs/server_scripts/thevalley/pregen.js"
+hash = "f18489e367f7d3d571c95bb59a6aa99bc06bb7572187ce114f7f37d50a2f496d"
+
+[[files]]
 file = "kubejs/server_scripts/thevalley/stream/stream.js"
 hash = "e1e29c87cf56da81733c626a0f779e82f19d364f8082dae3ad0d1635034dc53c"
 
@@ -26816,6 +26820,11 @@ metafile = true
 [[files]]
 file = "mods/entity-texture-features-fabric.pw.toml"
 hash = "48d621f055c242082a47a9df3770b38000889b9e2b0e0d14c014ad1ae35968c4"
+metafile = true
+
+[[files]]
+file = "mods/entityculling.pw.toml"
+hash = "f27d83c5464f9c55bc281b1b3a9aba3e4dca0cdf928ea801839c52cb8ed61245"
 metafile = true
 
 [[files]]
