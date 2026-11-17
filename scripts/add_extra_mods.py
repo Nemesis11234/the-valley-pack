@@ -32,12 +32,16 @@ def main():
             continue
         q = urllib.parse.urlencode({"loaders": '["forge"]', "game_versions": '["1.20.1"]'})
         versions = api(f"project/{pid}/version?{q}")
-        match = [v for v in versions if v["version_number"] == m["version"]]
+        # "latest"면 Forge 1.20.1용 최신 정식(release) 버전 (한 번 추가되면 pack/mods에 고정됨)
+        if m["version"] == "latest":
+            match = [v for v in versions if v.get("version_type") == "release"] or versions
+        else:
+            match = [v for v in versions if v["version_number"] == m["version"]]
         if not match:
             print(f"  ! {m['slug']}: 버전 {m['version']}을 못 찾음. 있는 버전: {[v['version_number'] for v in versions[:5]]}")
             sys.exit(1)
         vid = match[0]["id"]
-        print(f"  + {m['slug']} {m['version']} ({vid})")
+        print(f"  + {m['slug']} {match[0]['version_number']} ({vid})")
         subprocess.run(["packwiz", "-y", "modrinth", "add", "--project-id", pid, "--version-id", vid], cwd=pack, check=True)
 
 

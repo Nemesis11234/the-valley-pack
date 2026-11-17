@@ -36,6 +36,12 @@
       "find": "  {\n    \"mob\": \"balloonbox:balloonbox\",\n    \"mincount\": {\n      \"amount\": 1,\n      \"perplayer\": false,\n      \"mob\": \"balloonbox:balloonbox\"\n    },\n    \"result\": \"deny\"\n  },\n",
       "with": "",
       "why": "위와 같은 이유로 없는 몹(balloonbox) 규칙 제거"
+    },
+    {
+      "file": "config/chunky/config.json",
+      "find": "\"continueOnRestart\": false",
+      "with": "\"continueOnRestart\": true",
+      "why": "새 월드 지형 미리 만들기가 서버 재시작 때 끊기지 않게 (pregen.js, 2026-11-17)"
     }
   ]
 }

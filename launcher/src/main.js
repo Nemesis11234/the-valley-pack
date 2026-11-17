@@ -340,10 +340,20 @@ async function configurePrism(java) {
     UserAskedAboutAutomaticJavaDownload: 'true',
     CloseAfterLaunch: 'true',
     QuitAfterGameStop: 'true',
-    MaxMemAlloc: config.memoryMB || 8192,
-    MinMemAlloc: 2048,
+    MaxMemAlloc: pickMemoryMB(),
+    MinMemAlloc: 4096,
   });
 }
+
+// 게임 메모리: memoryAuto면 PC 램에 맞춰 (32GB 같은 넉넉한 PC 10GB, 16GB PC 8GB, 그 아래 6GB)
+function pickMemoryMB() {
+  if (!config.memoryAuto && config.memoryMB) return config.memoryMB;
+  const gb = require('os').totalmem() / 1073741824;
+  return gb >= 24 ? 10240 : gb >= 14 ? 8192 : 6144;
+}
+
+// 끊김 줄이는 Java 설정 (큰 모드팩용 G1 가비지 컬렉터 조정)
+const JVM_ARGS = '-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=50 -XX:+UnlockExperimentalVMOptions -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:G1HeapRegionSize=32M';
 
 async function ensureInstance(java, packInfo, target) {
   await fsp.mkdir(GAME_DIR, { recursive: true });
@@ -367,8 +377,10 @@ async function ensureInstance(java, packInfo, target) {
     JavaPath: toSlash(java),
     AutomaticJava: 'false',
     OverrideMemory: 'true',
-    MaxMemAlloc: config.memoryMB || 8192,
-    MinMemAlloc: 2048,
+    MaxMemAlloc: pickMemoryMB(),
+    MinMemAlloc: 4096,
+    OverrideJavaArgs: 'true',
+    JvmArgs: JVM_ARGS,
     JoinServerOnLaunch: 'true',
     JoinServerOnLaunchAddress: `${host}:${port}`,
   });

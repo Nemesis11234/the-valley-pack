@@ -10,6 +10,11 @@
       "slug": "korean-chat-patch",
       "version": "mc1.20.1-1.9.0-forge",
       "why": "채팅창에서 한/영 전환 없이 한글 입력 (클라이언트 전용, 2026-11-14 결정)"
+    },
+    {
+      "slug": "entityculling",
+      "version": "latest",
+      "why": "안 보이는 몹·동물·상자는 그리지 않아 FPS 향상 (클라이언트 전용, 2026-11-17 결정)"
     }
   ]
 }

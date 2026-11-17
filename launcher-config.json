@@ -7,6 +7,7 @@
   "packUrl": "https://raw.githubusercontent.com/Nemesis11234/the-valley-pack/main/pack/pack.toml",
   "manualModsUrl": "https://raw.githubusercontent.com/Nemesis11234/the-valley-pack/main/pack/manual-mods.json",
   "memoryMB": 8192,
+  "memoryAuto": true,
   "closeOnLaunch": true,
   "notices": [
     {
