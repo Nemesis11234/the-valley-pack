@@ -87,7 +87,7 @@ function tvAiContext(player) {
     let v = tvG(player, "vehicle", "getVehicle");
     return v ? tvEntityName(v) : "";
   }, "");
-  lines.push(`상태: 체력 ${hp}/${maxHp}, 배고픔 ${food}/20, 손에 든 것: ${held}${vehicle ? ", 타고 있는 것: " + vehicle : ""}${player.isCrouching() ? ", 웅크림" : ""}`);
+  lines.push(`상태: 체력 ${hp}/${maxHp}, 배고픔 ${food}/20${held == "빈손" || held == "?" ? "" : ", 손에 든 것: " + held}${vehicle ? ", 타고 있는 것: " + vehicle : ""}${player.isCrouching() ? ", 웅크림" : ""}`);
 
   let near = tvAiSafe(() => {
     let counts = {};
