@@ -25699,7 +25699,7 @@ hash = "ce756bcd339389cc58a49fed302602430fb84a3fac6954e45295b47bf1b351c4"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/pregen.js"
-hash = "f18489e367f7d3d571c95bb59a6aa99bc06bb7572187ce114f7f37d50a2f496d"
+hash = "dcec617b361d5b1c92d5a8a36ecc0e20ce65d199ec58221a171be2bb253128b9"
 
 [[files]]
 file = "kubejs/server_scripts/thevalley/stream/stream.js"

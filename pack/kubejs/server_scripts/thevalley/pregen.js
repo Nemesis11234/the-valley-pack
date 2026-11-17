@@ -15,15 +15,18 @@ ServerEvents.loaded((e) => {
   let server = e.server;
   let pd = server.persistentData;
   if (pd.getLong("tvPregenAt") > 0) return;
-  let spawn = server.overworld().getSharedSpawnPos();
-  let x = spawn.x, z = spawn.z;
-  server.runCommandSilent("chunky world minecraft:overworld");
-  server.runCommandSilent(`chunky center ${x} ${z}`);
-  server.runCommandSilent(`chunky radius ${TV_PREGEN.radius}`);
-  server.runCommandSilent("chunky start");
-  pd.putLong("tvPregenAt", Date.now());
-  tvPregenPaused = false;
-  console.info(`[pregen] 새 월드: 스폰(${x}, ${z}) 주변 반경 ${TV_PREGEN.radius} 지형 미리 만들기 시작`);
+  // 서버가 막 켜졌을 땐 Chunky가 아직 준비 전이라 명령이 무시됨 → 10초 뒤에 시작 (2026-11-17 확인)
+  server.scheduleInTicks(200, () => {
+    let spawn = server.overworld().getSharedSpawnPos();
+    let x = spawn.x, z = spawn.z;
+    server.runCommandSilent("chunky world minecraft:overworld");
+    server.runCommandSilent(`chunky center ${x} ${z}`);
+    server.runCommandSilent(`chunky radius ${TV_PREGEN.radius}`);
+    server.runCommandSilent("chunky start");
+    pd.putLong("tvPregenAt", Date.now());
+    tvPregenPaused = false;
+    console.info(`[pregen] 새 월드: 스폰(${x}, ${z}) 주변 반경 ${TV_PREGEN.radius} 지형 미리 만들기 시작`);
+  });
 });
 
 ServerEvents.tick((e) => {
