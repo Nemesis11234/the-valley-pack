@@ -102,7 +102,7 @@ function tvAiContext(player) {
       let name = tvEntityName(e);
       // 적·NPC·동물을 구분해서 넘김 (노움=주민처럼 친근한 NPC를 적으로 착각하지 않게)
       let tkey = String(e.type);
-      let kind = e.isMonster() ? "적" : /villager|wandering_trader|npc|golem|mannequin/.test(tkey) ? "친근한 NPC" : "동물";
+      let kind = e.isMonster() ? "적" : /villager|wandering_trader|npc|golem|mannequin/.test(tkey) ? "마을 주민" : "동물";
       let key = `${kind}: ${name}`;
       counts[key] = (counts[key] || 0) + 1;
     });
