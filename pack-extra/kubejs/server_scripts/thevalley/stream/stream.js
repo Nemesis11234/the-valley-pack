@@ -442,7 +442,7 @@ function tvEvent(player, hype, subs, reason, category, vars) {
   tvChange(player, hype, subs, reason);
   if (Math.abs(hype) >= 15) tvMem(player).bigEventAt = tvNow(); // 큰 장면 직후엔 딴소리(평화롭다 등) 안 함
   // 큰 장면은 AI가 이어서 반응 (템플릿은 1줄만 먼저)
-  let aiUsed = Math.abs(hype) >= 15 && global.tvAiRequest && global.tvAiRequest(player, "event", reason);
+  let aiUsed = Math.abs(hype) >= TV.aiEventMinHype && global.tvAiRequest && global.tvAiRequest(player, "event", reason);
   if (category) tvViewerChat(player, category, vars || {}, aiUsed ? 1 : null, hype >= 50 ? 10 : 6);
   if (hype >= TV.eventDonationMinHype && Math.random() < Math.min(TV.eventDonationMaxChance, hype / 200)) {
     player.server.scheduleInTicks(40 + Math.floor(Math.random() * 120), () => {
@@ -1005,7 +1005,7 @@ function tvSecond(player) {
     mem.lastIdleChat = now;
     mem.idleGap = (TV.idleChatMaxSec - (TV.idleChatMaxSec - TV.idleChatMinSec) * busy) * 1000 * (0.6 + Math.random() * 0.8);
     let aiIdleGap = (TV.aiIdleMaxSec - (TV.aiIdleMaxSec - TV.aiIdleMinSec) * busy) * 1000;
-    if (now - (mem.aiIdleAt || 0) > aiIdleGap && global.tvAiRequest && global.tvAiRequest(player, "idle", "특별한 일 없이 플레이 중")) {
+    if (TV.aiIdle && now - (mem.aiIdleAt || 0) > aiIdleGap && global.tvAiRequest && global.tvAiRequest(player, "idle", "특별한 일 없이 플레이 중")) {
       mem.aiIdleAt = now;
     } else {
       // 90%는 화면 상황 반응, 10%만 일반 잡담
