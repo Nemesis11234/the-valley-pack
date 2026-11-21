@@ -84,6 +84,15 @@ jobs:
                   --metrics UnblendedCost --group-by Type=DIMENSION,Key=RECORD_TYPE \
                   --query 'ResultsByTime[0].Groups[].[Keys[0],Metrics.UnblendedCost.Amount]' --output text || echo "권한 없음"
               done
+              echo "== 이번 달 항목별 (크레딧 빼기 전)"
+              aws ce get-cost-and-usage --region us-east-1 --time-period Start=$S,End=$E --granularity MONTHLY \
+                --metrics UnblendedCost UsageQuantity --filter '{"Dimensions":{"Key":"RECORD_TYPE","Values":["Usage"]}}' \
+                --group-by Type=DIMENSION,Key=USAGE_TYPE \
+                --query 'ResultsByTime[0].Groups[?to_number(Metrics.UnblendedCost.Amount)>`0.01`].[Keys[0],Metrics.UnblendedCost.Amount,Metrics.UsageQuantity.Amount]' --output text || true
+              echo "== 날짜별"
+              aws ce get-cost-and-usage --region us-east-1 --time-period Start=$S,End=$E --granularity DAILY \
+                --metrics UnblendedCost --filter '{"Dimensions":{"Key":"RECORD_TYPE","Values":["Usage"]}}' \
+                --query 'ResultsByTime[].[TimePeriod.Start,Total.UnblendedCost.Amount]' --output text || true
               echo "== 남은 크레딧 (프리 티어 플랜)"
               aws freetier get-account-plan-state --region us-east-1 --output json || echo "권한 없음"
               echo "RESULT: 요금 조회 끝"
