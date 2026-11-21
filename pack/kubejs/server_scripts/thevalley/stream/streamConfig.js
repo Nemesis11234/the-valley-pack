@@ -99,6 +99,9 @@ global.TV_CONFIG = {
   situationChatRatio: 0.9,
   chatLog: true, // 방송 채팅을 서버 로그에 남김 ([TVCHAT])
   // AI 잡담 간격(초)
+  // AI는 꼭 필요할 때만 (2026-11-21, 6명 기준 비용 줄이기): 평소 잡담은 템플릿, AI는 스트리머 채팅·큰 장면·큰 후원만
+  aiIdle: false, // true면 조용할 때도 AI 잡담 (시간당 비용 크게 늘어남)
+  aiEventMinHype: 25, // 이 이상 큰 장면만 AI (사망·보스·트로피 등)
   aiIdleMaxSec: 40,
   aiIdleMinSec: 15,
 
