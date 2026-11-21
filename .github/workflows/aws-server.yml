@@ -14,7 +14,7 @@ on:
         description: 할 일
         required: true
         type: choice
-        options: [status, start, stop, reboot, logs, shell, set-ai-key]
+        options: [status, start, stop, reboot, logs, shell, set-ai-key, cost]
         default: status
       cmd:
         description: shell일 때 서버에서 실행할 명령
@@ -75,6 +75,17 @@ jobs:
             if [ "$(state)" = "running" ] && mc_up; then echo "RESULT: 이미 켜져 있음"; exit 0; fi
           fi
           case "$ACTION" in
+            cost)
+              # 이번 달·지난달 요금과 크레딧 사용액 (Cost Explorer, 버지니아 리전 API). 남은 크레딧 잔액은 콘솔에서만 보임
+              S=$(date -u +%Y-%m-01); E=$(date -u -d tomorrow +%Y-%m-%d); P=$(date -u -d "$S -1 month" +%Y-%m-01)
+              for R in "$P $S" "$S $E"; do set -- $R
+                echo "== 기간 $1 ~ $2"
+                aws ce get-cost-and-usage --region us-east-1 --time-period Start=$1,End=$2 --granularity MONTHLY \
+                  --metrics UnblendedCost --group-by Type=DIMENSION,Key=RECORD_TYPE \
+                  --query 'ResultsByTime[0].Groups[].[Keys[0],Metrics.UnblendedCost.Amount]' --output text || echo "권한 없음"
+              done
+              echo "RESULT: 요금 조회 끝"
+              ;;
             start)
               aws ec2 start-instances --instance-ids "$INSTANCE_ID" >/dev/null
               aws ec2 wait instance-running --instance-ids "$INSTANCE_ID"
